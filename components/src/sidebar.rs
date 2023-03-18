@@ -41,7 +41,7 @@ impl Sidebar {
             .width(Length::Fill),
             icon(Icon::ChevronExpand).size(16).style(color!(0xA7A9AD))
         ]
-        .padding([20, 0])
+        .padding([0, 0, 20, 0])
         .align_items(Alignment::Center)
         .width(Length::Fill);
 
@@ -51,7 +51,7 @@ impl Sidebar {
             .style(theme::Container::Custom(Box::new(SidebarStyle)))
             .width(240.0)
             .height(Length::Fill)
-            .padding(10)
+            .padding([20, 12])
             .into()
     }
 }
