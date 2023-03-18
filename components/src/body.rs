@@ -12,9 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use desktop::app::App;
-use iced::{Sandbox, Settings};
+use iced::widget::{Container, Scrollable, Text};
+use iced::Element;
 
-pub fn main() -> iced::Result {
-    App::run(Settings::default())
+#[derive(Debug, Default)]
+pub struct Body {}
+
+pub enum Message {}
+
+impl Body {
+    pub fn new() -> Self {
+        Self {}
+    }
+
+    pub fn view(&self) -> Element<Message> {
+        let content = Text::new("Body");
+        Container::new(Scrollable::new(content)).into()
+    }
 }

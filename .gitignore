@@ -14,3 +14,5 @@ Cargo.lock
 
 # Used for environment variables
 .env
+
+.DS_Store

@@ -12,9 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use desktop::app::App;
-use iced::{Sandbox, Settings};
-
-pub fn main() -> iced::Result {
-    App::run(Settings::default())
-}
+pub mod app;
