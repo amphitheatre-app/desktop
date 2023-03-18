@@ -14,8 +14,9 @@
 
 use components::body::Body;
 use components::sidebar::Sidebar;
-use iced::widget::{Row, Rule};
-use iced::{Element, Length, Sandbox};
+use iced::theme::Palette;
+use iced::widget::{rule, Row, Rule};
+use iced::{color, Element, Length, Sandbox, Theme};
 
 #[derive(Debug, Clone, Copy)]
 pub enum Message {
@@ -51,8 +52,36 @@ impl Sandbox for App {
             .width(Length::Fill)
             .height(Length::Fill)
             .push(self.sidebar.view().map(|_| Message::SidebarMessage))
-            .push(Rule::vertical(1))
+            .push(Rule::vertical(1).style(MyRule))
             .push(self.body.view().map(|_| Message::BodyMessage))
             .into()
+    }
+
+    fn theme(&self) -> Theme {
+        Theme::custom(Palette {
+            background: color!(0x292C33),
+            ..Theme::Dark.palette()
+        })
+    }
+}
+
+pub struct MyRule;
+
+impl rule::StyleSheet for MyRule {
+    type Style = Theme;
+
+    fn appearance(&self, _style: &Self::Style) -> rule::Appearance {
+        rule::Appearance {
+            color: color!(0x474B56),
+            width: 1,
+            radius: 0.0,
+            fill_mode: rule::FillMode::Full,
+        }
+    }
+}
+
+impl Into<iced::theme::Rule> for MyRule {
+    fn into(self) -> iced::theme::Rule {
+        iced::theme::Rule::Custom(Box::new(MyRule))
     }
 }
