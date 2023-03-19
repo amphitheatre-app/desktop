@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use iced::widget::{column, container, row, rule, scrollable, text, Container, Rule, Scrollable, Text};
+use iced::widget::{
+    column, container, row, rule, scrollable, text, Button, Container, Rule, Scrollable, Text, TextInput,
+};
 use iced::{color, theme, Alignment, Element, Length, Theme};
 use icon::{icon, Icon};
 const CONTEXT_NAME: &str = "Amphitheatre Local";
@@ -21,7 +23,10 @@ const DISCONNECTED: &str = "Disconnected. Retrying...";
 #[derive(Debug, Default)]
 pub struct Sidebar {}
 
-pub enum Message {}
+#[derive(Clone)]
+pub enum Message {
+    TextInputChanged(String),
+}
 
 impl Sidebar {
     pub fn new() -> Self {
@@ -41,7 +46,7 @@ impl Sidebar {
             .width(Length::Fill),
             icon(Icon::ChevronExpand).size(16).style(color!(0xA7A9AD))
         ]
-        .padding([0, 0, 20, 0])
+        .padding([0, 0, 16, 0])
         .align_items(Alignment::Center)
         .width(Length::Fill);
 
@@ -97,7 +102,18 @@ impl Sidebar {
             ),
         ];
 
-        let content = column![context, Scrollable::new(playbooks).style(ScrollableStyle)];
+        let omnibox = row![
+            TextInput::new("Search", "", Message::TextInputChanged),
+            Button::new(icon(Icon::Plus))
+        ]
+        .padding([0, 0, 16, 0]);
+
+        let content = column![
+            context,
+            omnibox,
+            Scrollable::new(playbooks).style(ScrollableStyle)
+        ];
+
         Container::new(content)
             .style(theme::Container::Custom(Box::new(SidebarStyle)))
             .width(240.0)
