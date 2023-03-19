@@ -17,6 +17,7 @@ pub fn icon<'a>(icon: Icon) -> Text<'a> {
     Text::new(icon_to_char(icon).to_string())
         .font(ICONS)
         .width(20)
+        .height(20)
         .vertical_alignment(Vertical::Center)
         .horizontal_alignment(Horizontal::Center)
         .size(20)

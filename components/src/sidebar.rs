@@ -13,9 +13,10 @@
 // limitations under the License.
 
 use iced::widget::{
-    column, container, row, rule, scrollable, text, Button, Container, Rule, Scrollable, Text, TextInput,
+    button, column, container, row, rule, scrollable, text, text_input, Button, Container, Rule, Scrollable,
+    TextInput,
 };
-use iced::{color, theme, Alignment, Element, Length, Theme};
+use iced::{color, Alignment, Color, Element, Length, Theme};
 use icon::{icon, Icon};
 const CONTEXT_NAME: &str = "Amphitheatre Local";
 const DISCONNECTED: &str = "Disconnected. Retrying...";
@@ -35,20 +36,24 @@ impl Sidebar {
 
     pub fn view(&self) -> Element<Message> {
         // Context selector
-        let context = row![
-            column![
-                text(CONTEXT_NAME),
-                row![
-                    icon(Icon::Dot).style(color!(0xDF5658)).width(10),
-                    Text::new(DISCONNECTED).size(14).style(color!(0xA7A9AD))
+        let context = Container::new(
+            row![
+                column![
+                    text(CONTEXT_NAME),
+                    row![
+                        text("•").size(14).style(color!(0xDF5658)),
+                        text(DISCONNECTED).size(14).style(color!(0xA7A9AD))
+                    ]
+                    .align_items(Alignment::Center)
                 ]
+                .width(Length::Fill),
+                icon(Icon::ChevronExpand).size(14).style(color!(0xA7A9AD))
             ]
+            .align_items(Alignment::Center)
             .width(Length::Fill),
-            icon(Icon::ChevronExpand).size(16).style(color!(0xA7A9AD))
-        ]
-        .padding([0, 0, 16, 0])
-        .align_items(Alignment::Center)
-        .width(Length::Fill);
+        )
+        .style(ContextStyle)
+        .padding(16);
 
         // Playbook
         let playbooks = column![
@@ -103,22 +108,21 @@ impl Sidebar {
         ];
 
         let omnibox = row![
-            TextInput::new("Search", "", Message::TextInputChanged),
-            Button::new(icon(Icon::Plus))
+            TextInput::new("Search", "", Message::TextInputChanged).style(TextInputStyle),
+            Button::new(icon(Icon::Plus)).style(ButtonStyle.into())
         ]
-        .padding([0, 0, 16, 0]);
+        .padding([0, 0, 16, 0])
+        .spacing(4);
 
         let content = column![
             context,
-            omnibox,
-            Scrollable::new(playbooks).style(ScrollableStyle)
+            column![omnibox, Scrollable::new(playbooks).style(ScrollableStyle)].padding(16)
         ];
 
         Container::new(content)
-            .style(theme::Container::Custom(Box::new(SidebarStyle)))
+            .style(SidebarStyle)
             .width(240.0)
             .height(Length::Fill)
-            .padding([20, 12])
             .into()
     }
 }
@@ -151,6 +155,12 @@ impl container::StyleSheet for SidebarStyle {
             background: color!(0x30343D).into(),
             ..Default::default()
         }
+    }
+}
+
+impl Into<iced::theme::Container> for SidebarStyle {
+    fn into(self) -> iced::theme::Container {
+        iced::theme::Container::Custom(Box::new(SidebarStyle))
     }
 }
 
@@ -214,5 +224,100 @@ impl rule::StyleSheet for RuleStyle {
 impl Into<iced::theme::Rule> for RuleStyle {
     fn into(self) -> iced::theme::Rule {
         iced::theme::Rule::Custom(Box::new(RuleStyle))
+    }
+}
+
+struct ContextStyle;
+
+impl container::StyleSheet for ContextStyle {
+    type Style = Theme;
+
+    fn appearance(&self, _style: &Self::Style) -> container::Appearance {
+        container::Appearance {
+            background: color!(0x393D48).into(),
+            ..Default::default()
+        }
+    }
+}
+
+impl Into<iced::theme::Container> for ContextStyle {
+    fn into(self) -> iced::theme::Container {
+        iced::theme::Container::Custom(Box::new(ContextStyle))
+    }
+}
+
+struct TextInputStyle;
+
+impl text_input::StyleSheet for TextInputStyle {
+    type Style = Theme;
+
+    fn active(&self, _style: &Self::Style) -> text_input::Appearance {
+        text_input::Appearance {
+            background: color!(0x292C33).into(),
+            border_radius: 6.0,
+            border_width: 1.0,
+            border_color: color!(0x474B56),
+        }
+    }
+
+    fn focused(&self, _style: &Self::Style) -> text_input::Appearance {
+        text_input::Appearance {
+            background: color!(0x292C33).into(),
+            border_radius: 6.0,
+            border_width: 1.0,
+            border_color: color!(0x474B56),
+        }
+    }
+
+    fn placeholder_color(&self, _style: &Self::Style) -> iced::Color {
+        color!(0x474B56)
+    }
+
+    fn value_color(&self, _style: &Self::Style) -> iced::Color {
+        color!(0x474B56)
+    }
+
+    fn selection_color(&self, _style: &Self::Style) -> iced::Color {
+        color!(0x474B56)
+    }
+}
+
+impl Into<iced::theme::TextInput> for TextInputStyle {
+    fn into(self) -> iced::theme::TextInput {
+        iced::theme::TextInput::Custom(Box::new(TextInputStyle))
+    }
+}
+
+struct ButtonStyle;
+
+impl button::StyleSheet for ButtonStyle {
+    type Style = Theme;
+
+    fn active(&self, _style: &Self::Style) -> button::Appearance {
+        button::Appearance {
+            background: Some(Color::TRANSPARENT.into()),
+            border_radius: 6.0,
+            border_width: 1.0,
+            border_color: color!(0x474B56),
+            text_color: color!(0xffffff),
+            ..Default::default()
+        }
+    }
+
+    fn hovered(&self, _style: &Self::Style) -> button::Appearance {
+        button::Appearance {
+            background: Some(color!(0x474B56).into()),
+            border_radius: 6.0,
+            border_width: 1.0,
+            border_color: color!(0x474B56),
+            text_color: color!(0xffffff),
+            ..Default::default()
+        }
+    }
+}
+
+impl Into<iced::theme::Button> for ButtonStyle {
+    fn into(self) -> iced::theme::Button {
+        iced::theme::Button::Custom(Box::new(ButtonStyle))
     }
 }
