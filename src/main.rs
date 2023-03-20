@@ -18,8 +18,8 @@ use iced::{window, Sandbox, Settings};
 pub fn main() -> iced::Result {
     App::run(Settings {
         window: window::Settings {
-            size: (960, 720),
-            min_size: Some((960, 720)),
+            size: (1028, 640),
+            min_size: Some((1028, 640)),
             ..window::Settings::default()
         },
         ..Settings::default()
