@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use iced::theme::Palette;
-use iced::{color, Element, Length, Sandbox, Theme};
+use iced::{color, executor, Application, Command, Element, Length, Theme};
 use iced_aw::{split, Split};
 
 use crate::body::{self, Body};
@@ -32,27 +32,33 @@ pub struct App {
     divider_position: Option<u16>,
 }
 
-impl Sandbox for App {
+impl Application for App {
+    type Executor = executor::Default;
     type Message = Message;
+    type Theme = Theme;
+    type Flags = ();
 
-    fn new() -> Self {
-        Self {
+    fn new(_flags: Self::Flags) -> (Self, Command<Message>) {
+        let app = Self {
             sidebar: Sidebar::new(),
             body: Body::new(),
-            divider_position: Some(240),
-        }
+            divider_position: Some(220),
+        };
+
+        (app, Command::none())
     }
 
     fn title(&self) -> String {
         String::from("Amphitheatre Desktop")
     }
 
-    fn update(&mut self, message: Self::Message) {
+    fn update(&mut self, message: Self::Message) -> Command<Message> {
         match message {
             Message::SidebarMessage(message) => self.sidebar.update(message),
             Message::BodyMessage(message) => self.body.update(message),
             Message::SplitResized(position) => self.divider_position = Some(position),
         }
+        Command::none()
     }
 
     fn view(&self) -> Element<'_, Self::Message> {
@@ -63,8 +69,8 @@ impl Sandbox for App {
             split::Axis::Vertical,
             Message::SplitResized,
         )
-        .min_size_first(240)
-        .min_size_second(719)
+        .min_size_first(200)
+        .min_size_second(790)
         .width(Length::Fill)
         .height(Length::Fill)
         .spacing(1.0)

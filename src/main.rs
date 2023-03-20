@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use desktop::app::App;
-use iced::{window, Sandbox, Settings};
+use iced::{window, Application, Settings};
 
 pub fn main() -> iced::Result {
     App::run(Settings {

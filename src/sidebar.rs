@@ -18,6 +18,7 @@ use iced::widget::{
 };
 use iced::{color, Alignment, Color, Element, Length, Theme};
 use icon::{icon, Icon};
+
 const CONTEXT_NAME: &str = "Amphitheatre Local";
 const DISCONNECTED: &str = "Disconnected. Retrying...";
 
