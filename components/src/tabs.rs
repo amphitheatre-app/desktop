@@ -12,7 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod app;
-pub mod body;
-pub mod detail;
-pub mod sidebar;
+use iced::widget::Container;
+use iced::{Element, Length};
+use iced_aw::TabLabel;
+
+pub trait Tab {
+    type Message;
+
+    fn title(&self) -> String;
+
+    fn label(&self) -> TabLabel;
+
+    fn view(&self) -> Element<'_, Self::Message> {
+        Container::new(self.content())
+            .width(Length::Fill)
+            .height(Length::Fill)
+            .into()
+    }
+
+    fn content(&self) -> Element<'_, Self::Message>;
+}

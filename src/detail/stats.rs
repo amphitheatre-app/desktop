@@ -12,7 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod app;
-pub mod body;
-pub mod detail;
-pub mod sidebar;
+use components::tabs::Tab;
+use iced::widget::{text, Container};
+use iced::Element;
+use iced_aw::TabLabel;
+
+#[derive(Clone, Debug)]
+pub enum Message {}
+
+pub struct Stats;
+
+impl Stats {
+    pub fn new() -> Self {
+        Self {}
+    }
+
+    pub fn update(&mut self, _message: Message) {}
+}
+
+impl Tab for Stats {
+    type Message = Message;
+
+    fn title(&self) -> String {
+        String::from("Stats")
+    }
+
+    fn label(&self) -> TabLabel {
+        TabLabel::Text(self.title())
+    }
+
+    fn content(&self) -> Element<'_, Self::Message> {
+        Container::new(text(self.title())).into()
+    }
+}

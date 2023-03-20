@@ -12,22 +12,56 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use iced::alignment::{Horizontal, Vertical};
-use iced::widget::{button, column, container, horizontal_space, row, rule, text, vertical_rule, Container};
+use components::tabs::Tab;
+use iced::widget::{button, column, container, horizontal_space, row, rule, text, Container};
 use iced::{color, Alignment, Color, Element, Length, Theme};
+use iced_aw::Tabs;
 use icon::{icon, Icon};
 
-#[derive(Debug, Default)]
-pub struct Body {}
+use crate::detail::envrionment::{self, Envrionment};
+use crate::detail::logs::{self, Logs};
+use crate::detail::resources::{self, Resources};
+use crate::detail::stats::{self, Stats};
 
-#[derive(Clone)]
+pub struct Body {
+    active_tab: usize,
+    logs: Logs,
+    resources: Resources,
+    envrionment: Envrionment,
+    stats: Stats,
+}
+
+#[derive(Clone, Debug)]
 pub enum Message {
     ButtonPressed,
+    TabSelected(usize),
+
+    Logs(logs::Message),
+    Resources(resources::Message),
+    Envrionment(envrionment::Message),
+    Stats(stats::Message),
 }
 
 impl Body {
     pub fn new() -> Self {
-        Self {}
+        Self {
+            active_tab: 0,
+            logs: Logs::new(),
+            resources: Resources::new(),
+            envrionment: Envrionment::new(),
+            stats: Stats::new(),
+        }
+    }
+
+    pub fn update(&mut self, message: Message) {
+        match message {
+            Message::ButtonPressed => todo!(),
+            Message::TabSelected(tab) => self.active_tab = tab,
+            Message::Logs(message) => self.logs.update(message),
+            Message::Resources(message) => self.resources.update(message),
+            Message::Envrionment(message) => self.envrionment.update(message),
+            Message::Stats(message) => self.stats.update(message),
+        }
     }
 
     pub fn view(&self) -> Element<Message> {
@@ -65,48 +99,27 @@ impl Body {
                 .width(Length::Fill)
                 .align_items(Alignment::Center),
         )
-        .style(ToolbarStyle)
+        // .style(ToolbarStyle)
         .padding(16);
 
         // tabs
-        let tabs = Container::new(
-            row![
-                Container::new(
-                    text("Logs")
-                        .width(Length::Fill)
-                        .height(Length::Fill)
-                        .horizontal_alignment(Horizontal::Center)
-                        .vertical_alignment(Vertical::Center)
-                )
-                .width(Length::Fill)
-                .height(Length::Fill)
-                .align_y(Vertical::Center)
-                .style(ActiveTabStyle),
-                vertical_rule(0.4).style(RuleStyle),
-                text("Resources")
-                    .width(Length::Fill)
-                    .horizontal_alignment(Horizontal::Center)
-                    .style(color!(0xA7A9AD)),
-                vertical_rule(0.4).style(RuleStyle),
-                text("Envrionment")
-                    .width(Length::Fill)
-                    .horizontal_alignment(Horizontal::Center)
-                    .style(color!(0xA7A9AD)),
-                vertical_rule(0.4).style(RuleStyle),
-                text("Stats")
-                    .width(Length::Fill)
-                    .horizontal_alignment(Horizontal::Center)
-                    .style(color!(0xA7A9AD)),
-            ]
-            .align_items(Alignment::Center)
-            .width(Length::Fill)
-            .height(Length::Fill),
-        )
-        .height(32)
-        .style(TabsStyle);
+        let tabs = Tabs::new(self.active_tab, Message::TabSelected)
+            .push(self.logs.label(), self.logs.view().map(Message::Logs))
+            .push(
+                self.resources.label(),
+                self.resources.view().map(Message::Resources),
+            )
+            .push(
+                self.envrionment.label(),
+                self.envrionment.view().map(Message::Envrionment),
+            )
+            .push(self.stats.label(), self.stats.view().map(Message::Stats))
+            .height(Length::Shrink);
 
-        let content = column![toolbar, tabs, horizontal_space(Length::Shrink)];
-        Container::new(content).into()
+        Container::new(column![toolbar, tabs])
+            .width(Length::Fill)
+            .height(Length::Fill)
+            .into()
     }
 }
 
@@ -126,25 +139,6 @@ impl container::StyleSheet for ToolbarStyle {
 impl Into<iced::theme::Container> for ToolbarStyle {
     fn into(self) -> iced::theme::Container {
         iced::theme::Container::Custom(Box::new(ToolbarStyle))
-    }
-}
-
-struct TabsStyle;
-
-impl container::StyleSheet for TabsStyle {
-    type Style = Theme;
-
-    fn appearance(&self, _style: &Self::Style) -> container::Appearance {
-        container::Appearance {
-            background: color!(0x30343D).into(),
-            ..Default::default()
-        }
-    }
-}
-
-impl Into<iced::theme::Container> for TabsStyle {
-    fn into(self) -> iced::theme::Container {
-        iced::theme::Container::Custom(Box::new(TabsStyle))
     }
 }
 

@@ -24,7 +24,7 @@ const DISCONNECTED: &str = "Disconnected. Retrying...";
 #[derive(Debug, Default)]
 pub struct Sidebar {}
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Message {
     TextInputChanged(String),
 }
@@ -32,6 +32,12 @@ pub enum Message {
 impl Sidebar {
     pub fn new() -> Self {
         Self {}
+    }
+
+    pub fn update(&mut self, message: Message) {
+        match message {
+            Message::TextInputChanged(_) => todo!(),
+        }
     }
 
     pub fn view(&self) -> Element<Message> {
@@ -52,7 +58,7 @@ impl Sidebar {
             .align_items(Alignment::Center)
             .width(Length::Fill),
         )
-        .style(ContextStyle)
+        // .style(ContextStyle)
         .padding(16);
 
         // Playbook

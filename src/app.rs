@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use components::body::Body;
-use components::sidebar::Sidebar;
 use iced::theme::Palette;
-use iced::{color, Element, Sandbox, Theme};
+use iced::{color, Element, Length, Sandbox, Theme};
 use iced_aw::{split, Split};
 
-#[derive(Debug, Clone, Copy)]
+use crate::body::{self, Body};
+use crate::sidebar::{self, Sidebar};
+
+#[derive(Clone, Debug)]
 pub enum Message {
-    SidebarMessage,
-    BodyMessage,
+    SidebarMessage(sidebar::Message),
+    BodyMessage(body::Message),
     SplitResized(u16),
 }
 
@@ -36,8 +37,8 @@ impl Sandbox for App {
 
     fn new() -> Self {
         Self {
-            sidebar: Default::default(),
-            body: Default::default(),
+            sidebar: Sidebar::new(),
+            body: Body::new(),
             divider_position: Some(240),
         }
     }
@@ -48,22 +49,24 @@ impl Sandbox for App {
 
     fn update(&mut self, message: Self::Message) {
         match message {
-            Message::SidebarMessage => todo!(),
-            Message::BodyMessage => todo!(),
+            Message::SidebarMessage(message) => self.sidebar.update(message),
+            Message::BodyMessage(message) => self.body.update(message),
             Message::SplitResized(position) => self.divider_position = Some(position),
         }
     }
 
     fn view(&self) -> Element<'_, Self::Message> {
         Split::new(
-            self.sidebar.view().map(|_| Message::SidebarMessage),
-            self.body.view().map(|_| Message::BodyMessage),
+            self.sidebar.view().map(Message::SidebarMessage),
+            self.body.view().map(Message::BodyMessage),
             self.divider_position,
             split::Axis::Vertical,
             Message::SplitResized,
         )
         .min_size_first(240)
         .min_size_second(719)
+        .width(Length::Fill)
+        .height(Length::Fill)
         .spacing(1.0)
         .into()
     }
