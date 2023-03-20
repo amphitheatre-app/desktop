@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use iced::theme::Palette;
-use iced::{color, executor, Application, Command, Element, Length, Theme};
-use iced_aw::{split, Split};
+use iced::{executor, Application, Command, Length};
+use iced_aw::split;
 
 use crate::body::{self, Body};
 use crate::sidebar::{self, Sidebar};
+use crate::theme::Theme;
+use crate::widget::{Element, Split};
 
 #[derive(Clone, Debug)]
 pub enum Message {
@@ -75,12 +76,5 @@ impl Application for App {
         .height(Length::Fill)
         .spacing(1.0)
         .into()
-    }
-
-    fn theme(&self) -> Theme {
-        Theme::custom(Palette {
-            background: color!(0x292C33),
-            ..Theme::Dark.palette()
-        })
     }
 }

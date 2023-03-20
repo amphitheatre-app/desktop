@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use components::tabs::Tab;
-use iced::widget::{text, Container};
-use iced::Element;
 use iced_aw::TabLabel;
+
+use crate::components::tabs::Tab;
+use crate::widget::{Container, Element, Text};
 
 #[derive(Clone, Debug)]
 pub enum Message {}
 
+#[derive(Default)]
 pub struct Resources;
 
 impl Resources {
@@ -42,6 +43,6 @@ impl Tab for Resources {
     }
 
     fn content(&self) -> Element<'_, Self::Message> {
-        Container::new(text(self.title())).into()
+        Container::new(Text::new(self.title())).into()
     }
 }

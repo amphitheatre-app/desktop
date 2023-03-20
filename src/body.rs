@@ -12,17 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use components::tabs::Tab;
-use iced::widget::{button, column, container, horizontal_space, row, rule, text, Container};
-use iced::{color, Alignment, Color, Element, Length, Theme};
-use iced_aw::Tabs;
-use icon::{icon, Icon};
+use iced::widget::{horizontal_space, Rule};
+use iced::{Alignment, Length};
+use iced_aw::native::IconText;
+use iced_aw::Icon;
 
+use crate::components::tabs::Tab;
 use crate::detail::envrionment::{self, Envrionment};
 use crate::detail::logs::{self, Logs};
 use crate::detail::resources::{self, Resources};
 use crate::detail::stats::{self, Stats};
+use crate::theme;
+use crate::widget::{Button, Column, Container, Element, Row, Tabs, Text};
 
+#[derive(Default)]
 pub struct Body {
     active_tab: usize,
     logs: Logs,
@@ -55,7 +58,7 @@ impl Body {
 
     pub fn update(&mut self, message: Message) {
         match message {
-            Message::ButtonPressed => todo!(),
+            Message::ButtonPressed => {}
             Message::TabSelected(tab) => self.active_tab = tab,
             Message::Logs(message) => self.logs.update(message),
             Message::Resources(message) => self.resources.update(message),
@@ -65,41 +68,45 @@ impl Body {
     }
 
     pub fn view(&self) -> Element<Message> {
-        let title = row![
-            icon(Icon::List),
-            column![
-                text("Clean code linters"),
-                text("Running").size(14).style(color!(0x49914C)),
-            ],
-        ]
-        .align_items(Alignment::Center)
-        .spacing(4);
+        let title = Column::new()
+            .push(Text::new("Clean code linters"))
+            .push(Text::new("Running").size(14).style(theme::Text::Success));
 
-        let actions = row![
-            button(icon(Icon::Play))
-                .style(ButtonStyle.into())
-                .on_press(Message::ButtonPressed),
-            button(icon(Icon::Stop))
-                .style(ButtonStyle.into())
-                .on_press(Message::ButtonPressed),
-            button(icon(Icon::ArrowRepeat))
-                .style(ButtonStyle.into())
-                .on_press(Message::ButtonPressed),
-            button(icon(Icon::X))
-                .style(ButtonStyle.into())
-                .on_press(Message::ButtonPressed)
-        ]
-        .align_items(Alignment::Center)
-        .spacing(4);
+        let heading = Row::new()
+            .push(IconText::new(Icon::List).width(Length::Fixed(20.0)))
+            .push(title)
+            .align_items(Alignment::Center)
+            .spacing(8);
+
+        let actions = Row::new()
+            .push(
+                Button::new(IconText::new(Icon::Play).width(Length::Fixed(20.0)))
+                    .on_press(Message::ButtonPressed),
+            )
+            .push(
+                Button::new(IconText::new(Icon::Stop).width(Length::Fixed(20.0)))
+                    .on_press(Message::ButtonPressed),
+            )
+            .push(
+                Button::new(IconText::new(Icon::ArrowRepeat).width(Length::Fixed(20.0)))
+                    .on_press(Message::ButtonPressed),
+            )
+            .push(
+                Button::new(IconText::new(Icon::X).width(Length::Fixed(20.0)))
+                    .on_press(Message::ButtonPressed),
+            )
+            .align_items(Alignment::Center)
+            .spacing(4);
 
         // toolbar
-
         let toolbar = Container::new(
-            row![title, horizontal_space(Length::Fill), actions]
+            Row::new()
+                .push(heading)
+                .push(horizontal_space(Length::Fill))
+                .push(actions)
                 .width(Length::Fill)
                 .align_items(Alignment::Center),
         )
-        // .style(ToolbarStyle)
         .padding(16);
 
         // tabs
@@ -116,102 +123,10 @@ impl Body {
             .push(self.stats.label(), self.stats.view().map(Message::Stats))
             .height(Length::Shrink);
 
-        Container::new(column![toolbar, tabs])
+        let content = Column::new().push(toolbar).push(Rule::horizontal(1)).push(tabs);
+        Container::new(content)
             .width(Length::Fill)
             .height(Length::Fill)
             .into()
-    }
-}
-
-struct ToolbarStyle;
-
-impl container::StyleSheet for ToolbarStyle {
-    type Style = Theme;
-
-    fn appearance(&self, _style: &Self::Style) -> container::Appearance {
-        container::Appearance {
-            background: color!(0x393D48).into(),
-            ..Default::default()
-        }
-    }
-}
-
-impl Into<iced::theme::Container> for ToolbarStyle {
-    fn into(self) -> iced::theme::Container {
-        iced::theme::Container::Custom(Box::new(ToolbarStyle))
-    }
-}
-
-struct ActiveTabStyle;
-
-impl container::StyleSheet for ActiveTabStyle {
-    type Style = Theme;
-
-    fn appearance(&self, _style: &Self::Style) -> container::Appearance {
-        container::Appearance {
-            background: color!(0x292C33).into(),
-            ..Default::default()
-        }
-    }
-}
-
-impl Into<iced::theme::Container> for ActiveTabStyle {
-    fn into(self) -> iced::theme::Container {
-        iced::theme::Container::Custom(Box::new(ActiveTabStyle))
-    }
-}
-
-struct RuleStyle;
-
-impl rule::StyleSheet for RuleStyle {
-    type Style = Theme;
-
-    fn appearance(&self, _style: &Self::Style) -> rule::Appearance {
-        rule::Appearance {
-            color: color!(0x474B56),
-            width: 1,
-            radius: 0.0,
-            fill_mode: rule::FillMode::Full,
-        }
-    }
-}
-
-impl Into<iced::theme::Rule> for RuleStyle {
-    fn into(self) -> iced::theme::Rule {
-        iced::theme::Rule::Custom(Box::new(RuleStyle))
-    }
-}
-
-struct ButtonStyle;
-
-impl button::StyleSheet for ButtonStyle {
-    type Style = Theme;
-
-    fn active(&self, _style: &Self::Style) -> button::Appearance {
-        button::Appearance {
-            background: Some(Color::TRANSPARENT.into()),
-            border_radius: 6.0,
-            border_width: 1.0,
-            border_color: color!(0x474B56),
-            text_color: color!(0xffffff),
-            ..Default::default()
-        }
-    }
-
-    fn hovered(&self, _style: &Self::Style) -> button::Appearance {
-        button::Appearance {
-            background: Some(color!(0x474B56).into()),
-            border_radius: 6.0,
-            border_width: 1.0,
-            border_color: color!(0x474B56),
-            text_color: color!(0xffffff),
-            ..Default::default()
-        }
-    }
-}
-
-impl Into<iced::theme::Button> for ButtonStyle {
-    fn into(self) -> iced::theme::Button {
-        iced::theme::Button::Custom(Box::new(ButtonStyle))
     }
 }

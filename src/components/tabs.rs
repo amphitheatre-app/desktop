@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use iced::widget::Container;
-use iced::{Element, Length};
+use iced::Length;
 use iced_aw::TabLabel;
+
+use crate::widget::{Container, Element};
 
 pub trait Tab {
     type Message;

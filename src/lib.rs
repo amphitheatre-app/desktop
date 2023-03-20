@@ -14,5 +14,8 @@
 
 pub mod app;
 pub mod body;
+pub mod components;
 pub mod detail;
 pub mod sidebar;
+pub mod theme;
+pub mod widget;
