@@ -121,7 +121,6 @@ impl Sidebar {
 
         Container::new(content)
             .style(SidebarStyle)
-            .width(240.0)
             .height(Length::Fill)
             .into()
     }

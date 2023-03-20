@@ -15,18 +15,20 @@
 use components::body::Body;
 use components::sidebar::Sidebar;
 use iced::theme::Palette;
-use iced::widget::{rule, Row, Rule};
-use iced::{color, Element, Length, Sandbox, Theme};
+use iced::{color, Element, Sandbox, Theme};
+use iced_aw::{split, Split};
 
 #[derive(Debug, Clone, Copy)]
 pub enum Message {
     SidebarMessage,
     BodyMessage,
+    SplitResized(u16),
 }
 
 pub struct App {
     sidebar: Sidebar,
     body: Body,
+    divider_position: Option<u16>,
 }
 
 impl Sandbox for App {
@@ -36,6 +38,7 @@ impl Sandbox for App {
         Self {
             sidebar: Default::default(),
             body: Default::default(),
+            divider_position: Some(240),
         }
     }
 
@@ -43,18 +46,26 @@ impl Sandbox for App {
         String::from("Amphitheatre Desktop")
     }
 
-    fn update(&mut self, _message: Self::Message) {
-        todo!()
+    fn update(&mut self, message: Self::Message) {
+        match message {
+            Message::SidebarMessage => todo!(),
+            Message::BodyMessage => todo!(),
+            Message::SplitResized(position) => self.divider_position = Some(position),
+        }
     }
 
     fn view(&self) -> Element<'_, Self::Message> {
-        Row::new()
-            .width(Length::Fill)
-            .height(Length::Fill)
-            .push(self.sidebar.view().map(|_| Message::SidebarMessage))
-            .push(Rule::vertical(1).style(MyRule))
-            .push(self.body.view().map(|_| Message::BodyMessage))
-            .into()
+        Split::new(
+            self.sidebar.view().map(|_| Message::SidebarMessage),
+            self.body.view().map(|_| Message::BodyMessage),
+            self.divider_position,
+            split::Axis::Vertical,
+            Message::SplitResized,
+        )
+        .min_size_first(240)
+        .min_size_second(719)
+        .spacing(1.0)
+        .into()
     }
 
     fn theme(&self) -> Theme {
@@ -62,26 +73,5 @@ impl Sandbox for App {
             background: color!(0x292C33),
             ..Theme::Dark.palette()
         })
-    }
-}
-
-pub struct MyRule;
-
-impl rule::StyleSheet for MyRule {
-    type Style = Theme;
-
-    fn appearance(&self, _style: &Self::Style) -> rule::Appearance {
-        rule::Appearance {
-            color: color!(0x474B56),
-            width: 1,
-            radius: 0.0,
-            fill_mode: rule::FillMode::Full,
-        }
-    }
-}
-
-impl Into<iced::theme::Rule> for MyRule {
-    fn into(self) -> iced::theme::Rule {
-        iced::theme::Rule::Custom(Box::new(MyRule))
     }
 }

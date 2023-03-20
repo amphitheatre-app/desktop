@@ -10,4 +10,5 @@ members = ["components", "icon"]
 
 [dependencies]
 iced = { version = "0.8" }
+iced_aw = { version = "0.4.1" }
 components = { path = "components" }

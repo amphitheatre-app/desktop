@@ -13,8 +13,15 @@
 // limitations under the License.
 
 use desktop::app::App;
-use iced::{Sandbox, Settings};
+use iced::{window, Sandbox, Settings};
 
 pub fn main() -> iced::Result {
-    App::run(Settings::default())
+    App::run(Settings {
+        window: window::Settings {
+            size: (960, 720),
+            min_size: Some((960, 720)),
+            ..window::Settings::default()
+        },
+        ..Settings::default()
+    })
 }
