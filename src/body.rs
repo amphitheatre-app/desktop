@@ -68,17 +68,46 @@ impl Body {
     }
 
     pub fn view(&self) -> Element<Message> {
+        Container::new(
+            Column::new()
+                .push(self.toolbar())
+                .push(Rule::horizontal(1))
+                .push(self.tabs()),
+        )
+        .width(Length::Fill)
+        .height(Length::Fill)
+        .into()
+    }
+
+    /// toolbar
+    fn toolbar(&self) -> Element<Message> {
+        Container::new(
+            Row::new()
+                .push(self.header())
+                .push(horizontal_space(Length::Fill))
+                .push(self.actions())
+                .width(Length::Fill)
+                .align_items(Alignment::Center),
+        )
+        .padding(16)
+        .into()
+    }
+
+    fn header(&self) -> Element<Message> {
         let title = Column::new()
             .push(Text::new("Clean code linters"))
             .push(Text::new("Running").size(14).style(theme::Text::Success));
 
-        let heading = Row::new()
+        Row::new()
             .push(IconText::new(Icon::List).width(Length::Fixed(20.0)))
             .push(title)
             .align_items(Alignment::Center)
-            .spacing(8);
+            .spacing(8)
+            .into()
+    }
 
-        let actions = Row::new()
+    fn actions(&self) -> Element<Message> {
+        Row::new()
             .push(
                 Button::new(IconText::new(Icon::Play).width(Length::Fixed(20.0)))
                     .on_press(Message::ButtonPressed),
@@ -96,21 +125,12 @@ impl Body {
                     .on_press(Message::ButtonPressed),
             )
             .align_items(Alignment::Center)
-            .spacing(4);
+            .spacing(4)
+            .into()
+    }
 
-        // toolbar
-        let toolbar = Container::new(
-            Row::new()
-                .push(heading)
-                .push(horizontal_space(Length::Fill))
-                .push(actions)
-                .width(Length::Fill)
-                .align_items(Alignment::Center),
-        )
-        .padding(16);
-
-        // tabs
-        let tabs = Tabs::new(self.active_tab, Message::TabSelected)
+    fn tabs(&self) -> Element<Message> {
+        Tabs::new(self.active_tab, Message::TabSelected)
             .push(self.logs.label(), self.logs.view().map(Message::Logs))
             .push(
                 self.resources.label(),
@@ -121,12 +141,7 @@ impl Body {
                 self.envrionment.view().map(Message::Envrionment),
             )
             .push(self.stats.label(), self.stats.view().map(Message::Stats))
-            .height(Length::Shrink);
-
-        let content = Column::new().push(toolbar).push(Rule::horizontal(1)).push(tabs);
-        Container::new(content)
-            .width(Length::Fill)
-            .height(Length::Fill)
+            .height(Length::Shrink)
             .into()
     }
 }
