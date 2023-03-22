@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use iced::widget::Rule;
 use iced::Length;
 use iced_aw::TabLabel;
 
-use crate::widget::{Container, Element};
+use crate::widget::{Column, Container, Element};
 
 pub trait Tab {
     type Message;
@@ -25,10 +26,14 @@ pub trait Tab {
     fn label(&self) -> TabLabel;
 
     fn view(&self) -> Element<'_, Self::Message> {
-        Container::new(self.content())
-            .width(Length::Fill)
-            .height(Length::Fill)
-            .into()
+        Container::new(
+            Column::new()
+                .push(Rule::horizontal(1))
+                .push(Container::new(self.content()).padding(16)),
+        )
+        .width(Length::Fill)
+        .height(Length::Fill)
+        .into()
     }
 
     fn content(&self) -> Element<'_, Self::Message>;

@@ -141,6 +141,7 @@ impl Body {
                 self.envrionment.view().map(Message::Envrionment),
             )
             .push(self.stats.label(), self.stats.view().map(Message::Stats))
+            .tab_label_padding(8.0)
             .height(Length::Shrink)
             .into()
     }
