@@ -12,11 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod app;
-pub mod body;
-pub mod components;
-pub mod detail;
-pub mod sidebar;
-pub mod theme;
-pub mod util;
-pub mod widget;
+pub mod strings;

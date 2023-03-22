@@ -18,14 +18,16 @@ use iced_aw::native::IconText;
 use iced_aw::Icon;
 
 use crate::theme;
+use crate::util::strings::generate_random_words_string;
 use crate::widget::{Button, Column, Container, Element, Row, Scrollable, Text, TextInput};
 
 const CONTEXT_NAME: &str = "Amphitheatre Local";
 const DISCONNECTED: &str = "Disconnected. Retrying...";
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Sidebar {
     query: String,
+    playbooks: Vec<(String, String)>,
 }
 
 #[derive(Clone, Debug)]
@@ -36,7 +38,19 @@ pub enum Message {
 
 impl Sidebar {
     pub fn new() -> Self {
-        Self { query: String::new() }
+        let playbooks = (0..10)
+            .map(|_| {
+                (
+                    generate_random_words_string(2..3),
+                    generate_random_words_string(8..16),
+                )
+            })
+            .collect();
+
+        Self {
+            query: String::new(),
+            playbooks,
+        }
     }
 
     pub fn update(&mut self, message: Message) {
@@ -48,16 +62,10 @@ impl Sidebar {
 
     pub fn view(&self) -> Element<Message> {
         let context = self.context_selector();
-        let playbooks = Column::with_children(
-            (0..10)
-                .map(|_| {
-                    playbook(
-                        "Clean code linters",
-                        "Make sure your code matches your style guide with these essential code linters.",
-                    )
-                })
-                .collect(),
-        );
+
+        let playbooks = self.playbooks.iter().fold(Column::new(), |column, playbook| {
+            column.push(item(&playbook.0, &playbook.1))
+        });
 
         let content = Column::new().push(context).push(
             Column::new()
@@ -108,7 +116,7 @@ impl Sidebar {
     }
 }
 
-fn playbook<'a>(title: impl ToString, description: impl ToString) -> Element<'a, Message> {
+fn item<'a>(title: impl ToString, description: impl ToString) -> Element<'a, Message> {
     let icon = Container::new(
         IconText::new(Icon::Box)
             .width(Length::Fixed(24.0))

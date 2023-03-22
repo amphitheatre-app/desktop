@@ -23,6 +23,7 @@ use crate::detail::logs::{self, Logs};
 use crate::detail::resources::{self, Resources};
 use crate::detail::stats::{self, Stats};
 use crate::theme;
+use crate::util::strings::generate_random_words_string;
 use crate::widget::{Button, Column, Container, Element, Row, Tabs, Text};
 
 #[derive(Default)]
@@ -95,7 +96,7 @@ impl Body {
 
     fn header(&self) -> Element<Message> {
         let title = Column::new()
-            .push(Text::new("Clean code linters"))
+            .push(Text::new(generate_random_words_string(3..10)))
             .push(Text::new("Running").size(14).style(theme::Text::Success));
 
         Row::new()
