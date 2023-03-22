@@ -46,6 +46,29 @@ impl Sidebar {
         }
     }
 
+    pub fn view(&self) -> Element<Message> {
+        let context = self.context_selector();
+        let playbooks = Column::with_children(
+            (0..10)
+                .map(|_| {
+                    playbook(
+                        "Clean code linters",
+                        "Make sure your code matches your style guide with these essential code linters.",
+                    )
+                })
+                .collect(),
+        );
+
+        let content = Column::new().push(context).push(
+            Column::new()
+                .push(self.omnibox())
+                .push(Scrollable::new(playbooks))
+                .padding(16),
+        );
+
+        Container::new(content).height(Length::Fill).into()
+    }
+
     fn context_selector(&self) -> Element<Message> {
         let state = Row::new()
             .push(Text::new("•").size(14).style(theme::Text::Danger))
@@ -72,79 +95,16 @@ impl Sidebar {
         .into()
     }
 
-    pub fn view(&self) -> Element<Message> {
-        // Context selector
-
-        let context = self.context_selector();
-
-        // Playbook
-        let playbooks = Column::new()
-            .push(playbook(
-                "Clean code linters",
-                "Make sure your code matches your style guide with these essential code linters.",
-            ))
-            .push(playbook(
-                "Open journalism",
-                "See how publications and data-driven journalists use open source to power their ...",
-            ))
-            .push(playbook(
-                "Design essentials",
-                "This collection of design libraries are the best on the web, and will complete your ...",
-            ))
-            .push(playbook(
-                "Design essentials",
-                "This collection of design libraries are the best on the web, and will complete your ...",
-            ))
-            .push(playbook(
-                "Design essentials",
-                "This collection of design libraries are the best on the web, and will complete your ...",
-            ))
-            .push(playbook(
-                "Design essentials",
-                "This collection of design libraries are the best on the web, and will complete your ...",
-            ))
-            .push(playbook(
-                "Design essentials",
-                "This collection of design libraries are the best on the web, and will complete your ...",
-            ))
-            .push(playbook(
-                "Design essentials",
-                "This collection of design libraries are the best on the web, and will complete your ...",
-            ))
-            .push(playbook(
-                "Design essentials",
-                "This collection of design libraries are the best on the web, and will complete your ...",
-            ))
-            .push(playbook(
-                "Design essentials",
-                "This collection of design libraries are the best on the web, and will complete your ...",
-            ))
-            .push(playbook(
-                "Design essentials",
-                "This collection of design libraries are the best on the web, and will complete your ...",
-            ))
-            .push(playbook(
-                "Design essentials",
-                "This collection of design libraries are the best on the web, and will complete your ...",
-            ));
-
-        let omnibox = Row::new()
+    fn omnibox(&self) -> Element<Message> {
+        Row::new()
             .push(TextInput::new("Search", &self.query, Message::TextInputChanged))
             .push(
                 Button::new(IconText::new(Icon::Plus).width(Length::Fixed(20.0)))
                     .on_press(Message::ButtonPressed),
             )
             .padding([0, 0, 16, 0])
-            .spacing(4);
-
-        let content = Column::new().push(context).push(
-            Column::new()
-                .push(omnibox)
-                .push(Scrollable::new(playbooks))
-                .padding(16),
-        );
-
-        Container::new(content).height(Length::Fill).into()
+            .spacing(4)
+            .into()
     }
 }
 
