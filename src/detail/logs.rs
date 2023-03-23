@@ -14,6 +14,7 @@
 
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use std::path::Path;
 
 use iced::alignment::Horizontal;
 use iced::{Alignment, Length};
@@ -32,7 +33,8 @@ pub struct Logs {
 
 impl Logs {
     pub fn new() -> Self {
-        let word_file = File::open("assets/test.access.log").unwrap();
+        let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("assets/test.access.log");
+        let word_file = File::open(path).unwrap();
         let reader = BufReader::new(word_file);
         let buffer: Vec<String> = reader.lines().map(|line| line.unwrap()).collect();
 
