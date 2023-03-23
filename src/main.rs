@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#![windows_subsystem = "windows"]
+
 use desktop::app::App;
 use iced::{window, Application, Settings};
 
