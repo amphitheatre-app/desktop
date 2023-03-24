@@ -32,7 +32,8 @@ pub struct Sidebar {
 
 #[derive(Clone, Debug)]
 pub enum Message {
-    ButtonPressed,
+    ContextSelectorPressed,
+    CreateButtonPressed,
     TextInputChanged(String),
 }
 
@@ -55,7 +56,8 @@ impl Sidebar {
 
     pub fn update(&mut self, message: Message) {
         match message {
-            Message::ButtonPressed => {}
+            Message::ContextSelectorPressed => {}
+            Message::CreateButtonPressed => {}
             Message::TextInputChanged(query) => self.query = query,
         }
     }
@@ -89,15 +91,19 @@ impl Sidebar {
             .width(Length::Fill);
 
         Container::new(
-            Row::new()
-                .push(heading)
-                .push(
-                    IconText::new(Icon::ChevronExpand)
-                        .size(16.0)
-                        .color(color!(0x474B56)),
-                )
-                .align_items(Alignment::Center)
-                .width(Length::Fill),
+            Button::new(
+                Row::new()
+                    .push(heading)
+                    .push(
+                        IconText::new(Icon::ChevronExpand)
+                            .size(16.0)
+                            .color(color!(0x474B56)),
+                    )
+                    .align_items(Alignment::Center)
+                    .width(Length::Fill),
+            )
+            .style(theme::Button::Element)
+            .on_press(Message::ContextSelectorPressed),
         )
         .padding(16)
         .into()
@@ -108,11 +114,17 @@ impl Sidebar {
             .push(TextInput::new("Search", &self.query, Message::TextInputChanged))
             .push(
                 Button::new(IconText::new(Icon::Plus).width(Length::Fixed(20.0)))
-                    .on_press(Message::ButtonPressed),
+                    .on_press(Message::CreateButtonPressed),
             )
             .padding([0, 0, 16, 0])
             .spacing(4)
             .into()
+    }
+}
+
+impl Default for Sidebar {
+    fn default() -> Self {
+        Self::new()
     }
 }
 

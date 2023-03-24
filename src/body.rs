@@ -33,6 +33,7 @@ pub struct Body {
     resources: Resources,
     envrionment: Envrionment,
     stats: Stats,
+    title: String,
 }
 
 #[derive(Clone, Debug)]
@@ -54,6 +55,7 @@ impl Body {
             resources: Resources::new(),
             envrionment: Envrionment::new(),
             stats: Stats::new(),
+            title: generate_random_words_string(3..10),
         }
     }
 
@@ -96,7 +98,7 @@ impl Body {
 
     fn header(&self) -> Element<Message> {
         let title = Column::new()
-            .push(Text::new(generate_random_words_string(3..10)))
+            .push(Text::new(&self.title))
             .push(Text::new("Running").size(14).style(theme::Text::Success));
 
         Row::new()

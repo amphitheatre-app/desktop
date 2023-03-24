@@ -51,7 +51,7 @@ impl split::StyleSheet for Theme {
         split::Appearance {
             first_background: Some(ACCENT.into()),
             divider_background: ACCENT.into(),
-            divider_border_color: ACCENT.into(),
+            divider_border_color: ACCENT,
             border_width: 0.0,
             border_color: Color::TRANSPARENT,
             ..split::Appearance::default()
@@ -191,28 +191,42 @@ impl text_input::StyleSheet for Theme {
         color!(0x474B56)
     }
 }
-impl button::StyleSheet for Theme {
-    type Style = ();
 
-    fn active(&self, _style: &Self::Style) -> button::Appearance {
-        button::Appearance {
-            background: Some(Color::TRANSPARENT.into()),
-            border_radius: 6.0,
-            border_width: 1.0,
-            border_color: color!(0x474B56),
-            text_color: color!(0xffffff),
-            ..button::Appearance::default()
+#[derive(Debug, Clone, Copy, Default)]
+pub enum Button {
+    #[default]
+    Default,
+    Element,
+}
+
+impl button::StyleSheet for Theme {
+    type Style = Button;
+
+    fn active(&self, style: &Self::Style) -> button::Appearance {
+        match style {
+            Button::Default => button::Appearance {
+                background: Some(Color::TRANSPARENT.into()),
+                border_radius: 6.0,
+                border_width: 1.0,
+                border_color: color!(0x474B56),
+                text_color: color!(0xffffff),
+                ..button::Appearance::default()
+            },
+            Button::Element => button::Appearance::default(),
         }
     }
 
-    fn hovered(&self, _style: &Self::Style) -> button::Appearance {
-        button::Appearance {
-            background: Some(color!(0x474B56).into()),
-            border_radius: 6.0,
-            border_width: 1.0,
-            border_color: color!(0x474B56),
-            text_color: color!(0xffffff),
-            ..button::Appearance::default()
+    fn hovered(&self, style: &Self::Style) -> button::Appearance {
+        match style {
+            Button::Default => button::Appearance {
+                background: Some(color!(0x474B56).into()),
+                border_radius: 6.0,
+                border_width: 1.0,
+                border_color: color!(0x474B56),
+                text_color: color!(0xffffff),
+                ..button::Appearance::default()
+            },
+            Button::Element => button::Appearance::default(),
         }
     }
 }

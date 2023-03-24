@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Prevent console window from showing up on Windows
 #![windows_subsystem = "windows"]
 
 use desktop::app::App;
