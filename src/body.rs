@@ -18,9 +18,8 @@ use iced_aw::native::IconText;
 use iced_aw::Icon;
 
 use crate::components::tabs::Tab;
-use crate::detail::envrionment::{self, Envrionment};
+use crate::detail::inspect::{self, Information};
 use crate::detail::logs::{self, Logs};
-use crate::detail::resources::{self, Resources};
 use crate::detail::stats::{self, Stats};
 use crate::theme;
 use crate::util::strings::generate_random_words_string;
@@ -30,8 +29,7 @@ use crate::widget::{Button, Column, Container, Element, Row, Tabs, Text};
 pub struct Body {
     active_tab: usize,
     logs: Logs,
-    resources: Resources,
-    envrionment: Envrionment,
+    info: Information,
     stats: Stats,
     title: String,
 }
@@ -42,8 +40,7 @@ pub enum Message {
     TabSelected(usize),
 
     Logs(logs::Message),
-    Resources(resources::Message),
-    Envrionment(envrionment::Message),
+    Information(inspect::Message),
     Stats(stats::Message),
 }
 
@@ -52,8 +49,7 @@ impl Body {
         Self {
             active_tab: 0,
             logs: Logs::new(),
-            resources: Resources::new(),
-            envrionment: Envrionment::new(),
+            info: Information::new(),
             stats: Stats::new(),
             title: generate_random_words_string(3..10),
         }
@@ -64,8 +60,7 @@ impl Body {
             Message::ButtonPressed => {}
             Message::TabSelected(tab) => self.active_tab = tab,
             Message::Logs(message) => self.logs.update(message),
-            Message::Resources(message) => self.resources.update(message),
-            Message::Envrionment(message) => self.envrionment.update(message),
+            Message::Information(message) => self.info.update(message),
             Message::Stats(message) => self.stats.update(message),
         }
     }
@@ -135,14 +130,7 @@ impl Body {
     fn tabs(&self) -> Element<Message> {
         Tabs::new(self.active_tab, Message::TabSelected)
             .push(self.logs.label(), self.logs.view().map(Message::Logs))
-            .push(
-                self.resources.label(),
-                self.resources.view().map(Message::Resources),
-            )
-            .push(
-                self.envrionment.label(),
-                self.envrionment.view().map(Message::Envrionment),
-            )
+            .push(self.info.label(), self.info.view().map(Message::Information))
             .push(self.stats.label(), self.stats.view().map(Message::Stats))
             .tab_label_padding(8.0)
             .height(Length::Shrink)

@@ -21,9 +21,9 @@ use crate::widget::{Container, Element, Text};
 pub enum Message {}
 
 #[derive(Default)]
-pub struct Resources;
+pub struct Information;
 
-impl Resources {
+impl Information {
     pub fn new() -> Self {
         Self {}
     }
@@ -31,11 +31,11 @@ impl Resources {
     pub fn update(&mut self, _message: Message) {}
 }
 
-impl Tab for Resources {
+impl Tab for Information {
     type Message = Message;
 
     fn title(&self) -> String {
-        String::from("Resources")
+        String::from("Inspect")
     }
 
     fn label(&self) -> TabLabel {
