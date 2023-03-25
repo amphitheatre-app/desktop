@@ -107,6 +107,7 @@ impl Tab for Information {
             }
         }
 
-        Scrollable::new(Column::with_children(children).spacing(16).width(Length::Fill)).into()
+        let content = Column::with_children(children).spacing(16).width(Length::Fill);
+        Scrollable::new(content).into()
     }
 }

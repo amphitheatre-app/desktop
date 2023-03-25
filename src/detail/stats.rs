@@ -12,10 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use iced::widget::{Row, Rule};
+use iced::{Alignment, Length};
 use iced_aw::TabLabel;
 
 use crate::components::tabs::Tab;
-use crate::widget::{Container, Element, Text};
+use crate::widget::{Column, Container, Element, Text};
 
 #[derive(Clone, Debug)]
 pub enum Message {}
@@ -43,6 +45,44 @@ impl Tab for Stats {
     }
 
     fn content(&self) -> Element<'_, Self::Message> {
-        Container::new(Text::new(self.title())).into()
+        let content = Column::new()
+            .push(
+                Row::new()
+                    .push(self.cell("0.92%", "CPU USAGE"))
+                    .push(Rule::vertical(1))
+                    .push(self.cell("118.3 MB", "MEMORY USAGE"))
+                    .width(Length::Fill)
+                    .height(Length::FillPortion(5)),
+            )
+            .push(Rule::horizontal(1))
+            .push(
+                Row::new()
+                    .push(self.cell("62.1 MB / 216 kB", "DISK READ/WRITE"))
+                    .push(Rule::vertical(1))
+                    .push(self.cell("0 Bytes / 0 Bytes", "NETWORK IO"))
+                    .width(Length::Fill)
+                    .height(Length::FillPortion(5)),
+            )
+            .width(Length::Fill)
+            .height(Length::Fill);
+
+        Container::new(content).into()
+    }
+}
+
+impl Stats {
+    fn cell(&self, value: impl ToString, label: impl ToString) -> Element<Message> {
+        Container::new(
+            Column::new()
+                .push(Text::new(value.to_string()).size(26))
+                .push(Text::new(label.to_string()).size(16))
+                .align_items(Alignment::Center)
+                .spacing(32),
+        )
+        .width(Length::Fill)
+        .height(Length::Fill)
+        .center_x()
+        .center_y()
+        .into()
     }
 }
