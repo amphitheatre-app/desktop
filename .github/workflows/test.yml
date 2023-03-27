@@ -1,10 +1,6 @@
 name: Test
 
-on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+on: [push, pull_request]
 
 env:
   CARGO_TERM_COLOR: always
@@ -15,6 +11,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - uses: dtolnay/rust-toolchain
+      with:
+        toolchain: nightly-2022-12-01
+        components: rustfmt
 
     - name: Check code formatting
       run: cargo fmt --all -- --check
