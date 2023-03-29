@@ -2,7 +2,7 @@ name: Build Release Binaries
 
 on:
   release:
-    types: [created]
+    types: [published]
 
 env:
   CARGO_TERM_COLOR: always
