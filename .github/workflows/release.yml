@@ -7,10 +7,11 @@ on:
 env:
   CARGO_TERM_COLOR: always
   RELEASE_BIN_NAME: amphitheatre-desktop
+  RUST_TOOLCHAIN: nightly-2022-12-01
 
 jobs:
-  build-release:
-    name: build-release
+  release:
+    name: Release
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -30,7 +31,7 @@ jobs:
     - uses: actions/checkout@v3
     - uses: dtolnay/rust-toolchain@master
       with:
-        toolchain: nightly-2022-12-01
+        toolchain: ${{ env.RUST_TOOLCHAIN }}
 
     - name: Build release binary
       run: cargo build --verbose --release
