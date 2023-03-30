@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::fs::File;
-use std::io::{BufRead, BufReader};
-use std::path::Path;
+use std::io::{BufRead, Cursor};
 
 use iced::alignment::Horizontal;
 use iced::{Alignment, Length};
@@ -31,14 +29,13 @@ pub struct Logs {
     buffer: Vec<String>,
 }
 
+const LOGS: &[u8] = include_bytes!("../../assets/test.access.log");
+
 impl Logs {
     pub fn new() -> Self {
-        let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("assets/test.access.log");
-        let word_file = File::open(path).unwrap();
-        let reader = BufReader::new(word_file);
-        let buffer: Vec<String> = reader.lines().map(|line| line.unwrap()).collect();
-
-        Self { buffer }
+        Self {
+            buffer: Cursor::new(LOGS).lines().map(|line| line.unwrap()).collect(),
+        }
     }
 
     pub fn update(&mut self, _message: Message) {}
