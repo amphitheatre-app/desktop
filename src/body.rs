@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use amp_client::playbooks::Playbook;
 use iced::widget::{horizontal_space, Rule};
 use iced::{Alignment, Length, Subscription};
 use iced_aw::native::IconText;
@@ -22,16 +23,15 @@ use crate::detail::inspect::{self, Information};
 use crate::detail::logs::{self, Logs};
 use crate::detail::stats::{self, Stats};
 use crate::theme;
-use crate::util::strings::generate_random_words_string;
 use crate::widget::{Button, Column, Container, Element, Row, Tabs, Text};
 
 #[derive(Default)]
 pub struct Body {
+    playbook: Option<Playbook>,
     active_tab: usize,
     logs: Logs,
     info: Information,
     stats: Stats,
-    title: String,
 }
 
 #[derive(Clone, Debug)]
@@ -47,11 +47,11 @@ pub enum Message {
 impl Body {
     pub fn new() -> Self {
         Self {
+            playbook: None,
             active_tab: 0,
             logs: Logs::new(),
             info: Information::new(),
             stats: Stats::new(),
-            title: generate_random_words_string(3..10),
         }
     }
 
@@ -70,6 +70,10 @@ impl Body {
     }
 
     pub fn view(&self) -> Element<Message> {
+        if self.playbook.is_none() {
+            return empty(Text::new(""));
+        }
+
         Container::new(
             Column::new()
                 .push(self.toolbar())
@@ -96,8 +100,10 @@ impl Body {
     }
 
     fn header(&self) -> Element<Message> {
+        let title = &self.playbook.as_ref().unwrap().title;
+
         let title = Column::new()
-            .push(Text::new(&self.title))
+            .push(Text::new(title))
             .push(Text::new("Running").size(14).style(theme::Text::Success));
 
         Row::new()
@@ -140,4 +146,16 @@ impl Body {
             .height(Length::Shrink)
             .into()
     }
+}
+
+fn empty<'a, T>(content: T) -> Element<'a, Message>
+where
+    T: Into<Element<'a, Message>>,
+{
+    Container::new(content)
+        .width(Length::Fill)
+        .height(Length::Fill)
+        .center_x()
+        .center_y()
+        .into()
 }

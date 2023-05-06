@@ -116,9 +116,7 @@ impl Sidebar {
         let mut v: Vec<Element<Message>> = vec![];
 
         if self.playbooks.is_empty() {
-            v.push(empty(
-                Text::new("No playbooks").size(16).style(theme::Text::Secondary),
-            ));
+            v.push(empty(Text::new("No playbooks")));
         } else if self.playbooks.len() > 10 {
             v.push(self.omnibox());
         } else {
