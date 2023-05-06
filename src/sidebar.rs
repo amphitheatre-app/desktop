@@ -12,22 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use amp_common::config::Cluster;
+use std::time::Duration;
+
+use amp_client::client::Client;
+use amp_client::playbooks::Playbook;
+use amp_common::config::{Cluster, ContextConfiguration};
 use iced::widget::Rule;
-use iced::{color, Alignment, Length};
+use iced::{color, Alignment, Length, Subscription};
 use iced_aw::native::IconText;
 use iced_aw::Icon;
 
 use crate::theme;
-use crate::util::strings::generate_random_words_string;
 use crate::widget::{Button, Column, Container, Element, Row, Scrollable, Text, TextInput};
-
-const DISCONNECTED: &str = "Disconnected. Retrying...";
 
 #[derive(Debug)]
 pub struct Sidebar {
     query: String,
-    playbooks: Vec<(String, String)>,
+    playbooks: Vec<Playbook>,
+    contexts: Option<ContextConfiguration>,
+    // current_context
+    context: Cluster,
+    state: State,
 }
 
 #[derive(Clone, Debug)]
@@ -35,22 +40,39 @@ pub enum Message {
     ContextSelectorPressed,
     CreateButtonPressed,
     TextInputChanged(String),
+    RefreshPlaybooks,
+    ContextLoaded(Option<ContextConfiguration>),
+}
+
+#[derive(Clone, Debug)]
+pub enum State {
+    Connecting,
+    Connected,
+    Disconnected,
+}
+
+// impl std::fmt::Display for State
+impl std::fmt::Display for State {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            State::Connecting => write!(f, "Connecting..."),
+            State::Connected => write!(f, "Connected"),
+            State::Disconnected => write!(f, "Disconnected. Retrying..."),
+        }
+    }
 }
 
 impl Sidebar {
     pub fn new() -> Self {
-        let playbooks = (0..10)
-            .map(|_| {
-                (
-                    generate_random_words_string(2..3),
-                    generate_random_words_string(8..16),
-                )
-            })
-            .collect();
-
         Self {
             query: String::new(),
-            playbooks,
+            playbooks: vec![],
+            contexts: None,
+            context: Cluster {
+                title: "Unknown".to_string(),
+                ..Cluster::default()
+            },
+            state: State::Connecting,
         }
     }
 
@@ -59,37 +81,73 @@ impl Sidebar {
             Message::ContextSelectorPressed => {}
             Message::CreateButtonPressed => {}
             Message::TextInputChanged(query) => self.query = query,
+            Message::RefreshPlaybooks => {
+                let url = &format!("{}/v1", &self.context.server);
+                let client = Client::new(url, self.context.token.clone());
+
+                match client.playbooks().list(None) {
+                    Ok(playbooks) => {
+                        self.playbooks = playbooks;
+                        self.state = State::Connected;
+                    }
+                    Err(e) => {
+                        eprintln!("Failed to fetch playbooks, error: {}", e);
+                        self.state = State::Disconnected;
+                    }
+                }
+            }
+            Message::ContextLoaded(contexts) => {
+                self.contexts = contexts;
+                if let Some(contexts) = &self.contexts {
+                    if let Some(context) = contexts.current() {
+                        self.context = context.clone();
+                    }
+                }
+            }
         }
     }
 
-    pub fn view(&self, ctx: &Option<Cluster>) -> Element<Message> {
-        let context = match ctx {
-            Some(ctx) => self.context_selector(ctx),
-            None => Text::new("No context selected").into(),
-        };
+    /// poll playbooks from the server every 5 seconds
+    pub fn subscription(&self) -> Subscription<Message> {
+        iced::time::every(Duration::from_secs(5)).map(|_| Message::RefreshPlaybooks)
+    }
 
-        let playbooks = self.playbooks.iter().fold(Column::new(), |column, playbook| {
-            column.push(item(&playbook.0, &playbook.1))
-        });
+    pub fn view(&self) -> Element<Message> {
+        let mut v: Vec<Element<Message>> = vec![];
 
-        let content = Column::new().push(context).push(
-            Column::new()
-                .push(self.omnibox())
-                .push(Scrollable::new(playbooks))
-                .padding(16),
-        );
+        if self.playbooks.is_empty() {
+            v.push(empty(
+                Text::new("No playbooks").size(16).style(theme::Text::Secondary),
+            ));
+        } else if self.playbooks.len() > 10 {
+            v.push(self.omnibox());
+        } else {
+            let playbooks = self.playbooks.iter().fold(Column::new(), |column, playbook| {
+                column.push(item(&playbook.title, &playbook.description))
+            });
+            v.push(Scrollable::new(playbooks).into());
+        }
+
+        let items = Column::with_children(v).spacing(16).width(Length::Fill);
+        let content = Column::new().push(self.context_selector()).push(items);
 
         Container::new(content).height(Length::Fill).into()
     }
 
-    fn context_selector(&self, ctx: &Cluster) -> Element<Message> {
+    fn context_selector(&self) -> Element<Message> {
+        let style = match self.state {
+            State::Connecting => theme::Text::Secondary,
+            State::Connected => theme::Text::Success,
+            State::Disconnected => theme::Text::Danger,
+        };
+        let text = self.state.to_string();
         let state = Row::new()
-            .push(Text::new("•").size(14).style(theme::Text::Danger))
-            .push(Text::new(DISCONNECTED).size(14).style(theme::Text::Secondary))
+            .push(Text::new("•").size(14).style(style))
+            .push(Text::new(text).size(14).style(theme::Text::Secondary))
             .align_items(Alignment::Center);
 
         let heading = Column::new()
-            .push(Text::new(ctx.title.to_string()))
+            .push(Text::new(self.context.title.to_string()))
             .push(state)
             .width(Length::Fill);
 
@@ -162,5 +220,17 @@ fn item<'a>(title: impl ToString, description: impl ToString) -> Element<'a, Mes
                 .height(64),
         )
         .push(Rule::horizontal(1))
+        .into()
+}
+
+fn empty<'a, T>(content: T) -> Element<'a, Message>
+where
+    T: Into<Element<'a, Message>>,
+{
+    Container::new(content)
+        .width(Length::Fill)
+        .height(Length::Fill)
+        .center_x()
+        .center_y()
         .into()
 }

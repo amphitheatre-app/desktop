@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use amp_common::config::{Cluster, Configuration};
-use iced::{executor, Application, Command, Length};
+use amp_common::config::Configuration;
+use iced::{executor, Application, Command, Length, Subscription};
 use iced_aw::split;
 
 use crate::body::{self, Body};
 use crate::configuration::{self, ConfigurationError};
 use crate::sidebar::{self, Sidebar};
 use crate::theme::Theme;
-use crate::widget::{Element, Split};
+use crate::widget::{Container, Element, Split, Text};
 
 #[derive(Clone, Debug)]
 pub enum Message {
@@ -35,8 +35,7 @@ pub struct App {
     sidebar: Sidebar,
     body: Body,
     divider_position: Option<u16>,
-    configuration: Configuration,
-    context: Option<Cluster>,
+    configuration: Option<Configuration>,
 }
 
 impl Application for App {
@@ -50,8 +49,7 @@ impl Application for App {
             sidebar: Sidebar::new(),
             body: Body::new(),
             divider_position: Some(220),
-            configuration: Configuration::default(),
-            context: None,
+            configuration: None,
         };
 
         let command = Command::perform(configuration::load(), Message::ConfigurationMessage);
@@ -66,10 +64,9 @@ impl Application for App {
     fn update(&mut self, message: Self::Message) -> Command<Message> {
         match message {
             Message::ConfigurationMessage(Ok(configuration)) => {
-                self.configuration = configuration;
-                if let Some(context) = &self.configuration.context {
-                    self.context = context.current().cloned();
-                }
+                self.sidebar
+                    .update(sidebar::Message::ContextLoaded(configuration.context.clone()));
+                self.configuration = Some(configuration);
             }
             Message::ConfigurationMessage(Err(err)) => {
                 eprintln!("Could not load configuration: {}", err);
@@ -78,12 +75,24 @@ impl Application for App {
             Message::BodyMessage(message) => self.body.update(message),
             Message::SplitResized(position) => self.divider_position = Some(position),
         }
+
         Command::none()
     }
 
+    fn subscription(&self) -> Subscription<Self::Message> {
+        Subscription::batch(vec![
+            self.sidebar.subscription().map(Message::SidebarMessage),
+            self.body.subscription().map(Message::BodyMessage),
+        ])
+    }
+
     fn view(&self) -> Element<'_, Self::Message> {
+        if self.configuration.is_none() {
+            return empty(Text::new("Loading..."));
+        }
+
         Split::new(
-            self.sidebar.view(&self.context).map(Message::SidebarMessage),
+            self.sidebar.view().map(Message::SidebarMessage),
             self.body.view().map(Message::BodyMessage),
             self.divider_position,
             split::Axis::Vertical,
@@ -96,4 +105,16 @@ impl Application for App {
         .spacing(1.0)
         .into()
     }
+}
+
+fn empty<'a, T>(content: T) -> Element<'a, Message>
+where
+    T: Into<Element<'a, Message>>,
+{
+    Container::new(content)
+        .width(Length::Fill)
+        .height(Length::Fill)
+        .center_x()
+        .center_y()
+        .into()
 }

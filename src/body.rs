@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use iced::widget::{horizontal_space, Rule};
-use iced::{Alignment, Length};
+use iced::{Alignment, Length, Subscription};
 use iced_aw::native::IconText;
 use iced_aw::Icon;
 
@@ -63,6 +63,10 @@ impl Body {
             Message::Information(message) => self.info.update(message),
             Message::Stats(message) => self.stats.update(message),
         }
+    }
+
+    pub fn subscription(&self) -> Subscription<Message> {
+        Subscription::none()
     }
 
     pub fn view(&self) -> Element<Message> {
