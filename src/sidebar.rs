@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use amp_common::config::Cluster;
 use iced::widget::Rule;
 use iced::{color, Alignment, Length};
 use iced_aw::native::IconText;
@@ -21,7 +22,6 @@ use crate::theme;
 use crate::util::strings::generate_random_words_string;
 use crate::widget::{Button, Column, Container, Element, Row, Scrollable, Text, TextInput};
 
-const CONTEXT_NAME: &str = "Amphitheatre Local";
 const DISCONNECTED: &str = "Disconnected. Retrying...";
 
 #[derive(Debug)]
@@ -62,8 +62,11 @@ impl Sidebar {
         }
     }
 
-    pub fn view(&self) -> Element<Message> {
-        let context = self.context_selector();
+    pub fn view(&self, ctx: &Option<Cluster>) -> Element<Message> {
+        let context = match ctx {
+            Some(ctx) => self.context_selector(ctx),
+            None => Text::new("No context selected").into(),
+        };
 
         let playbooks = self.playbooks.iter().fold(Column::new(), |column, playbook| {
             column.push(item(&playbook.0, &playbook.1))
@@ -79,14 +82,14 @@ impl Sidebar {
         Container::new(content).height(Length::Fill).into()
     }
 
-    fn context_selector(&self) -> Element<Message> {
+    fn context_selector(&self, ctx: &Cluster) -> Element<Message> {
         let state = Row::new()
             .push(Text::new("•").size(14).style(theme::Text::Danger))
             .push(Text::new(DISCONNECTED).size(14).style(theme::Text::Secondary))
             .align_items(Alignment::Center);
 
         let heading = Column::new()
-            .push(Text::new(CONTEXT_NAME))
+            .push(Text::new(ctx.title.to_string()))
             .push(state)
             .width(Length::Fill);
 
