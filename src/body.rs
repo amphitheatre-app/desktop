@@ -71,7 +71,7 @@ impl Body {
 
     pub fn view(&self) -> Element<Message> {
         if self.playbook.is_none() {
-            return empty(Text::new(""));
+            return empty(Text::new("No playbook selected"));
         }
 
         Container::new(

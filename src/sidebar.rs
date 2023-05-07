@@ -17,7 +17,6 @@ use std::time::Duration;
 use amp_client::client::Client;
 use amp_client::playbooks::Playbook;
 use amp_common::config::{Cluster, ContextConfiguration};
-use iced::widget::Rule;
 use iced::{color, Alignment, Length, Subscription};
 use iced_aw::native::IconText;
 use iced_aw::Icon;
@@ -113,21 +112,19 @@ impl Sidebar {
     }
 
     pub fn view(&self) -> Element<Message> {
-        let mut v: Vec<Element<Message>> = vec![];
-
-        if self.playbooks.is_empty() {
-            v.push(empty(Text::new("No playbooks")));
-        } else if self.playbooks.len() > 10 {
-            v.push(self.omnibox());
-        } else {
-            let playbooks = self.playbooks.iter().fold(Column::new(), |column, playbook| {
+        let playbooks = self
+            .playbooks
+            .iter()
+            .fold(Column::new().spacing(8), |column, playbook| {
                 column.push(item(&playbook.title, &playbook.description))
             });
-            v.push(Scrollable::new(playbooks).into());
-        }
 
-        let items = Column::with_children(v).spacing(16).width(Length::Fill);
-        let content = Column::new().push(self.context_selector()).push(items);
+        let content = Column::new()
+            .push(self.context_selector())
+            .push(self.omnibox())
+            .push(Scrollable::new(playbooks))
+            .padding(16)
+            .spacing(16);
 
         Container::new(content).height(Length::Fill).into()
     }
@@ -164,7 +161,6 @@ impl Sidebar {
             .style(theme::Button::Element)
             .on_press(Message::ContextSelectorPressed),
         )
-        .padding(16)
         .into()
     }
 
@@ -175,7 +171,6 @@ impl Sidebar {
                 Button::new(IconText::new(Icon::Plus).width(Length::Fixed(20.0)))
                     .on_press(Message::CreateButtonPressed),
             )
-            .padding([0, 0, 16, 0])
             .spacing(4)
             .into()
     }
@@ -193,42 +188,19 @@ fn item<'a>(title: impl ToString, description: impl ToString) -> Element<'a, Mes
             .width(Length::Fixed(24.0))
             .height(Length::Fixed(26.0))
             .size(24.0),
-    )
-    .width(36)
-    .center_y()
-    .height(Length::Fill);
+    );
 
     let content = Column::new()
         .push(Text::new(title.to_string()))
         .push(
             Text::new(description.to_string())
-                .size(14)
-                .style(theme::Text::Secondary),
+                .style(theme::Text::Secondary)
+                .size(14),
         )
-        .width(Length::Fill)
-        .height(Length::Fill);
-
-    Column::new()
-        .push(
-            Row::new()
-                .push(icon)
-                .push(content)
-                .padding([8, 0])
-                .width(Length::Fill)
-                .height(64),
-        )
-        .push(Rule::horizontal(1))
-        .into()
-}
-
-fn empty<'a, T>(content: T) -> Element<'a, Message>
-where
-    T: Into<Element<'a, Message>>,
-{
-    Container::new(content)
         .width(Length::Fill)
         .height(Length::Fill)
-        .center_x()
-        .center_y()
-        .into()
+        .spacing(2);
+
+    let content = Row::new().push(icon).push(content).spacing(8);
+    Container::new(content).max_height(86).into()
 }
