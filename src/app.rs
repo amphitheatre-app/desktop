@@ -71,6 +71,9 @@ impl Application for App {
             Message::ConfigurationMessage(Err(err)) => {
                 eprintln!("Could not load configuration: {}", err);
             }
+            Message::SidebarMessage(sidebar::Message::PlaybookSelected(playbook)) => {
+                self.body.update(body::Message::PlaybookSelected(playbook));
+            }
             Message::SidebarMessage(message) => self.sidebar.update(message),
             Message::BodyMessage(message) => self.body.update(message),
             Message::SplitResized(position) => self.divider_position = Some(position),

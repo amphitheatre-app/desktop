@@ -42,6 +42,7 @@ pub enum Message {
     Logs(logs::Message),
     Information(inspect::Message),
     Stats(stats::Message),
+    PlaybookSelected(Playbook),
 }
 
 impl Body {
@@ -62,6 +63,7 @@ impl Body {
             Message::Logs(message) => self.logs.update(message),
             Message::Information(message) => self.info.update(message),
             Message::Stats(message) => self.stats.update(message),
+            Message::PlaybookSelected(playbook) => self.playbook = Some(playbook),
         }
     }
 

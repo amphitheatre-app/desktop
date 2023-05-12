@@ -41,6 +41,7 @@ pub enum Message {
     TextInputChanged(String),
     RefreshPlaybooks,
     ContextLoaded(Option<ContextConfiguration>),
+    PlaybookSelected(Playbook),
 }
 
 #[derive(Clone, Debug)]
@@ -103,6 +104,9 @@ impl Sidebar {
                     }
                 }
             }
+            Message::PlaybookSelected(playbook) => {
+                println!("Playbook selected: {:?}", playbook);
+            }
         }
     }
 
@@ -116,7 +120,14 @@ impl Sidebar {
             .playbooks
             .iter()
             .fold(Column::new().spacing(8), |column, playbook| {
-                column.push(item(&playbook.title, &playbook.description))
+                let item = item(&playbook.title, &playbook.description);
+                let height = item.as_widget().height();
+                column.push(
+                    Button::new(item)
+                        .height(height)
+                        .style(theme::Button::Element)
+                        .on_press(Message::PlaybookSelected(playbook.clone())),
+                )
             });
 
         let content = Column::new()
