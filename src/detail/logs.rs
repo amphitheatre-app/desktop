@@ -53,13 +53,13 @@ impl Tab for Logs {
     }
 
     fn content(&self) -> Element<'_, Self::Message> {
-        let content = self.buffer.iter().fold(
-            Column::new().spacing(4).align_items(Alignment::Start),
-            |column, log| {
+        let content = self
+            .buffer
+            .iter()
+            .fold(Column::new().spacing(4).align_items(Alignment::Start), |column, log| {
                 let text = Text::new(log).size(14).horizontal_alignment(Horizontal::Left);
                 column.push(Container::new(text).width(Length::Fill))
-            },
-        );
+            });
 
         Scrollable::new(content).into()
     }

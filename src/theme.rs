@@ -73,11 +73,7 @@ impl tabs::StyleSheet for Theme {
     fn active(&self, _style: Self::Style, is_active: bool) -> tab_bar::Appearance {
         let mut appearance = tab_bar::Appearance::default();
 
-        let text_color = if is_active {
-            color!(0xC9CCD3)
-        } else {
-            color!(0x848993)
-        };
+        let text_color = if is_active { color!(0xC9CCD3) } else { color!(0x848993) };
 
         appearance.tab_label_background = SURFACE.into();
         appearance.tab_label_border_width = 0.0;
@@ -115,7 +111,7 @@ impl scrollable::StyleSheet for Theme {
         }
     }
 
-    fn hovered(&self, _style: &Self::Style) -> scrollable::Scrollbar {
+    fn hovered(&self, _style: &Self::Style, _is_mouse_over_scrollbar: bool) -> scrollable::Scrollbar {
         scrollable::Scrollbar {
             background: Default::default(),
             border_radius: 0.0,
@@ -167,6 +163,7 @@ impl text_input::StyleSheet for Theme {
             border_radius: 6.0,
             border_width: 1.0,
             border_color: color!(0x474B56),
+            icon_color: color!(0xC9CCD3),
         }
     }
 
@@ -176,6 +173,7 @@ impl text_input::StyleSheet for Theme {
             border_radius: 6.0,
             border_width: 1.0,
             border_color: color!(0x474B56),
+            icon_color: color!(0xC9CCD3),
         }
     }
 
@@ -189,6 +187,20 @@ impl text_input::StyleSheet for Theme {
 
     fn selection_color(&self, _style: &Self::Style) -> iced::Color {
         color!(0x474B56)
+    }
+
+    fn disabled_color(&self, _style: &Self::Style) -> Color {
+        color!(0xC9CCD3)
+    }
+
+    fn disabled(&self, _style: &Self::Style) -> text_input::Appearance {
+        text_input::Appearance {
+            background: color!(0x292C33).into(),
+            border_radius: 6.0,
+            border_width: 1.0,
+            border_color: color!(0x474B56),
+            icon_color: color!(0xC9CCD3),
+        }
     }
 }
 

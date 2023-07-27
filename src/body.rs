@@ -118,22 +118,13 @@ impl Body {
 
     fn actions(&self) -> Element<Message> {
         Row::new()
-            .push(
-                Button::new(IconText::new(Icon::Play).width(Length::Fixed(20.0)))
-                    .on_press(Message::ButtonPressed),
-            )
-            .push(
-                Button::new(IconText::new(Icon::Stop).width(Length::Fixed(20.0)))
-                    .on_press(Message::ButtonPressed),
-            )
+            .push(Button::new(IconText::new(Icon::Play).width(Length::Fixed(20.0))).on_press(Message::ButtonPressed))
+            .push(Button::new(IconText::new(Icon::Stop).width(Length::Fixed(20.0))).on_press(Message::ButtonPressed))
             .push(
                 Button::new(IconText::new(Icon::ArrowRepeat).width(Length::Fixed(20.0)))
                     .on_press(Message::ButtonPressed),
             )
-            .push(
-                Button::new(IconText::new(Icon::X).width(Length::Fixed(20.0)))
-                    .on_press(Message::ButtonPressed),
-            )
+            .push(Button::new(IconText::new(Icon::X).width(Length::Fixed(20.0))).on_press(Message::ButtonPressed))
             .align_items(Alignment::Center)
             .spacing(4)
             .into()

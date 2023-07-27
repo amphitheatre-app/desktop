@@ -161,11 +161,7 @@ impl Sidebar {
             Button::new(
                 Row::new()
                     .push(heading)
-                    .push(
-                        IconText::new(Icon::ChevronExpand)
-                            .size(16.0)
-                            .color(color!(0x474B56)),
-                    )
+                    .push(IconText::new(Icon::ChevronExpand).size(16.0).color(color!(0x474B56)))
                     .align_items(Alignment::Center)
                     .width(Length::Fill),
             )
@@ -177,7 +173,7 @@ impl Sidebar {
 
     fn omnibox(&self) -> Element<Message> {
         Row::new()
-            .push(TextInput::new("Search", &self.query, Message::TextInputChanged))
+            .push(TextInput::new("Search", &self.query).on_input(Message::TextInputChanged))
             .push(
                 Button::new(IconText::new(Icon::Plus).width(Length::Fixed(20.0)))
                     .on_press(Message::CreateButtonPressed),
