@@ -28,7 +28,7 @@ use crate::widget::{Button, Column, Container, Element, Row, Tabs, Text};
 #[derive(Default)]
 pub struct Body {
     playbook: Option<Playbook>,
-    active_tab: usize,
+    active_tab: TabId,
     logs: Logs,
     info: Information,
     stats: Stats,
@@ -37,19 +37,27 @@ pub struct Body {
 #[derive(Clone, Debug)]
 pub enum Message {
     ButtonPressed,
-    TabSelected(usize),
+    TabSelected(TabId),
 
     Logs(logs::Message),
-    Information(inspect::Message),
+    Info(inspect::Message),
     Stats(stats::Message),
     PlaybookSelected(Playbook),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub enum TabId {
+    #[default]
+    Logs,
+    Info,
+    Stats,
 }
 
 impl Body {
     pub fn new() -> Self {
         Self {
             playbook: None,
-            active_tab: 0,
+            active_tab: TabId::default(),
             logs: Logs::new(),
             info: Information::new(),
             stats: Stats::new(),
@@ -61,7 +69,7 @@ impl Body {
             Message::ButtonPressed => {}
             Message::TabSelected(tab) => self.active_tab = tab,
             Message::Logs(message) => self.logs.update(message),
-            Message::Information(message) => self.info.update(message),
+            Message::Info(message) => self.info.update(message),
             Message::Stats(message) => self.stats.update(message),
             Message::PlaybookSelected(playbook) => self.playbook = Some(playbook),
         }
@@ -131,10 +139,11 @@ impl Body {
     }
 
     fn tabs(&self) -> Element<Message> {
-        Tabs::new(self.active_tab, Message::TabSelected)
-            .push(self.logs.label(), self.logs.view().map(Message::Logs))
-            .push(self.info.label(), self.info.view().map(Message::Information))
-            .push(self.stats.label(), self.stats.view().map(Message::Stats))
+        Tabs::new(Message::TabSelected)
+            .push(TabId::Logs, self.logs.label(), self.logs.view().map(Message::Logs))
+            .push(TabId::Info, self.info.label(), self.info.view().map(Message::Info))
+            .push(TabId::Stats, self.stats.label(), self.stats.view().map(Message::Stats))
+            .set_active_tab(&self.active_tab)
             .tab_label_padding(8.0)
             .height(Length::Shrink)
             .into()

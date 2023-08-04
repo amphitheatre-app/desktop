@@ -1,7 +1,7 @@
 use iced::widget::{button, container, rule, scrollable, text, text_input};
 use iced::{application, color, Color};
+use iced_aw::split;
 use iced_aw::style::tab_bar;
-use iced_aw::{split, tabs};
 
 const SURFACE: Color = Color::from_rgb(0x29 as f32 / 255.0, 0x2C as f32 / 255.0, 0x33 as f32 / 255.0);
 const ACCENT: Color = Color::from_rgb(0x30 as f32 / 255.0, 0x34 as f32 / 255.0, 0x3D as f32 / 255.0);
@@ -67,7 +67,7 @@ impl split::StyleSheet for Theme {
     }
 }
 
-impl tabs::StyleSheet for Theme {
+impl tab_bar::StyleSheet for Theme {
     type Style = ();
 
     fn active(&self, _style: Self::Style, is_active: bool) -> tab_bar::Appearance {
@@ -99,12 +99,12 @@ impl scrollable::StyleSheet for Theme {
     fn active(&self, _style: &Self::Style) -> scrollable::Scrollbar {
         scrollable::Scrollbar {
             background: Default::default(),
-            border_radius: 0.0,
+            border_radius: 0.0.into(),
             border_width: 0.0,
             border_color: Default::default(),
             scroller: scrollable::Scroller {
                 color: Default::default(),
-                border_radius: 0.0,
+                border_radius: 0.0.into(),
                 border_width: 0.0,
                 border_color: Default::default(),
             },
@@ -114,12 +114,12 @@ impl scrollable::StyleSheet for Theme {
     fn hovered(&self, _style: &Self::Style, _is_mouse_over_scrollbar: bool) -> scrollable::Scrollbar {
         scrollable::Scrollbar {
             background: Default::default(),
-            border_radius: 0.0,
+            border_radius: 0.0.into(),
             border_width: 0.0,
             border_color: Default::default(),
             scroller: scrollable::Scroller {
                 color: Default::default(),
-                border_radius: 0.0,
+                border_radius: 0.0.into(),
                 border_width: 0.0,
                 border_color: Default::default(),
             },
@@ -134,7 +134,7 @@ impl rule::StyleSheet for Theme {
         rule::Appearance {
             color: color!(0x474B56),
             width: 1,
-            radius: 0.0,
+            radius: 0.0.into(),
             fill_mode: rule::FillMode::Full,
         }
     }
@@ -160,7 +160,7 @@ impl text_input::StyleSheet for Theme {
     fn active(&self, _style: &Self::Style) -> text_input::Appearance {
         text_input::Appearance {
             background: color!(0x292C33).into(),
-            border_radius: 6.0,
+            border_radius: 6.0.into(),
             border_width: 1.0,
             border_color: color!(0x474B56),
             icon_color: color!(0xC9CCD3),
@@ -170,7 +170,7 @@ impl text_input::StyleSheet for Theme {
     fn focused(&self, _style: &Self::Style) -> text_input::Appearance {
         text_input::Appearance {
             background: color!(0x292C33).into(),
-            border_radius: 6.0,
+            border_radius: 6.0.into(),
             border_width: 1.0,
             border_color: color!(0x474B56),
             icon_color: color!(0xC9CCD3),
@@ -196,7 +196,7 @@ impl text_input::StyleSheet for Theme {
     fn disabled(&self, _style: &Self::Style) -> text_input::Appearance {
         text_input::Appearance {
             background: color!(0x292C33).into(),
-            border_radius: 6.0,
+            border_radius: 6.0.into(),
             border_width: 1.0,
             border_color: color!(0x474B56),
             icon_color: color!(0xC9CCD3),
@@ -218,7 +218,7 @@ impl button::StyleSheet for Theme {
         match style {
             Button::Default => button::Appearance {
                 background: Some(Color::TRANSPARENT.into()),
-                border_radius: 6.0,
+                border_radius: 6.0.into(),
                 border_width: 1.0,
                 border_color: color!(0x474B56),
                 text_color: color!(0xffffff),
@@ -232,7 +232,7 @@ impl button::StyleSheet for Theme {
         match style {
             Button::Default => button::Appearance {
                 background: Some(color!(0x474B56).into()),
-                border_radius: 6.0,
+                border_radius: 6.0.into(),
                 border_width: 1.0,
                 border_color: color!(0x474B56),
                 text_color: color!(0xffffff),

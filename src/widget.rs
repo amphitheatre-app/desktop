@@ -14,13 +14,13 @@ pub type TextInput<'a, Message, Renderer = self::Renderer> = iced::widget::TextI
 
 pub type Container<'a, Message> = iced::widget::Container<'a, Message, Renderer>;
 
-pub type Modal<'a, Content, Message, Backend, Theme> = iced_aw::Modal<'a, Content, Message, Backend, Theme>;
+pub type Modal<'a, Message, Renderer = self::Renderer> = iced_aw::Modal<'a, Message, Renderer>;
 
-pub type Card<'a, Message, Backend, Theme> = iced_aw::Card<'a, Message, Backend, Theme>;
+pub type Card<'a, Message, Renderer = self::Renderer> = iced_aw::Card<'a, Message, Renderer>;
 
-pub type Tabs<'a, Message, Backend, Theme> = iced_aw::Tabs<'a, Message, Backend, Theme>;
+pub type Tabs<'a, Message, TabId, Renderer = self::Renderer> = iced_aw::Tabs<'a, Message, TabId, Renderer>;
 
-pub type Split<'a, Message, Backend, Theme> = iced_aw::Split<'a, Message, Backend, Theme>;
+pub type Split<'a, Message, Renderer = self::Renderer> = iced_aw::Split<'a, Message, Renderer>;
 
 pub type Scrollable<'a, Message, Renderer = self::Renderer> = iced::widget::Scrollable<'a, Message, Renderer>;
 
