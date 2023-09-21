@@ -17,9 +17,9 @@ use std::time::Duration;
 use amp_client::client::Client;
 use amp_client::playbooks::Playbook;
 use amp_common::config::{Cluster, ContextConfiguration};
-use iced::{color, Alignment, Length, Subscription};
-use iced_aw::native::IconText;
-use iced_aw::Icon;
+use iced::{Alignment, Length, Subscription};
+use iced_aw::graphics::icons::icon_to_char;
+use iced_aw::{Icon, ICON_FONT};
 
 use crate::theme;
 use crate::widget::{Button, Column, Container, Element, Row, Scrollable, Text, TextInput};
@@ -161,7 +161,11 @@ impl Sidebar {
             Button::new(
                 Row::new()
                     .push(heading)
-                    .push(IconText::new(Icon::ChevronExpand).size(16.0).color(color!(0x474B56)))
+                    .push(
+                        Text::new(icon_to_char(Icon::ChevronExpand).to_string())
+                            .font(ICON_FONT)
+                            .size(16.0),
+                    )
                     .align_items(Alignment::Center)
                     .width(Length::Fill),
             )
@@ -175,8 +179,12 @@ impl Sidebar {
         Row::new()
             .push(TextInput::new("Search", &self.query).on_input(Message::TextInputChanged))
             .push(
-                Button::new(IconText::new(Icon::Plus).width(Length::Fixed(20.0)))
-                    .on_press(Message::CreateButtonPressed),
+                Button::new(
+                    Text::new(icon_to_char(Icon::Plus).to_string())
+                        .font(ICON_FONT)
+                        .width(Length::Fixed(20.0)),
+                )
+                .on_press(Message::CreateButtonPressed),
             )
             .spacing(4)
             .into()
@@ -191,7 +199,8 @@ impl Default for Sidebar {
 
 fn item<'a>(title: impl ToString, description: impl ToString) -> Element<'a, Message> {
     let icon = Container::new(
-        IconText::new(Icon::Box)
+        Text::new(icon_to_char(Icon::Box).to_string())
+            .font(ICON_FONT)
             .width(Length::Fixed(24.0))
             .height(Length::Fixed(26.0))
             .size(24.0),

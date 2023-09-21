@@ -47,7 +47,7 @@ impl text::StyleSheet for Theme {
 impl split::StyleSheet for Theme {
     type Style = ();
 
-    fn active(&self, _style: Self::Style) -> split::Appearance {
+    fn active(&self, _style: &Self::Style) -> split::Appearance {
         split::Appearance {
             first_background: Some(ACCENT.into()),
             divider_background: ACCENT.into(),
@@ -58,11 +58,11 @@ impl split::StyleSheet for Theme {
         }
     }
 
-    fn hovered(&self, style: Self::Style) -> split::Appearance {
+    fn hovered(&self, style: &Self::Style) -> split::Appearance {
         self.active(style)
     }
 
-    fn dragged(&self, style: Self::Style) -> split::Appearance {
+    fn dragged(&self, style: &Self::Style) -> split::Appearance {
         self.active(style)
     }
 }
@@ -70,7 +70,7 @@ impl split::StyleSheet for Theme {
 impl tab_bar::StyleSheet for Theme {
     type Style = ();
 
-    fn active(&self, _style: Self::Style, is_active: bool) -> tab_bar::Appearance {
+    fn active(&self, _style: &Self::Style, is_active: bool) -> tab_bar::Appearance {
         let mut appearance = tab_bar::Appearance::default();
 
         let text_color = if is_active { color!(0xC9CCD3) } else { color!(0x848993) };
@@ -84,7 +84,7 @@ impl tab_bar::StyleSheet for Theme {
         appearance
     }
 
-    fn hovered(&self, style: Self::Style, is_active: bool) -> tab_bar::Appearance {
+    fn hovered(&self, style: &Self::Style, is_active: bool) -> tab_bar::Appearance {
         tab_bar::Appearance {
             icon_color: color!(0xC9CCD3),
             text_color: color!(0xC9CCD3),

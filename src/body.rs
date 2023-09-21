@@ -15,8 +15,8 @@
 use amp_client::playbooks::Playbook;
 use iced::widget::{horizontal_space, Rule};
 use iced::{Alignment, Length, Subscription};
-use iced_aw::native::IconText;
-use iced_aw::Icon;
+use iced_aw::graphics::icons::icon_to_char;
+use iced_aw::{Icon, ICON_FONT};
 
 use crate::components::tabs::Tab;
 use crate::detail::inspect::{self, Information};
@@ -117,7 +117,11 @@ impl Body {
             .push(Text::new("Running").size(14).style(theme::Text::Success));
 
         Row::new()
-            .push(IconText::new(Icon::List).width(Length::Fixed(20.0)))
+            .push(
+                Text::new(icon_to_char(Icon::List).to_string())
+                    .font(ICON_FONT)
+                    .width(Length::Fixed(20.0)),
+            )
             .push(title)
             .align_items(Alignment::Center)
             .spacing(8)
@@ -126,13 +130,38 @@ impl Body {
 
     fn actions(&self) -> Element<Message> {
         Row::new()
-            .push(Button::new(IconText::new(Icon::Play).width(Length::Fixed(20.0))).on_press(Message::ButtonPressed))
-            .push(Button::new(IconText::new(Icon::Stop).width(Length::Fixed(20.0))).on_press(Message::ButtonPressed))
             .push(
-                Button::new(IconText::new(Icon::ArrowRepeat).width(Length::Fixed(20.0)))
-                    .on_press(Message::ButtonPressed),
+                Button::new(
+                    Text::new(icon_to_char(Icon::Play).to_string())
+                        .font(ICON_FONT)
+                        .width(Length::Fixed(20.0)),
+                )
+                .on_press(Message::ButtonPressed),
             )
-            .push(Button::new(IconText::new(Icon::X).width(Length::Fixed(20.0))).on_press(Message::ButtonPressed))
+            .push(
+                Button::new(
+                    Text::new(icon_to_char(Icon::Stop).to_string())
+                        .font(ICON_FONT)
+                        .width(Length::Fixed(20.0)),
+                )
+                .on_press(Message::ButtonPressed),
+            )
+            .push(
+                Button::new(
+                    Text::new(icon_to_char(Icon::ArrowRepeat).to_string())
+                        .font(ICON_FONT)
+                        .width(Length::Fixed(20.0)),
+                )
+                .on_press(Message::ButtonPressed),
+            )
+            .push(
+                Button::new(
+                    Text::new(icon_to_char(Icon::X).to_string())
+                        .font(ICON_FONT)
+                        .width(Length::Fixed(20.0)),
+                )
+                .on_press(Message::ButtonPressed),
+            )
             .align_items(Alignment::Center)
             .spacing(4)
             .into()
