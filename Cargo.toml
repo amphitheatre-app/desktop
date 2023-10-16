@@ -12,7 +12,7 @@ path = "src/main.rs"
 [dependencies]
 anyhow = "1.0.66"
 amp-client = { git = "https://github.com/amphitheatre-app/amp-client-rust", tag="v0.3.2" }
-amp-common = { git = "https://github.com/amphitheatre-app/common", tag="v0.5.1" }
+amp-common = { git = "https://github.com/amphitheatre-app/common", tag="v0.5.2" }
 iced = { version = "0.10.0", features = ["tokio", "debug"] }
 iced_aw = { version = "0.7.0" }
 rand = "0.8.5"
