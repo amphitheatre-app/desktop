@@ -12,9 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod app;
-pub mod config;
-pub mod styles;
-pub mod utils;
-pub mod views;
-pub mod widgets;
+pub mod application;
+
+mod button;
+pub use button::Button;
+
+pub mod constants;
+pub mod container;
+pub mod rule;
+pub mod scrollable;
+pub mod split;
+pub mod tab_bar;
+
+pub mod text_input;
+
+mod text;
+pub use text::Text;
+
+/// The custom theme for the application.
+/// All the widgets will implement for this theme.
+#[derive(Debug, Clone, Copy, Default)]
+pub struct Theme;

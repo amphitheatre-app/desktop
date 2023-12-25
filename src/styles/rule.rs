@@ -12,9 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod app;
-pub mod config;
-pub mod styles;
-pub mod utils;
-pub mod views;
-pub mod widgets;
+use super::Theme;
+
+use iced::color;
+use iced::widget::rule::{self, Appearance, StyleSheet};
+
+impl StyleSheet for Theme {
+    type Style = ();
+
+    fn appearance(&self, _style: &Self::Style) -> Appearance {
+        Appearance {
+            color: color!(0x474B56),
+            width: 1,
+            radius: 0.0.into(),
+            fill_mode: rule::FillMode::Full,
+        }
+    }
+}

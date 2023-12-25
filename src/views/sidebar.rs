@@ -22,7 +22,7 @@ use iced::{Alignment, Length, Subscription};
 use iced_aw::graphics::icons::icon_to_char;
 use iced_aw::{Icon, ICON_FONT};
 
-use crate::theme;
+use crate::styles;
 use crate::widgets::{Button, Column, Element, Row, Scrollable, Text, TextInput};
 
 #[derive(Debug)]
@@ -127,7 +127,7 @@ impl Sidebar {
                 // let height = item.as_widget().height();
                 column.push(
                     Button::new(item)
-                        .style(theme::Button::Element)
+                        .style(styles::Button::Element)
                         .width(Length::Fill)
                         .on_press(Message::PlaybookSelected(playbook.clone())),
                 )
@@ -148,14 +148,14 @@ impl Sidebar {
 
     fn context_selector(&self) -> Element<Message> {
         let style = match self.state {
-            State::Connecting => theme::Text::Secondary,
-            State::Connected => theme::Text::Success,
-            State::Disconnected => theme::Text::Danger,
+            State::Connecting => styles::Text::Secondary,
+            State::Connected => styles::Text::Success,
+            State::Disconnected => styles::Text::Danger,
         };
         let text = self.state.to_string();
         let state = Row::new()
             .push(Text::new("•").size(14).style(style))
-            .push(Text::new(text).size(14).style(theme::Text::Secondary))
+            .push(Text::new(text).size(14).style(styles::Text::Secondary))
             .align_items(Alignment::Center);
 
         let heading = Column::new()
@@ -175,7 +175,7 @@ impl Sidebar {
                     .align_items(Alignment::Center)
                     .width(Length::Fill),
             )
-            .style(theme::Button::Element)
+            .style(styles::Button::Element)
             .on_press(Message::ContextSelectorPressed),
         )
         .into()

@@ -17,7 +17,7 @@ use iced::{executor, Application, Command, Length, Subscription};
 use iced_aw::split;
 
 use crate::config::{self, ConfigurationError};
-use crate::theme::Theme;
+use crate::styles::Theme;
 use crate::views::body::{self, Body};
 use crate::views::sidebar::{self, Sidebar};
 use crate::widgets::{Container, Element, Split, Text};

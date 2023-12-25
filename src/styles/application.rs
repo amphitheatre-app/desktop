@@ -12,9 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod app;
-pub mod config;
-pub mod styles;
-pub mod utils;
-pub mod views;
-pub mod widgets;
+use iced::application::{Appearance, StyleSheet};
+use iced::color;
+
+use super::{constants::SURFACE, Theme};
+
+impl StyleSheet for Theme {
+    type Style = ();
+
+    fn appearance(&self, _style: &Self::Style) -> Appearance {
+        Appearance {
+            background_color: SURFACE,
+            text_color: color!(0xC9CCD3),
+        }
+    }
+}

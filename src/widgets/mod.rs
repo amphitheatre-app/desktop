@@ -14,7 +14,7 @@
 
 pub mod tabs;
 
-use crate::theme::Theme;
+use crate::styles::Theme;
 
 pub type Renderer = iced::Renderer<Theme>;
 

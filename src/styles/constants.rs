@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod app;
-pub mod config;
-pub mod styles;
-pub mod utils;
-pub mod views;
-pub mod widgets;
+use iced::Color;
+
+pub const SURFACE: Color = Color::from_rgb(0x29 as f32 / 255.0, 0x2C as f32 / 255.0, 0x33 as f32 / 255.0);
+pub const ACCENT: Color = Color::from_rgb(0x30 as f32 / 255.0, 0x34 as f32 / 255.0, 0x3D as f32 / 255.0);

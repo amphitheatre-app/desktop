@@ -18,7 +18,7 @@ use iced::{Alignment, Length, Subscription};
 use iced_aw::graphics::icons::icon_to_char;
 use iced_aw::{Icon, ICON_FONT};
 
-use crate::theme;
+use crate::styles;
 use crate::views::detail::inspect::{self, Information};
 use crate::views::detail::logs::{self, Logs};
 use crate::views::detail::stats::{self, Stats};
@@ -114,7 +114,7 @@ impl Body {
 
         let title = Column::new()
             .push(Text::new(title))
-            .push(Text::new("Running").size(14).style(theme::Text::Success));
+            .push(Text::new("Running").size(14).style(styles::Text::Success));
 
         Row::new()
             .push(

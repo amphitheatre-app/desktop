@@ -12,9 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod app;
-pub mod config;
-pub mod styles;
-pub mod utils;
-pub mod views;
-pub mod widgets;
+use iced::widget::container::{Appearance, StyleSheet};
+
+use super::Theme;
+
+#[derive(Debug, Clone, Copy, Default)]
+pub enum Container {
+    #[default]
+    Default,
+}
+
+impl StyleSheet for Theme {
+    type Style = Container;
+
+    fn appearance(&self, _style: &Self::Style) -> Appearance {
+        Appearance::default()
+    }
+}
