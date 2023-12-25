@@ -16,8 +16,8 @@ use iced::widget::{Row, Rule};
 use iced::{Alignment, Length};
 use iced_aw::TabLabel;
 
-use crate::components::tabs::Tab;
-use crate::widget::{Column, Container, Element, Text};
+use crate::widgets::tabs::Tab;
+use crate::widgets::{Column, Container, Element, Text};
 
 #[derive(Clone, Debug)]
 pub enum Message {}

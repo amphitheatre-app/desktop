@@ -16,7 +16,7 @@ use iced::widget::Rule;
 use iced::Length;
 use iced_aw::TabLabel;
 
-use crate::widget::{Column, Container, Element};
+use super::{Column, Container, Element};
 
 pub trait Tab {
     type Message;

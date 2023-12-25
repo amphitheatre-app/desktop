@@ -13,9 +13,8 @@
 // limitations under the License.
 
 pub mod app;
-pub mod components;
 pub mod configuration;
 pub mod theme;
 pub mod utils;
 pub mod views;
-pub mod widget;
+pub mod widgets;

@@ -23,7 +23,7 @@ use iced_aw::graphics::icons::icon_to_char;
 use iced_aw::{Icon, ICON_FONT};
 
 use crate::theme;
-use crate::widget::{Button, Column, Element, Row, Scrollable, Text, TextInput};
+use crate::widgets::{Button, Column, Element, Row, Scrollable, Text, TextInput};
 
 #[derive(Debug)]
 pub struct Sidebar {

@@ -20,7 +20,7 @@ use crate::configuration::{self, ConfigurationError};
 use crate::theme::Theme;
 use crate::views::body::{self, Body};
 use crate::views::sidebar::{self, Sidebar};
-use crate::widget::{Container, Element, Split, Text};
+use crate::widgets::{Container, Element, Split, Text};
 
 #[derive(Clone, Debug)]
 pub enum Message {

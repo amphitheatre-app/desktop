@@ -18,12 +18,12 @@ use iced::{Alignment, Length, Subscription};
 use iced_aw::graphics::icons::icon_to_char;
 use iced_aw::{Icon, ICON_FONT};
 
-use crate::components::tabs::Tab;
 use crate::theme;
 use crate::views::detail::inspect::{self, Information};
 use crate::views::detail::logs::{self, Logs};
 use crate::views::detail::stats::{self, Stats};
-use crate::widget::{Button, Column, Container, Element, Row, Tabs, Text};
+use crate::widgets::tabs::Tab;
+use crate::widgets::{Button, Column, Container, Element, Row, Tabs, Text};
 
 #[derive(Default)]
 pub struct Body {
