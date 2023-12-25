@@ -17,12 +17,13 @@ use std::time::Duration;
 use amp_client::client::Client;
 use amp_client::playbooks::Playbook;
 use amp_common::config::{Cluster, ContextConfiguration};
+use iced::widget::Container;
 use iced::{Alignment, Length, Subscription};
 use iced_aw::graphics::icons::icon_to_char;
 use iced_aw::{Icon, ICON_FONT};
 
 use crate::theme;
-use crate::widget::{Button, Column, Container, Element, Row, Scrollable, Text, TextInput};
+use crate::widget::{Button, Column, Element, Row, Scrollable, Text, TextInput};
 
 #[derive(Debug)]
 pub struct Sidebar {
@@ -101,6 +102,9 @@ impl Sidebar {
                 if let Some(contexts) = &self.contexts {
                     if let Some(context) = contexts.current() {
                         self.context = context.clone();
+
+                        // This will trigger a refresh of the playbooks.
+                        self.update(Message::RefreshPlaybooks);
                     }
                 }
             }
@@ -116,24 +120,26 @@ impl Sidebar {
     }
 
     pub fn view(&self) -> Element<Message> {
-        let playbooks = self
-            .playbooks
-            .iter()
-            .fold(Column::new().spacing(8), |column, playbook| {
+        let playbooks = self.playbooks.iter().fold(
+            Column::new().width(Length::Fill).height(Length::Fill),
+            |column, playbook| {
                 let item = item(&playbook.title, &playbook.description);
-                let height = item.as_widget().height();
+                // let height = item.as_widget().height();
                 column.push(
                     Button::new(item)
-                        .height(height)
                         .style(theme::Button::Element)
+                        .width(Length::Fill)
                         .on_press(Message::PlaybookSelected(playbook.clone())),
                 )
-            });
+            },
+        );
 
         let content = Column::new()
             .push(self.context_selector())
             .push(self.omnibox())
-            .push(Scrollable::new(playbooks))
+            .push(Scrollable::new(
+                Container::new(playbooks).width(Length::Fill).height(Length::Shrink),
+            ))
             .padding(16)
             .spacing(16);
 
@@ -197,26 +203,24 @@ impl Default for Sidebar {
     }
 }
 
-fn item<'a>(title: impl ToString, description: impl ToString) -> Element<'a, Message> {
-    let icon = Container::new(
-        Text::new(icon_to_char(Icon::Box).to_string())
-            .font(ICON_FONT)
-            .width(Length::Fixed(24.0))
-            .height(Length::Fixed(26.0))
-            .size(24.0),
-    );
+fn item<'a>(title: impl ToString, _description: impl ToString) -> Element<'a, Message> {
+    let icon = Text::new(icon_to_char(Icon::Box).to_string())
+        .font(ICON_FONT)
+        .size(14.0);
 
-    let content = Column::new()
+    // let content = Column::new()
+    //     .push(Text::new(title.to_string()))
+    //     .push(
+    //         Text::new(_description.to_string())
+    //             .style(theme::Text::Secondary)
+    //             .size(14),
+    //     )
+    //     .width(Length::Fill);
+
+    let content = Row::new()
+        .push(icon)
         .push(Text::new(title.to_string()))
-        .push(
-            Text::new(description.to_string())
-                .style(theme::Text::Secondary)
-                .size(14),
-        )
-        .width(Length::Fill)
-        .height(Length::Fill)
-        .spacing(2);
-
-    let content = Row::new().push(icon).push(content).spacing(8);
-    Container::new(content).max_height(86).into()
+        .align_items(Alignment::Start)
+        .spacing(8);
+    Container::new(content).into()
 }
