@@ -16,7 +16,7 @@ use amp_common::config::Configuration;
 use iced::{executor, Application, Command, Length, Subscription};
 use iced_aw::split;
 
-use crate::configuration::{self, ConfigurationError};
+use crate::config::{self, ConfigurationError};
 use crate::theme::Theme;
 use crate::views::body::{self, Body};
 use crate::views::sidebar::{self, Sidebar};
@@ -52,7 +52,7 @@ impl Application for App {
             configuration: None,
         };
 
-        let command = Command::perform(configuration::load(), Message::ConfigurationMessage);
+        let command = Command::perform(config::load(), Message::ConfigurationMessage);
 
         (app, command)
     }
