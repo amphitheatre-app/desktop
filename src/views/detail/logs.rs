@@ -29,7 +29,7 @@ pub struct Logs {
     buffer: Vec<String>,
 }
 
-const LOGS: &[u8] = include_bytes!("../../assets/test.access.log");
+const LOGS: &[u8] = include_bytes!("../../../assets/test.access.log");
 
 impl Logs {
     pub fn new() -> Self {

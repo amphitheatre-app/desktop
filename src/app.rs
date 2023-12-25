@@ -16,10 +16,10 @@ use amp_common::config::Configuration;
 use iced::{executor, Application, Command, Length, Subscription};
 use iced_aw::split;
 
-use crate::body::{self, Body};
 use crate::configuration::{self, ConfigurationError};
-use crate::sidebar::{self, Sidebar};
 use crate::theme::Theme;
+use crate::views::body::{self, Body};
+use crate::views::sidebar::{self, Sidebar};
 use crate::widget::{Container, Element, Split, Text};
 
 #[derive(Clone, Debug)]
