@@ -19,5 +19,5 @@ pub mod configuration;
 pub mod detail;
 pub mod sidebar;
 pub mod theme;
-pub mod util;
+pub mod utils;
 pub mod widget;
