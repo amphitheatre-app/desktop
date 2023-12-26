@@ -220,7 +220,7 @@ fn item<'a>(title: impl ToString, _description: impl ToString) -> Element<'a, Me
     let content = Row::new()
         .push(icon)
         .push(Text::new(title.to_string()))
-        .align_items(Alignment::Start)
+        .align_items(Alignment::Center)
         .spacing(8);
     Container::new(content).into()
 }
