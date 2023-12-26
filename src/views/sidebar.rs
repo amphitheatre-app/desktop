@@ -12,27 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::fmt::Display;
+use std::sync::Arc;
 use std::time::Duration;
 
-use amp_client::client::Client;
 use amp_client::playbooks::Playbook;
-use amp_common::config::{Cluster, ContextConfiguration};
 use iced::widget::Container;
 use iced::{Alignment, Length, Subscription};
 use iced_aw::graphics::icons::icon_to_char;
 use iced_aw::{Icon, ICON_FONT};
+use tracing::error;
 
+use crate::context::Context;
 use crate::styles;
 use crate::widgets::{Button, Column, Element, Row, Scrollable, Text, TextInput};
 
 #[derive(Debug)]
 pub struct Sidebar {
+    ctx: Arc<Context>,
     query: String,
     playbooks: Vec<Playbook>,
-    contexts: Option<ContextConfiguration>,
-    // current_context
-    context: Cluster,
     state: State,
+}
+
+impl Default for Sidebar {
+    fn default() -> Self {
+        Self::new(Arc::new(Context::default()))
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -41,38 +47,15 @@ pub enum Message {
     CreateButtonPressed,
     TextInputChanged(String),
     RefreshPlaybooks,
-    ContextLoaded(Option<ContextConfiguration>),
     PlaybookSelected(Playbook),
 }
 
-#[derive(Clone, Debug)]
-pub enum State {
-    Connecting,
-    Connected,
-    Disconnected,
-}
-
-// impl std::fmt::Display for State
-impl std::fmt::Display for State {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            State::Connecting => write!(f, "Connecting..."),
-            State::Connected => write!(f, "Connected"),
-            State::Disconnected => write!(f, "Disconnected. Retrying..."),
-        }
-    }
-}
-
 impl Sidebar {
-    pub fn new() -> Self {
+    pub fn new(ctx: Arc<Context>) -> Self {
         Self {
+            ctx,
             query: String::new(),
             playbooks: vec![],
-            contexts: None,
-            context: Cluster {
-                title: "Unknown".to_string(),
-                ..Cluster::default()
-            },
             state: State::Connecting,
         }
     }
@@ -83,30 +66,16 @@ impl Sidebar {
             Message::CreateButtonPressed => {}
             Message::TextInputChanged(query) => self.query = query,
             Message::RefreshPlaybooks => {
-                let url = &format!("{}/v1", &self.context.server);
-                let client = Client::new(url, self.context.token.clone());
-
-                match client.playbooks().list(None) {
+                match self.ctx.client.playbooks().list(None) {
                     Ok(playbooks) => {
                         self.playbooks = playbooks;
                         self.state = State::Connected;
                     }
                     Err(e) => {
-                        eprintln!("Failed to fetch playbooks, error: {}", e);
+                        error!("Failed to fetch playbooks, error: {}", e);
                         self.state = State::Disconnected;
                     }
-                }
-            }
-            Message::ContextLoaded(contexts) => {
-                self.contexts = contexts;
-                if let Some(contexts) = &self.contexts {
-                    if let Some(context) = contexts.current() {
-                        self.context = context.clone();
-
-                        // This will trigger a refresh of the playbooks.
-                        self.update(Message::RefreshPlaybooks);
-                    }
-                }
+                };
             }
             Message::PlaybookSelected(playbook) => {
                 println!("Playbook selected: {:?}", playbook);
@@ -145,7 +114,9 @@ impl Sidebar {
 
         Container::new(content).height(Length::Fill).into()
     }
+}
 
+impl Sidebar {
     fn context_selector(&self) -> Element<Message> {
         let style = match self.state {
             State::Connecting => styles::Text::Secondary,
@@ -158,8 +129,9 @@ impl Sidebar {
             .push(Text::new(text).size(14).style(styles::Text::Secondary))
             .align_items(Alignment::Center);
 
+        let context = self.ctx.cluster.read().unwrap();
         let heading = Column::new()
-            .push(Text::new(self.context.title.to_string()))
+            .push(Text::new(context.title.to_string()))
             .push(state)
             .width(Length::Fill);
 
@@ -197,9 +169,21 @@ impl Sidebar {
     }
 }
 
-impl Default for Sidebar {
-    fn default() -> Self {
-        Self::new()
+#[derive(Clone, Debug)]
+pub enum State {
+    Connecting,
+    Connected,
+    Disconnected,
+}
+
+// impl std::fmt::Display for State
+impl Display for State {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            State::Connecting => write!(f, "Connecting..."),
+            State::Connected => write!(f, "Connected"),
+            State::Disconnected => write!(f, "Disconnected. Retrying..."),
+        }
     }
 }
 

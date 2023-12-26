@@ -15,16 +15,37 @@
 // Prevent console window from showing up on Windows
 #![windows_subsystem = "windows"]
 
+use std::sync::Arc;
+
 use desktop::app::App;
+use desktop::context::Context;
+use desktop::errors::Result;
 use iced::{window, Application, Settings};
 
-pub fn main() -> iced::Result {
-    App::run(Settings {
+use tracing::error;
+use tracing_subscriber::EnvFilter;
+
+fn main() -> Result<()> {
+    // Initialize tracing
+    std::env::set_var("RUST_LOG", "desktop=trace");
+    let filter = EnvFilter::builder().from_env_lossy();
+    tracing_subscriber::fmt()
+        .with_target(false)
+        .with_env_filter(filter)
+        .init();
+
+    if let Err(err) = App::run(Settings {
+        flags: Arc::new(Context::init()?),
         window: window::Settings {
             size: (1028, 640),
             min_size: Some((1028, 640)),
             ..window::Settings::default()
         },
         ..Settings::default()
-    })
+    }) {
+        error!("{:#}", err);
+        std::process::exit(1);
+    }
+
+    Ok(())
 }

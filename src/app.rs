@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use amp_common::config::Configuration;
+use std::sync::Arc;
+
 use iced::{executor, Application, Command, Length, Subscription};
 use iced_aw::split;
 
-use crate::config::{self, ConfigurationError};
+use crate::context::Context;
 use crate::styles::Theme;
 use crate::views::body::{self, Body};
 use crate::views::sidebar::{self, Sidebar};
@@ -25,9 +26,6 @@ use crate::widgets::{Element, Split};
 
 #[derive(Clone, Debug)]
 pub enum Message {
-    // Global messages
-    ConfigurationMessage(Result<Configuration, ConfigurationError>),
-
     // Messages from the sub views.
     SidebarMessage(sidebar::Message),
     BodyMessage(body::Message),
@@ -37,27 +35,27 @@ pub enum Message {
 }
 
 pub struct App {
+    ctx: Arc<Context>,
     sidebar: Sidebar,
     body: Option<Body>,
     divider_position: Option<u16>,
-    configuration: Option<Configuration>,
 }
 
 impl Application for App {
     type Executor = executor::Default;
     type Message = Message;
     type Theme = Theme;
-    type Flags = ();
+    type Flags = Arc<Context>;
 
-    fn new(_flags: Self::Flags) -> (Self, Command<Message>) {
+    fn new(ctx: Self::Flags) -> (Self, Command<Message>) {
         let app = Self {
-            sidebar: Sidebar::new(),
+            ctx: ctx.clone(),
+            sidebar: Sidebar::new(ctx.clone()),
             body: None,
             divider_position: Some(220),
-            configuration: None,
         };
 
-        (app, Command::perform(config::load(), Message::ConfigurationMessage))
+        (app, Command::none())
     }
 
     fn title(&self) -> String {
@@ -66,16 +64,8 @@ impl Application for App {
 
     fn update(&mut self, message: Self::Message) -> Command<Message> {
         match message {
-            Message::ConfigurationMessage(Ok(configuration)) => {
-                self.sidebar
-                    .update(sidebar::Message::ContextLoaded(configuration.context.clone()));
-                self.configuration = Some(configuration);
-            }
-            Message::ConfigurationMessage(Err(err)) => {
-                eprintln!("Could not load configuration: {}", err);
-            }
             Message::SidebarMessage(sidebar::Message::PlaybookSelected(playbook)) => {
-                self.body = Some(Body::new(playbook.clone()));
+                self.body = Some(Body::new(self.ctx.clone(), playbook.clone()));
             }
             Message::SidebarMessage(message) => self.sidebar.update(message),
             Message::BodyMessage(message) => {
@@ -101,10 +91,6 @@ impl Application for App {
     }
 
     fn view(&self) -> Element<Self::Message> {
-        if self.configuration.is_none() {
-            return empty("Loading...").into();
-        }
-
         let first = self.sidebar.view().map(Message::SidebarMessage);
         let second = self
             .body

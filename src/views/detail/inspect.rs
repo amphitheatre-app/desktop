@@ -13,12 +13,14 @@
 // limitations under the License.
 
 use std::collections::HashMap;
+use std::sync::Arc;
 
 use amp_client::playbooks::Playbook;
 use iced::widget::Rule;
 use iced::{Length, Subscription};
 use iced_aw::TabLabel;
 
+use crate::context::Context;
 use crate::widgets::tabs::Tab;
 use crate::widgets::{Column, Element, Row, Scrollable, Text};
 
@@ -31,7 +33,7 @@ pub struct Information {
 }
 
 impl Information {
-    pub fn new(playbook: Playbook) -> Self {
+    pub fn new(_ctx: Arc<Context>, playbook: Playbook) -> Self {
         Self {
             playbook,
             data: HashMap::from([
@@ -78,23 +80,11 @@ impl Information {
     pub fn subscription(&self) -> Subscription<Message> {
         Subscription::none()
     }
-}
 
-impl Tab for Information {
-    type Message = Message;
-
-    fn title(&self) -> String {
-        String::from("Inspect")
-    }
-
-    fn label(&self) -> TabLabel {
-        TabLabel::Text(self.title())
-    }
-
-    fn content(&self) -> Element<'_, Self::Message> {
+    pub fn view(&self) -> Element<Message> {
         println!("The playbook is #{:?}", self.playbook.id);
 
-        let mut children: Vec<Element<'_, Self::Message>> = vec![];
+        let mut children = vec![];
 
         for (group, fields) in &self.data {
             children.push(Text::new(group.to_ascii_uppercase()).size(24).into());
@@ -115,7 +105,27 @@ impl Tab for Information {
             }
         }
 
-        let content = Column::with_children(children).spacing(16).width(Length::Fill);
+        let content = Column::with_children(children)
+            .padding(16)
+            .spacing(16)
+            .width(Length::Fill);
         Scrollable::new(content).into()
+    }
+}
+
+impl Tab for Information {
+    type Message = Message;
+
+    fn title(&self) -> String {
+        String::from("Inspect")
+    }
+
+    fn label(&self) -> TabLabel {
+        TabLabel::Text(self.title())
+    }
+
+    #[inline]
+    fn view(&self) -> Element<Self::Message> {
+        self.view()
     }
 }

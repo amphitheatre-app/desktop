@@ -25,16 +25,16 @@ pub trait Tab {
 
     fn label(&self) -> TabLabel;
 
-    fn view(&self) -> Element<'_, Self::Message> {
+    fn content(&self) -> Element<Self::Message> {
         Container::new(
             Column::new()
                 .push(Rule::horizontal(1))
-                .push(Container::new(self.content()).padding(16)),
+                .push(Container::new(self.view()).padding(16)),
         )
         .width(Length::Fill)
         .height(Length::Fill)
         .into()
     }
 
-    fn content(&self) -> Element<'_, Self::Message>;
+    fn view(&self) -> Element<Self::Message>;
 }

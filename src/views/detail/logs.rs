@@ -13,12 +13,14 @@
 // limitations under the License.
 
 use std::io::{BufRead, Cursor};
+use std::sync::Arc;
 
 use amp_client::playbooks::Playbook;
 use iced::alignment::Horizontal;
 use iced::{Alignment, Length, Subscription};
 use iced_aw::TabLabel;
 
+use crate::context::Context;
 use crate::widgets::tabs::Tab;
 use crate::widgets::{Column, Container, Element, Scrollable, Text};
 
@@ -33,7 +35,7 @@ pub struct Logs {
 const LOGS: &[u8] = include_bytes!("../../../assets/test.access.log");
 
 impl Logs {
-    pub fn new(playbook: Playbook) -> Self {
+    pub fn new(_ctx: Arc<Context>, playbook: Playbook) -> Self {
         Self {
             playbook,
             buffer: Cursor::new(LOGS).lines().map(|line| line.unwrap()).collect(),
@@ -44,6 +46,20 @@ impl Logs {
 
     pub fn subscription(&self) -> Subscription<Message> {
         Subscription::none()
+    }
+
+    pub fn view(&self) -> Element<Message> {
+        println!("The playbook is #{:?}", self.playbook.id);
+
+        let content = self
+            .buffer
+            .iter()
+            .fold(Column::new().spacing(4).align_items(Alignment::Start), |column, log| {
+                let text = Text::new(log).size(14).horizontal_alignment(Horizontal::Left);
+                column.push(Container::new(text).width(Length::Fill))
+            });
+
+        Scrollable::new(content).into()
     }
 }
 
@@ -58,17 +74,8 @@ impl Tab for Logs {
         TabLabel::Text(self.title())
     }
 
-    fn content(&self) -> Element<'_, Self::Message> {
-        println!("The playbook is #{:?}", self.playbook.id);
-
-        let content = self
-            .buffer
-            .iter()
-            .fold(Column::new().spacing(4).align_items(Alignment::Start), |column, log| {
-                let text = Text::new(log).size(14).horizontal_alignment(Horizontal::Left);
-                column.push(Container::new(text).width(Length::Fill))
-            });
-
-        Scrollable::new(content).into()
+    #[inline]
+    fn view(&self) -> Element<Self::Message> {
+        self.view()
     }
 }

@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::sync::Arc;
+
 use amp_client::playbooks::Playbook;
 use iced::widget::{Row, Rule};
 use iced::{Alignment, Length, Subscription};
 use iced_aw::TabLabel;
 
+use crate::context::Context;
 use crate::widgets::tabs::Tab;
 use crate::widgets::{Column, Container, Element, Text};
 
@@ -28,7 +31,7 @@ pub struct Stats {
 }
 
 impl Stats {
-    pub fn new(playbook: Playbook) -> Self {
+    pub fn new(_ctx: Arc<Context>, playbook: Playbook) -> Self {
         Self { playbook }
     }
 
@@ -37,20 +40,8 @@ impl Stats {
     pub fn subscription(&self) -> Subscription<Message> {
         Subscription::none()
     }
-}
 
-impl Tab for Stats {
-    type Message = Message;
-
-    fn title(&self) -> String {
-        String::from("Stats")
-    }
-
-    fn label(&self) -> TabLabel {
-        TabLabel::Text(self.title())
-    }
-
-    fn content(&self) -> Element<'_, Self::Message> {
+    pub fn view(&self) -> Element<Message> {
         println!("The playbook is #{:?}", self.playbook.id);
 
         let content = Column::new()
@@ -92,5 +83,22 @@ impl Stats {
         .center_x()
         .center_y()
         .into()
+    }
+}
+
+impl Tab for Stats {
+    type Message = Message;
+
+    fn title(&self) -> String {
+        String::from("Stats")
+    }
+
+    fn label(&self) -> TabLabel {
+        TabLabel::Text(self.title())
+    }
+
+    #[inline]
+    fn view(&self) -> Element<Self::Message> {
+        self.view()
     }
 }

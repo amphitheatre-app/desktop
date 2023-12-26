@@ -12,12 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::sync::Arc;
+
 use amp_client::playbooks::Playbook;
 use iced::widget::{horizontal_space, Rule};
 use iced::{Alignment, Length, Subscription};
 use iced_aw::graphics::icons::icon_to_char;
 use iced_aw::{Icon, ICON_FONT};
 
+use crate::context::Context;
 use crate::styles;
 use crate::views::detail::inspect::{self, Information};
 use crate::views::detail::logs::{self, Logs};
@@ -53,13 +56,13 @@ pub enum TabId {
 }
 
 impl Body {
-    pub fn new(playbook: Playbook) -> Self {
+    pub fn new(ctx: Arc<Context>, playbook: Playbook) -> Self {
         Self {
             playbook: playbook.clone(),
             active_tab: TabId::default(),
-            logs: Logs::new(playbook.clone()),
-            info: Information::new(playbook.clone()),
-            stats: Stats::new(playbook.clone()),
+            logs: Logs::new(ctx.clone(), playbook.clone()),
+            info: Information::new(ctx.clone(), playbook.clone()),
+            stats: Stats::new(ctx.clone(), playbook.clone()),
         }
     }
 
@@ -92,7 +95,9 @@ impl Body {
         .height(Length::Fill)
         .into()
     }
+}
 
+impl Body {
     /// toolbar
     fn toolbar(&self) -> Element<Message> {
         Container::new(
@@ -165,9 +170,13 @@ impl Body {
 
     fn tabs(&self) -> Element<Message> {
         Tabs::new(Message::TabSelected)
-            .push(TabId::Logs, self.logs.label(), self.logs.view().map(Message::Logs))
-            .push(TabId::Info, self.info.label(), self.info.view().map(Message::Info))
-            .push(TabId::Stats, self.stats.label(), self.stats.view().map(Message::Stats))
+            .push(TabId::Logs, self.logs.label(), self.logs.content().map(Message::Logs))
+            .push(TabId::Info, self.info.label(), self.info.content().map(Message::Info))
+            .push(
+                TabId::Stats,
+                self.stats.label(),
+                self.stats.content().map(Message::Stats),
+            )
             .set_active_tab(&self.active_tab)
             .tab_label_padding(8.0)
             .height(Length::Shrink)

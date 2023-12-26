@@ -1,6 +1,6 @@
 [package]
 name = "desktop"
-version = "0.2.2"
+version = "0.2.3"
 edition = "2021"
 
 [[bin]]
@@ -13,8 +13,14 @@ path = "src/main.rs"
 anyhow = "1.0.66"
 amp-client = { git = "https://github.com/amphitheatre-app/amp-client-rust", tag="v0.6.0" }
 amp-common = { git = "https://github.com/amphitheatre-app/common", tag="v0.6.0" }
+confy = "0.5.1"
 iced = { version = "0.10.0", features = ["tokio", "debug", "lazy"] }
 iced_aw = { version = "0.7.0" }
+ignore = "0.4.21"
+notify = "6.1.1"
 rand = "0.8.5"
 thiserror = "1.0"
 time = { version = "0.3.5", features = ["local-offset"] }
+toml = "0.8"
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
