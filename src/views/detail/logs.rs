@@ -12,54 +12,78 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::io::{BufRead, Cursor};
+use std::hash::Hash;
 use std::sync::Arc;
 
 use amp_client::playbooks::Playbook;
-use iced::alignment::Horizontal;
-use iced::{Alignment, Length, Subscription};
+use futures::StreamExt;
+use iced::widget::scrollable;
+use iced::{Command, Length, Subscription};
 use iced_aw::TabLabel;
+use iced_futures::{subscription, BoxStream};
+use reqwest_eventsource::{Event, EventSource};
 
 use crate::context::Context;
 use crate::widgets::tabs::Tab;
-use crate::widgets::{Column, Container, Element, Scrollable, Text};
+use crate::widgets::{Column, Element, Scrollable};
+use once_cell::sync::Lazy;
+
+static MESSAGE_LOG: Lazy<scrollable::Id> = Lazy::new(scrollable::Id::unique);
 
 #[derive(Clone, Debug)]
-pub enum Message {}
-
-pub struct Logs {
-    playbook: Playbook,
-    buffer: Vec<String>,
+pub enum Message {
+    Received(String),
+    Errored(String),
 }
 
-const LOGS: &[u8] = include_bytes!("../../../assets/test.access.log");
+pub struct Logs {
+    ctx: Arc<Context>,
+    playbook: Playbook,
+    messages: Vec<String>,
+}
 
 impl Logs {
-    pub fn new(_ctx: Arc<Context>, playbook: Playbook) -> Self {
+    pub fn new(ctx: Arc<Context>, playbook: Playbook) -> Self {
         Self {
+            ctx,
             playbook,
-            buffer: Cursor::new(LOGS).lines().map(|line| line.unwrap()).collect(),
+            messages: vec![],
         }
     }
 
-    pub fn update(&mut self, _message: Message) {}
+    pub fn update(&mut self, message: Message) -> Command<Message> {
+        match message {
+            Message::Received(message) => self.messages.push(message),
+            Message::Errored(message) => self.messages.push(message),
+        }
+        scrollable::snap_to(MESSAGE_LOG.clone(), scrollable::RelativeOffset::END)
+    }
 
+    // Tail the log stream from the server
     pub fn subscription(&self) -> Subscription<Message> {
-        Subscription::none()
+        Subscription::from_recipe(Receiver::new(
+            self.ctx.clone(),
+            &self.playbook.id,
+            &String::from("amp-example-go"),
+        ))
     }
 
     pub fn view(&self) -> Element<Message> {
-        println!("The playbook is #{:?}", self.playbook.id);
+        let content = Column::with_children(
+            self.messages
+                .iter()
+                .cloned()
+                .map(iced::widget::text)
+                .map(Element::from)
+                .collect(),
+        )
+        .width(Length::Fill)
+        .spacing(10);
 
-        let content = self
-            .buffer
-            .iter()
-            .fold(Column::new().spacing(4).align_items(Alignment::Start), |column, log| {
-                let text = Text::new(log).size(14).horizontal_alignment(Horizontal::Left);
-                column.push(Container::new(text).width(Length::Fill))
-            });
-
-        Scrollable::new(content).into()
+        Scrollable::new(content)
+            .id(MESSAGE_LOG.clone())
+            .height(Length::Fill)
+            .into()
     }
 }
 
@@ -77,5 +101,40 @@ impl Tab for Logs {
     #[inline]
     fn view(&self) -> Element<Self::Message> {
         self.view()
+    }
+}
+
+struct Receiver {
+    es: EventSource,
+}
+
+impl Receiver {
+    pub fn new(ctx: Arc<Context>, pid: &str, name: &str) -> Self {
+        Self {
+            es: ctx.client.actors().logs(pid, name),
+        }
+    }
+}
+
+const OPEN_STREAM_MESSAGE: &str = "Receiving the log stream from the server...";
+
+impl subscription::Recipe for Receiver {
+    type Output = Message;
+
+    fn hash(&self, state: &mut iced_futures::core::Hasher) {
+        std::any::TypeId::of::<Self>().hash(state)
+    }
+
+    fn stream(self: Box<Self>, _: subscription::EventStream) -> BoxStream<Self::Output> {
+        futures::stream::unfold(self.es, |mut es| async {
+            let event = es.next().await;
+            match event {
+                Some(Ok(Event::Open)) => Some((Message::Received(String::from(OPEN_STREAM_MESSAGE)), es)),
+                Some(Ok(Event::Message(message))) => Some((Message::Received(message.data), es)),
+                Some(Err(e)) => Some((Message::Errored(e.to_string()), es)),
+                _ => Some((Message::Errored(format!("{:#?}", event)), es)),
+            }
+        })
+        .boxed()
     }
 }

@@ -16,7 +16,7 @@ use std::sync::Arc;
 
 use amp_client::playbooks::Playbook;
 use iced::widget::{horizontal_space, Rule};
-use iced::{Alignment, Length, Subscription};
+use iced::{Alignment, Command, Length, Subscription};
 use iced_aw::graphics::icons::icon_to_char;
 use iced_aw::{Icon, ICON_FONT};
 
@@ -66,13 +66,16 @@ impl Body {
         }
     }
 
-    pub fn update(&mut self, message: Message) {
+    pub fn update(&mut self, message: Message) -> Command<Message> {
         match message {
-            Message::ButtonPressed => {}
-            Message::TabSelected(tab) => self.active_tab = tab,
-            Message::Logs(message) => self.logs.update(message),
-            Message::Info(message) => self.info.update(message),
-            Message::Stats(message) => self.stats.update(message),
+            Message::ButtonPressed => Command::none(),
+            Message::TabSelected(tab) => {
+                self.active_tab = tab;
+                Command::none()
+            }
+            Message::Logs(message) => self.logs.update(message).map(Message::Logs),
+            Message::Info(message) => self.info.update(message).map(Message::Info),
+            Message::Stats(message) => self.stats.update(message).map(Message::Stats),
         }
     }
 

@@ -709,17 +709,21 @@ dependencies = [
 
 [[package]]
 name = "desktop"
-version = "0.2.3"
+version = "0.2.4"
 dependencies = [
  "amp-client",
  "amp-common",
  "anyhow",
  "confy",
+ "futures",
  "iced",
  "iced_aw",
+ "iced_futures",
  "ignore",
  "notify",
+ "once_cell",
  "rand",
+ "reqwest-eventsource",
  "thiserror",
  "time",
  "toml 0.8.8",

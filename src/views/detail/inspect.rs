@@ -17,7 +17,7 @@ use std::sync::Arc;
 
 use amp_client::playbooks::Playbook;
 use iced::widget::Rule;
-use iced::{Length, Subscription};
+use iced::{Command, Length, Subscription};
 use iced_aw::TabLabel;
 
 use crate::context::Context;
@@ -28,14 +28,12 @@ use crate::widgets::{Column, Element, Row, Scrollable, Text};
 pub enum Message {}
 
 pub struct Information {
-    playbook: Playbook,
     data: HashMap<String, HashMap<String, String>>,
 }
 
 impl Information {
-    pub fn new(_ctx: Arc<Context>, playbook: Playbook) -> Self {
+    pub fn new(_ctx: Arc<Context>, _playbook: Playbook) -> Self {
         Self {
-            playbook,
             data: HashMap::from([
                 (
                     "environments".into(),
@@ -75,15 +73,15 @@ impl Information {
         }
     }
 
-    pub fn update(&mut self, _message: Message) {}
+    pub fn update(&mut self, _message: Message) -> Command<Message> {
+        Command::none()
+    }
 
     pub fn subscription(&self) -> Subscription<Message> {
         Subscription::none()
     }
 
     pub fn view(&self) -> Element<Message> {
-        println!("The playbook is #{:?}", self.playbook.id);
-
         let mut children = vec![];
 
         for (group, fields) in &self.data {

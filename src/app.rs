@@ -66,17 +66,20 @@ impl Application for App {
         match message {
             Message::SidebarMessage(sidebar::Message::PlaybookSelected(playbook)) => {
                 self.body = Some(Body::new(self.ctx.clone(), playbook.clone()));
+                Command::none()
             }
-            Message::SidebarMessage(message) => self.sidebar.update(message),
+            Message::SidebarMessage(message) => self.sidebar.update(message).map(Message::SidebarMessage),
             Message::BodyMessage(message) => {
                 if let Some(body) = &mut self.body {
-                    body.update(message);
+                    return body.update(message).map(Message::BodyMessage);
                 }
+                Command::none()
             }
-            Message::SplitResized(position) => self.divider_position = Some(position),
+            Message::SplitResized(position) => {
+                self.divider_position = Some(position);
+                Command::none()
+            }
         }
-
-        Command::none()
     }
 
     fn subscription(&self) -> Subscription<Self::Message> {

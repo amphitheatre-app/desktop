@@ -18,7 +18,7 @@ use std::time::Duration;
 
 use amp_client::playbooks::Playbook;
 use iced::widget::Container;
-use iced::{Alignment, Length, Subscription};
+use iced::{Alignment, Command, Length, Subscription};
 use iced_aw::graphics::icons::icon_to_char;
 use iced_aw::{Icon, ICON_FONT};
 use tracing::error;
@@ -60,11 +60,14 @@ impl Sidebar {
         }
     }
 
-    pub fn update(&mut self, message: Message) {
+    pub fn update(&mut self, message: Message) -> Command<Message> {
         match message {
-            Message::ContextSelectorPressed => {}
-            Message::CreateButtonPressed => {}
-            Message::TextInputChanged(query) => self.query = query,
+            Message::ContextSelectorPressed => Command::none(),
+            Message::CreateButtonPressed => Command::none(),
+            Message::TextInputChanged(query) => {
+                self.query = query;
+                Command::none()
+            }
             Message::RefreshPlaybooks => {
                 match self.ctx.client.playbooks().list(None) {
                     Ok(playbooks) => {
@@ -76,9 +79,11 @@ impl Sidebar {
                         self.state = State::Disconnected;
                     }
                 };
+                Command::none()
             }
             Message::PlaybookSelected(playbook) => {
                 println!("Playbook selected: {:?}", playbook);
+                Command::none()
             }
         }
     }

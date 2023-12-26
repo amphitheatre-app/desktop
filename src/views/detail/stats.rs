@@ -16,7 +16,7 @@ use std::sync::Arc;
 
 use amp_client::playbooks::Playbook;
 use iced::widget::{Row, Rule};
-use iced::{Alignment, Length, Subscription};
+use iced::{Alignment, Command, Length, Subscription};
 use iced_aw::TabLabel;
 
 use crate::context::Context;
@@ -26,24 +26,22 @@ use crate::widgets::{Column, Container, Element, Text};
 #[derive(Clone, Debug)]
 pub enum Message {}
 
-pub struct Stats {
-    playbook: Playbook,
-}
+pub struct Stats {}
 
 impl Stats {
-    pub fn new(_ctx: Arc<Context>, playbook: Playbook) -> Self {
-        Self { playbook }
+    pub fn new(_ctx: Arc<Context>, _playbook: Playbook) -> Self {
+        Self {}
     }
 
-    pub fn update(&mut self, _message: Message) {}
+    pub fn update(&mut self, _message: Message) -> Command<Message> {
+        Command::none()
+    }
 
     pub fn subscription(&self) -> Subscription<Message> {
         Subscription::none()
     }
 
     pub fn view(&self) -> Element<Message> {
-        println!("The playbook is #{:?}", self.playbook.id);
-
         let content = Column::new()
             .push(
                 Row::new()
