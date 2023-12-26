@@ -20,20 +20,25 @@ use crate::config::{self, ConfigurationError};
 use crate::styles::Theme;
 use crate::views::body::{self, Body};
 use crate::views::sidebar::{self, Sidebar};
-use crate::widgets::{Container, Element, Split, Text};
+use crate::widgets::empty::empty;
+use crate::widgets::{Element, Split};
 
 #[derive(Clone, Debug)]
 pub enum Message {
+    // Global messages
     ConfigurationMessage(Result<Configuration, ConfigurationError>),
 
+    // Messages from the sub views.
     SidebarMessage(sidebar::Message),
     BodyMessage(body::Message),
+
+    // Messages from self actions.
     SplitResized(u16),
 }
 
 pub struct App {
     sidebar: Sidebar,
-    body: Body,
+    body: Option<Body>,
     divider_position: Option<u16>,
     configuration: Option<Configuration>,
 }
@@ -47,14 +52,12 @@ impl Application for App {
     fn new(_flags: Self::Flags) -> (Self, Command<Message>) {
         let app = Self {
             sidebar: Sidebar::new(),
-            body: Body::new(),
+            body: None,
             divider_position: Some(220),
             configuration: None,
         };
 
-        let command = Command::perform(config::load(), Message::ConfigurationMessage);
-
-        (app, command)
+        (app, Command::perform(config::load(), Message::ConfigurationMessage))
     }
 
     fn title(&self) -> String {
@@ -72,10 +75,14 @@ impl Application for App {
                 eprintln!("Could not load configuration: {}", err);
             }
             Message::SidebarMessage(sidebar::Message::PlaybookSelected(playbook)) => {
-                self.body.update(body::Message::PlaybookSelected(playbook));
+                self.body = Some(Body::new(playbook.clone()));
             }
             Message::SidebarMessage(message) => self.sidebar.update(message),
-            Message::BodyMessage(message) => self.body.update(message),
+            Message::BodyMessage(message) => {
+                if let Some(body) = &mut self.body {
+                    body.update(message);
+                }
+            }
             Message::SplitResized(position) => self.divider_position = Some(position),
         }
 
@@ -85,18 +92,29 @@ impl Application for App {
     fn subscription(&self) -> Subscription<Self::Message> {
         Subscription::batch(vec![
             self.sidebar.subscription().map(Message::SidebarMessage),
-            self.body.subscription().map(Message::BodyMessage),
+            self.body
+                .as_ref()
+                .map(|body| body.subscription())
+                .unwrap_or(Subscription::none())
+                .map(Message::BodyMessage),
         ])
     }
 
-    fn view(&self) -> Element<'_, Self::Message> {
+    fn view(&self) -> Element<Self::Message> {
         if self.configuration.is_none() {
-            return empty(Text::new("Loading..."));
+            return empty("Loading...").into();
         }
 
+        let first = self.sidebar.view().map(Message::SidebarMessage);
+        let second = self
+            .body
+            .as_ref()
+            .map(|body| body.view().map(Message::BodyMessage))
+            .unwrap_or(empty("No playbook selected").into());
+
         Split::new(
-            self.sidebar.view().map(Message::SidebarMessage),
-            self.body.view().map(Message::BodyMessage),
+            first,
+            second,
             self.divider_position,
             split::Axis::Vertical,
             Message::SplitResized,
@@ -108,16 +126,4 @@ impl Application for App {
         .spacing(1.0)
         .into()
     }
-}
-
-fn empty<'a, T>(content: T) -> Element<'a, Message>
-where
-    T: Into<Element<'a, Message>>,
-{
-    Container::new(content)
-        .width(Length::Fill)
-        .height(Length::Fill)
-        .center_x()
-        .center_y()
-        .into()
 }

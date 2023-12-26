@@ -14,8 +14,9 @@
 
 use std::collections::HashMap;
 
+use amp_client::playbooks::Playbook;
 use iced::widget::Rule;
-use iced::Length;
+use iced::{Length, Subscription};
 use iced_aw::TabLabel;
 
 use crate::widgets::tabs::Tab;
@@ -24,14 +25,15 @@ use crate::widgets::{Column, Element, Row, Scrollable, Text};
 #[derive(Clone, Debug)]
 pub enum Message {}
 
-#[derive(Default)]
 pub struct Information {
+    playbook: Playbook,
     data: HashMap<String, HashMap<String, String>>,
 }
 
 impl Information {
-    pub fn new() -> Self {
+    pub fn new(playbook: Playbook) -> Self {
         Self {
+            playbook,
             data: HashMap::from([
                 (
                     "environments".into(),
@@ -72,6 +74,10 @@ impl Information {
     }
 
     pub fn update(&mut self, _message: Message) {}
+
+    pub fn subscription(&self) -> Subscription<Message> {
+        Subscription::none()
+    }
 }
 
 impl Tab for Information {
@@ -86,6 +92,8 @@ impl Tab for Information {
     }
 
     fn content(&self) -> Element<'_, Self::Message> {
+        println!("The playbook is #{:?}", self.playbook.id);
+
         let mut children: Vec<Element<'_, Self::Message>> = vec![];
 
         for (group, fields) in &self.data {

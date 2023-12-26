@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use amp_client::playbooks::Playbook;
 use iced::widget::{Row, Rule};
-use iced::{Alignment, Length};
+use iced::{Alignment, Length, Subscription};
 use iced_aw::TabLabel;
 
 use crate::widgets::tabs::Tab;
@@ -22,15 +23,20 @@ use crate::widgets::{Column, Container, Element, Text};
 #[derive(Clone, Debug)]
 pub enum Message {}
 
-#[derive(Default)]
-pub struct Stats;
+pub struct Stats {
+    playbook: Playbook,
+}
 
 impl Stats {
-    pub fn new() -> Self {
-        Self {}
+    pub fn new(playbook: Playbook) -> Self {
+        Self { playbook }
     }
 
     pub fn update(&mut self, _message: Message) {}
+
+    pub fn subscription(&self) -> Subscription<Message> {
+        Subscription::none()
+    }
 }
 
 impl Tab for Stats {
@@ -45,6 +51,8 @@ impl Tab for Stats {
     }
 
     fn content(&self) -> Element<'_, Self::Message> {
+        println!("The playbook is #{:?}", self.playbook.id);
+
         let content = Column::new()
             .push(
                 Row::new()

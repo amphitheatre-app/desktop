@@ -25,9 +25,9 @@ use crate::views::detail::stats::{self, Stats};
 use crate::widgets::tabs::Tab;
 use crate::widgets::{Button, Column, Container, Element, Row, Tabs, Text};
 
-#[derive(Default)]
+// #[derive(Default)]
 pub struct Body {
-    playbook: Option<Playbook>,
+    playbook: Playbook,
     active_tab: TabId,
     logs: Logs,
     info: Information,
@@ -42,7 +42,6 @@ pub enum Message {
     Logs(logs::Message),
     Info(inspect::Message),
     Stats(stats::Message),
-    PlaybookSelected(Playbook),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -54,13 +53,13 @@ pub enum TabId {
 }
 
 impl Body {
-    pub fn new() -> Self {
+    pub fn new(playbook: Playbook) -> Self {
         Self {
-            playbook: None,
+            playbook: playbook.clone(),
             active_tab: TabId::default(),
-            logs: Logs::new(),
-            info: Information::new(),
-            stats: Stats::new(),
+            logs: Logs::new(playbook.clone()),
+            info: Information::new(playbook.clone()),
+            stats: Stats::new(playbook.clone()),
         }
     }
 
@@ -71,19 +70,18 @@ impl Body {
             Message::Logs(message) => self.logs.update(message),
             Message::Info(message) => self.info.update(message),
             Message::Stats(message) => self.stats.update(message),
-            Message::PlaybookSelected(playbook) => self.playbook = Some(playbook),
         }
     }
 
     pub fn subscription(&self) -> Subscription<Message> {
-        Subscription::none()
+        Subscription::batch(vec![
+            self.logs.subscription().map(Message::Logs),
+            self.info.subscription().map(Message::Info),
+            self.stats.subscription().map(Message::Stats),
+        ])
     }
 
     pub fn view(&self) -> Element<Message> {
-        if self.playbook.is_none() {
-            return empty(Text::new("No playbook selected"));
-        }
-
         Container::new(
             Column::new()
                 .push(self.toolbar())
@@ -110,10 +108,8 @@ impl Body {
     }
 
     fn header(&self) -> Element<Message> {
-        let title = &self.playbook.as_ref().unwrap().title;
-
         let title = Column::new()
-            .push(Text::new(title))
+            .push(Text::new(&self.playbook.title))
             .push(Text::new("Running").size(14).style(styles::Text::Success));
 
         Row::new()
@@ -177,16 +173,4 @@ impl Body {
             .height(Length::Shrink)
             .into()
     }
-}
-
-fn empty<'a, T>(content: T) -> Element<'a, Message>
-where
-    T: Into<Element<'a, Message>>,
-{
-    Container::new(content)
-        .width(Length::Fill)
-        .height(Length::Fill)
-        .center_x()
-        .center_y()
-        .into()
 }
