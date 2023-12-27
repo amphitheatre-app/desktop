@@ -1,65 +1,57 @@
 name: Build Release Binaries
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - v[0-9]+.*
+
+permissions:
+  contents: write
 
 env:
   CARGO_TERM_COLOR: always
-  RELEASE_BIN_NAME: amphitheatre-desktop
 
 jobs:
-  release:
-    name: Release
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: taiki-e/create-gh-release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  upload-assets:
+    name: Upload Assets
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        build: [linux, macos, windows]
         include:
-        - build: linux
-          os: ubuntu-latest
-          target: x86_64-unknown-linux-gnu
-        - build: macos
-          os: macos-latest
-          target: x86_64-apple-darwin
-        - build: windows
-          os: windows-latest
-          target: x86_64-pc-windows-msvc
-
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            platform: linux-amd64
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            platform: linux-arm64
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            platform: darwin-amd64
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            platform: darwin-arm64
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            platform: windows-amd64
+#         - os: windows-latest
+#           target: aarch64-pc-windows-msvc
+#           platform: windows-arm64
     steps:
     - uses: actions/checkout@v4
-    - uses: dtolnay/rust-toolchain@stable
-    - name: Build release binary
-      run: cargo build --verbose --release
-
-    - name: Strip binary (Linux and macOS)
-      if: matrix.build == 'linux' || matrix.build == 'macos'
-      run: |
-        cargo install --force cargo-strip
-        cargo strip -t release
-
-    - name: Build archive
-      shell: bash
-      run: |
-        directory="${{ env.RELEASE_BIN_NAME }}-${{ matrix.target }}"
-        mkdir "$directory"
-        cp {README.md,LICENSE} "$directory/"
-        if [ "${{ matrix.build }}" = "windows" ]; then
-          cp "target/release/${{ env.RELEASE_BIN_NAME }}.exe" "$directory/"
-          7z a "$directory.zip" "$directory"
-          echo "ASSET=$directory.zip" >> $GITHUB_ENV
-        else
-          cp "target/release/${{ env.RELEASE_BIN_NAME }}" "$directory/"
-          tar czf "$directory.tar.gz" "$directory"
-          echo "ASSET=$directory.tar.gz" >> $GITHUB_ENV
-        fi
-
-    - name: Upload release archive
-      uses: actions/upload-release-asset@v1.0.2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - uses: taiki-e/install-action@cross
+    - uses: taiki-e/upload-rust-binary-action@v1
       with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: ${{ env.ASSET }}
-        asset_name: ${{ env.ASSET }}
-        asset_content_type: application/octet-stream
+        bin: amphitheatre-desktop
+        archive: $bin-${{ matrix.platform }}
+        target: ${{ matrix.target }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        include: LICENSE,README.md
