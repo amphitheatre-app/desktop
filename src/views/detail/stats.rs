@@ -12,51 +12,78 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::collections::HashMap;
 use std::sync::Arc;
+use std::time::Duration;
 
 use amp_client::playbooks::Playbook;
 use iced::widget::{Row, Rule};
 use iced::{Alignment, Command, Length, Subscription};
 use iced_aw::TabLabel;
+use tracing::{error, trace};
 
 use crate::context::Context;
 use crate::widgets::tabs::Tab;
 use crate::widgets::{Column, Container, Element, Text};
 
 #[derive(Clone, Debug)]
-pub enum Message {}
+pub enum Message {
+    Refresh,
+}
 
-pub struct Stats {}
+pub struct Stats {
+    ctx: Arc<Context>,
+    data: HashMap<String, String>,
+    playbook: Playbook,
+}
 
 impl Stats {
-    pub fn new(_ctx: Arc<Context>, _playbook: Playbook) -> Self {
-        Self {}
+    pub fn new(ctx: Arc<Context>, playbook: Playbook) -> Self {
+        Self {
+            ctx,
+            data: Default::default(),
+            playbook,
+        }
     }
 
-    pub fn update(&mut self, _message: Message) -> Command<Message> {
+    pub fn update(&mut self, message: Message) -> Command<Message> {
+        match message {
+            Message::Refresh => {
+                match self.ctx.client.actors().stats(&self.playbook.id, "amp-example-go") {
+                    Ok(data) => {
+                        trace!("Fetched actor's stats: {:#?}", data);
+                        self.data = serde_json::from_value(data).unwrap();
+                    }
+                    Err(e) => {
+                        error!("Failed to fetch actor's stats, error: {}", e);
+                    }
+                };
+            }
+        }
+
         Command::none()
     }
 
     pub fn subscription(&self) -> Subscription<Message> {
-        Subscription::none()
+        iced::time::every(Duration::from_secs(5)).map(|_| Message::Refresh)
     }
 
     pub fn view(&self) -> Element<Message> {
         let content = Column::new()
             .push(
                 Row::new()
-                    .push(self.cell("0.92%", "CPU USAGE"))
+                    .push(self.cell("CPU USAGE", self.cpu_usage_value()))
                     .push(Rule::vertical(1))
-                    .push(self.cell("118.3 MB", "MEMORY USAGE"))
+                    .push(self.cell("MEMORY USAGE", self.memory_usage_value()))
                     .width(Length::Fill)
                     .height(Length::FillPortion(5)),
             )
             .push(Rule::horizontal(1))
             .push(
                 Row::new()
-                    .push(self.cell("62.1 MB / 216 kB", "DISK READ/WRITE"))
+                    .push(self.cell("DISK READ/WRITE", "62.1 MB / 216 kB"))
                     .push(Rule::vertical(1))
-                    .push(self.cell("0 Bytes / 0 Bytes", "NETWORK IO"))
+                    .push(self.cell("NETWORK IO", "0 Bytes / 0 Bytes"))
                     .width(Length::Fill)
                     .height(Length::FillPortion(5)),
             )
@@ -68,7 +95,7 @@ impl Stats {
 }
 
 impl Stats {
-    fn cell(&self, value: impl ToString, label: impl ToString) -> Element<Message> {
+    fn cell(&self, label: impl ToString, value: impl ToString) -> Element<Message> {
         Container::new(
             Column::new()
                 .push(Text::new(value.to_string()).size(26))
@@ -81,6 +108,14 @@ impl Stats {
         .center_x()
         .center_y()
         .into()
+    }
+
+    fn cpu_usage_value(&self) -> String {
+        self.data.get("CPU USAGE").unwrap_or(&String::from("0")).to_string()
+    }
+
+    fn memory_usage_value(&self) -> String {
+        self.data.get("MEMORY USAGE").unwrap_or(&String::from("0")).to_string()
     }
 }
 
