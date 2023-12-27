@@ -21,14 +21,11 @@ use iced::widget::scrollable;
 use iced::{Command, Length, Subscription};
 use iced_aw::TabLabel;
 use iced_futures::{subscription, BoxStream};
-use reqwest_eventsource::{Event, EventSource};
+use reqwest_eventsource::Event;
 
 use crate::context::Context;
 use crate::widgets::tabs::Tab;
 use crate::widgets::{Column, Element, Scrollable};
-use once_cell::sync::Lazy;
-
-static MESSAGE_LOG: Lazy<scrollable::Id> = Lazy::new(scrollable::Id::unique);
 
 #[derive(Clone, Debug)]
 pub enum Message {
@@ -40,6 +37,7 @@ pub struct Logs {
     ctx: Arc<Context>,
     playbook: Playbook,
     messages: Vec<String>,
+    scrollable_id: scrollable::Id,
 }
 
 impl Logs {
@@ -48,6 +46,7 @@ impl Logs {
             ctx,
             playbook,
             messages: vec![],
+            scrollable_id: scrollable::Id::unique(),
         }
     }
 
@@ -56,7 +55,7 @@ impl Logs {
             Message::Received(message) => self.messages.push(message),
             Message::Errored(message) => self.messages.push(message),
         }
-        scrollable::snap_to(MESSAGE_LOG.clone(), scrollable::RelativeOffset::END)
+        scrollable::snap_to(self.scrollable_id.clone(), scrollable::RelativeOffset::END)
     }
 
     // Tail the log stream from the server
@@ -81,7 +80,7 @@ impl Logs {
         .spacing(10);
 
         Scrollable::new(content)
-            .id(MESSAGE_LOG.clone())
+            .id(self.scrollable_id.clone())
             .height(Length::Fill)
             .into()
     }
@@ -105,13 +104,17 @@ impl Tab for Logs {
 }
 
 struct Receiver {
-    es: EventSource,
+    ctx: Arc<Context>,
+    pid: String,
+    name: String,
 }
 
 impl Receiver {
     pub fn new(ctx: Arc<Context>, pid: &str, name: &str) -> Self {
         Self {
-            es: ctx.client.actors().logs(pid, name),
+            ctx,
+            pid: String::from(pid),
+            name: String::from(name),
         }
     }
 }
@@ -122,11 +125,13 @@ impl subscription::Recipe for Receiver {
     type Output = Message;
 
     fn hash(&self, state: &mut iced_futures::core::Hasher) {
-        std::any::TypeId::of::<Self>().hash(state)
+        std::any::TypeId::of::<Self>().hash(state);
+        self.pid.hash(state);
+        self.name.hash(state);
     }
 
     fn stream(self: Box<Self>, _: subscription::EventStream) -> BoxStream<Self::Output> {
-        futures::stream::unfold(self.es, |mut es| async {
+        futures::stream::unfold(self.ctx.client.actors().logs(&self.pid, &self.name), |mut es| async {
             let event = es.next().await;
             match event {
                 Some(Ok(Event::Open)) => Some((Message::Received(String::from(OPEN_STREAM_MESSAGE)), es)),
