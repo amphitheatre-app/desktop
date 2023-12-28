@@ -39,6 +39,8 @@ pub struct Body {
 
 #[derive(Clone, Debug)]
 pub enum Message {
+    Initializing,
+
     ButtonPressed,
     TabSelected(TabId),
 
@@ -68,15 +70,19 @@ impl Body {
 
     pub fn update(&mut self, message: Message) -> Command<Message> {
         match message {
-            Message::ButtonPressed => Command::none(),
-            Message::TabSelected(tab) => {
-                self.active_tab = tab;
-                Command::none()
+            Message::Initializing => {
+                return Command::batch(vec![
+                    Command::perform(async {}, |_| Message::Info(inspect::Message::Initializing)),
+                    Command::perform(async {}, |_| Message::Stats(stats::Message::Initializing)),
+                ]);
             }
-            Message::Logs(message) => self.logs.update(message).map(Message::Logs),
-            Message::Info(message) => self.info.update(message).map(Message::Info),
-            Message::Stats(message) => self.stats.update(message).map(Message::Stats),
+            Message::ButtonPressed => {}
+            Message::TabSelected(tab) => self.active_tab = tab,
+            Message::Logs(message) => return self.logs.update(message).map(Message::Logs),
+            Message::Info(message) => return self.info.update(message).map(Message::Info),
+            Message::Stats(message) => return self.stats.update(message).map(Message::Stats),
         }
+        Command::none()
     }
 
     pub fn subscription(&self) -> Subscription<Message> {

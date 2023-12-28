@@ -20,15 +20,16 @@ use amp_client::playbooks::Playbook;
 use iced::widget::{Row, Rule};
 use iced::{Alignment, Command, Length, Subscription};
 use iced_aw::TabLabel;
-use tracing::{error, trace};
 
+use crate::cmd::actor::refresh_actor_stats;
 use crate::context::Context;
 use crate::widgets::tabs::Tab;
 use crate::widgets::{Column, Container, Element, Text};
 
 #[derive(Clone, Debug)]
 pub enum Message {
-    Refresh,
+    Initializing,
+    StatsLoaded(HashMap<String, String>),
 }
 
 pub struct Stats {
@@ -48,24 +49,19 @@ impl Stats {
 
     pub fn update(&mut self, message: Message) -> Command<Message> {
         match message {
-            Message::Refresh => {
-                match self.ctx.client.actors().stats(&self.playbook.id, "amp-example-go") {
-                    Ok(data) => {
-                        trace!("Fetched actor's stats: {:#?}", data);
-                        self.data = serde_json::from_value(data).unwrap();
-                    }
-                    Err(e) => {
-                        error!("Failed to fetch actor's stats, error: {}", e);
-                    }
-                };
+            Message::Initializing => {
+                let pid = self.playbook.id.to_string();
+                let name = "amp-example-go".to_string();
+                return Command::perform(refresh_actor_stats(self.ctx.clone(), pid, name), Message::StatsLoaded);
             }
+            Message::StatsLoaded(data) => self.data = data,
         }
 
         Command::none()
     }
 
     pub fn subscription(&self) -> Subscription<Message> {
-        iced::time::every(Duration::from_secs(5)).map(|_| Message::Refresh)
+        iced::time::every(Duration::from_secs(5)).map(|_| Message::Initializing)
     }
 
     pub fn view(&self) -> Element<Message> {

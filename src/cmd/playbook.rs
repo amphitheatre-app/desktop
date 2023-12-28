@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod app;
-pub mod cmd;
-pub mod context;
-pub mod errors;
-pub mod styles;
-pub mod utils;
-pub mod views;
-pub mod widgets;
+use std::sync::Arc;
+
+use amp_client::playbooks::Playbook;
+
+use crate::context::Context;
+
+pub async fn refresh_playbooks(ctx: Arc<Context>) -> Vec<Playbook> {
+    ctx.client.playbooks().list(None).unwrap_or_default()
+}

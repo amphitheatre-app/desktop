@@ -55,7 +55,12 @@ impl Application for App {
             divider_position: Some(220),
         };
 
-        (app, Command::none())
+        let commands = Command::batch(vec![
+            Command::perform(async {}, |_| Message::SidebarMessage(sidebar::Message::Initializing)),
+            Command::perform(async {}, |_| Message::BodyMessage(body::Message::Initializing)),
+        ]);
+
+        (app, commands)
     }
 
     fn title(&self) -> String {
@@ -65,21 +70,17 @@ impl Application for App {
     fn update(&mut self, message: Self::Message) -> Command<Message> {
         match message {
             Message::SidebarMessage(sidebar::Message::PlaybookSelected(playbook)) => {
-                self.body = Some(Body::new(self.ctx.clone(), playbook.clone()));
-                Command::none()
+                self.body = Some(Body::new(self.ctx.clone(), playbook.clone()))
             }
-            Message::SidebarMessage(message) => self.sidebar.update(message).map(Message::SidebarMessage),
+            Message::SidebarMessage(message) => return self.sidebar.update(message).map(Message::SidebarMessage),
             Message::BodyMessage(message) => {
                 if let Some(body) = &mut self.body {
                     return body.update(message).map(Message::BodyMessage);
                 }
-                Command::none()
             }
-            Message::SplitResized(position) => {
-                self.divider_position = Some(position);
-                Command::none()
-            }
+            Message::SplitResized(position) => self.divider_position = Some(position),
         }
+        Command::none()
     }
 
     fn subscription(&self) -> Subscription<Self::Message> {

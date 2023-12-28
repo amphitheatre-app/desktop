@@ -21,8 +21,8 @@ use iced::widget::Container;
 use iced::{Alignment, Command, Length, Subscription};
 use iced_aw::graphics::icons::icon_to_char;
 use iced_aw::{Icon, ICON_FONT};
-use tracing::error;
 
+use crate::cmd::playbook::refresh_playbooks;
 use crate::context::Context;
 use crate::styles;
 use crate::widgets::{Button, Column, Element, Row, Scrollable, Text, TextInput};
@@ -43,10 +43,12 @@ impl Default for Sidebar {
 
 #[derive(Clone, Debug)]
 pub enum Message {
+    Initializing,
+    PlaybooksLoaded(Vec<Playbook>),
+
     ContextSelectorPressed,
     CreateButtonPressed,
     TextInputChanged(String),
-    RefreshPlaybooks,
     PlaybookSelected(Playbook),
 }
 
@@ -62,35 +64,26 @@ impl Sidebar {
 
     pub fn update(&mut self, message: Message) -> Command<Message> {
         match message {
-            Message::ContextSelectorPressed => Command::none(),
-            Message::CreateButtonPressed => Command::none(),
-            Message::TextInputChanged(query) => {
-                self.query = query;
-                Command::none()
+            Message::Initializing => {
+                return Command::perform(refresh_playbooks(self.ctx.clone()), Message::PlaybooksLoaded);
             }
-            Message::RefreshPlaybooks => {
-                match self.ctx.client.playbooks().list(None) {
-                    Ok(playbooks) => {
-                        self.playbooks = playbooks;
-                        self.state = State::Connected;
-                    }
-                    Err(e) => {
-                        error!("Failed to fetch playbooks, error: {}", e);
-                        self.state = State::Disconnected;
-                    }
-                };
-                Command::none()
+            Message::PlaybooksLoaded(playbooks) => {
+                self.playbooks = playbooks;
+                self.state = State::Connected;
             }
+            Message::ContextSelectorPressed => {}
+            Message::CreateButtonPressed => {}
+            Message::TextInputChanged(query) => self.query = query,
             Message::PlaybookSelected(playbook) => {
                 println!("Playbook selected: {:?}", playbook);
-                Command::none()
             }
         }
+        Command::none()
     }
 
     /// poll playbooks from the server every 5 seconds
     pub fn subscription(&self) -> Subscription<Message> {
-        iced::time::every(Duration::from_secs(5)).map(|_| Message::RefreshPlaybooks)
+        iced::time::every(Duration::from_secs(5)).map(|_| Message::Initializing)
     }
 
     pub fn view(&self) -> Element<Message> {

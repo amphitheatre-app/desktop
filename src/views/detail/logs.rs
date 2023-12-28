@@ -52,10 +52,15 @@ impl Logs {
 
     pub fn update(&mut self, message: Message) -> Command<Message> {
         match message {
-            Message::Received(message) => self.messages.push(message),
-            Message::Errored(message) => self.messages.push(message),
+            Message::Received(message) => {
+                self.messages.push(message);
+                scrollable::snap_to(self.scrollable_id.clone(), scrollable::RelativeOffset::END)
+            }
+            Message::Errored(message) => {
+                self.messages.push(message);
+                scrollable::snap_to(self.scrollable_id.clone(), scrollable::RelativeOffset::END)
+            }
         }
-        scrollable::snap_to(self.scrollable_id.clone(), scrollable::RelativeOffset::END)
     }
 
     // Tail the log stream from the server
