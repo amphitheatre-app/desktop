@@ -27,9 +27,12 @@ pub trait Tab {
 
     fn content(&self) -> Element<Self::Message> {
         Container::new(
-            Column::new()
-                .push(Rule::horizontal(1))
-                .push(Container::new(self.view()).padding(16)),
+            Column::new().push(Rule::horizontal(1)).push(
+                Container::new(self.view())
+                    .width(Length::Fill)
+                    .height(Length::Fill)
+                    .padding(16),
+            ),
         )
         .width(Length::Fill)
         .height(Length::Fill)

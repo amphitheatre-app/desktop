@@ -25,7 +25,7 @@ use reqwest_eventsource::Event;
 
 use crate::context::Context;
 use crate::widgets::tabs::Tab;
-use crate::widgets::{Column, Element, Scrollable};
+use crate::widgets::{Column, Element, Scrollable, Text};
 
 #[derive(Clone, Debug)]
 pub enum Message {
@@ -77,8 +77,7 @@ impl Logs {
             self.messages
                 .iter()
                 .cloned()
-                .map(iced::widget::text)
-                .map(Element::from)
+                .map(|message| Text::new(message).size(13).into())
                 .collect(),
         )
         .width(Length::Fill)
