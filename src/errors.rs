@@ -85,4 +85,7 @@ pub enum Errors {
 
     #[error("Failed to add context: {0}")]
     FailedAddContext(anyhow::Error),
+
+    #[error("Some error occurred: {0}")]
+    IcedError(#[from] iced::Error),
 }

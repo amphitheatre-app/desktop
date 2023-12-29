@@ -19,10 +19,8 @@ use std::sync::Arc;
 
 use desktop::app::App;
 use desktop::context::Context;
-use desktop::errors::Result;
+use desktop::errors::{Errors::IcedError, Result};
 use iced::{window, Application, Settings};
-
-use tracing::error;
 use tracing_subscriber::EnvFilter;
 
 fn main() -> Result<()> {
@@ -34,7 +32,7 @@ fn main() -> Result<()> {
         .with_env_filter(filter)
         .init();
 
-    if let Err(err) = App::run(Settings {
+    App::run(Settings {
         flags: Arc::new(Context::init()?),
         window: window::Settings {
             size: (1028, 640),
@@ -42,10 +40,6 @@ fn main() -> Result<()> {
             ..window::Settings::default()
         },
         ..Settings::default()
-    }) {
-        error!("{:#}", err);
-        std::process::exit(1);
-    }
-
-    Ok(())
+    })
+    .map_err(IcedError)
 }
