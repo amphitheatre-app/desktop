@@ -25,7 +25,9 @@ use iced_aw::{Icon, ICON_FONT};
 use crate::cmd::playbook::refresh_playbooks;
 use crate::context::Context;
 use crate::styles;
-use crate::widgets::{Button, Column, Element, Row, Scrollable, Text, TextInput};
+use crate::widgets::{Button, Column, Element, Modal, Row, Scrollable, Text, TextInput};
+
+use super::compose::{self, Compose};
 
 #[derive(Debug)]
 pub struct Sidebar {
@@ -33,6 +35,8 @@ pub struct Sidebar {
     query: String,
     playbooks: Vec<Playbook>,
     state: State,
+    show_modal: bool,
+    compose_form: compose::Form,
 }
 
 impl Default for Sidebar {
@@ -50,6 +54,10 @@ pub enum Message {
     CreateButtonPressed,
     TextInputChanged(String),
     PlaybookSelected(Playbook),
+
+    CloseComposeModal,
+    ComposeFormChanged(compose::Form),
+    ComposeFormSubmit,
 }
 
 impl Sidebar {
@@ -59,6 +67,8 @@ impl Sidebar {
             query: String::new(),
             playbooks: vec![],
             state: State::Connecting,
+            show_modal: false,
+            compose_form: compose::Form::default(),
         }
     }
 
@@ -72,10 +82,20 @@ impl Sidebar {
                 self.state = State::Connected;
             }
             Message::ContextSelectorPressed => {}
-            Message::CreateButtonPressed => {}
+            Message::CreateButtonPressed => self.show_modal = true,
             Message::TextInputChanged(query) => self.query = query,
             Message::PlaybookSelected(playbook) => {
                 println!("Playbook selected: {:?}", playbook);
+            }
+            Message::CloseComposeModal => {
+                self.show_modal = false;
+                self.compose_form = compose::Form::default();
+            }
+            Message::ComposeFormChanged(form) => self.compose_form = form,
+            Message::ComposeFormSubmit => {
+                println!("Form submitted: {:?}", self.compose_form);
+                self.show_modal = false;
+                self.compose_form = compose::Form::default();
             }
         }
         Command::none()
@@ -154,15 +174,33 @@ impl Sidebar {
     fn omnibox(&self) -> Element<Message> {
         Row::new()
             .push(TextInput::new("Search", &self.query).on_input(Message::TextInputChanged))
-            .push(
-                Button::new(
-                    Text::new(icon_to_char(Icon::Plus).to_string())
-                        .font(ICON_FONT)
-                        .width(Length::Fixed(20.0)),
-                )
-                .on_press(Message::CreateButtonPressed),
-            )
+            .push(self.button())
             .spacing(4)
+            .into()
+    }
+
+    fn button(&self) -> Element<Message> {
+        let underlay = Button::new(
+            Text::new(icon_to_char(Icon::Plus).to_string())
+                .font(ICON_FONT)
+                .width(Length::Fixed(20.0)),
+        )
+        .on_press(Message::CreateButtonPressed);
+
+        let overlay = if self.show_modal {
+            Some(Compose::new(
+                self.compose_form.clone(),
+                Message::ComposeFormChanged,
+                Message::CloseComposeModal,
+                Message::ComposeFormSubmit,
+            ))
+        } else {
+            None
+        };
+
+        Modal::new(underlay, overlay)
+            .backdrop(Message::CloseComposeModal)
+            .on_esc(Message::CloseComposeModal)
             .into()
     }
 }
