@@ -12,25 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod application;
+use iced::Background;
+use iced_aw::style::modal::Appearance;
+use iced_aw::style::modal::StyleSheet;
 
-mod button;
-pub use button::Button;
+use super::Theme;
 
-pub mod card;
-pub mod constants;
-pub mod container;
-pub mod modal;
-pub mod rule;
-pub mod scrollable;
-pub mod split;
-pub mod tab_bar;
-pub mod text_input;
+impl StyleSheet for Theme {
+    type Style = ();
 
-mod text;
-pub use text::Text;
-
-/// The custom theme for the application.
-/// All the widgets will implement for this theme.
-#[derive(Debug, Clone, Copy, Default)]
-pub struct Theme;
+    fn active(&self, _style: &Self::Style) -> Appearance {
+        Appearance {
+            background: Background::Color([0.0, 0.0, 0.0, 0.7].into()),
+        }
+    }
+}
