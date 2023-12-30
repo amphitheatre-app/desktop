@@ -12,7 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use iced::Color;
+pub const SPACING_SMALL: u16 = 5;
+pub const SPACING_NORMAL: u16 = 10;
+pub const SPACING_LARGE: u16 = 20;
+pub const SPACING_EXTRA_LARGE: u16 = 40;
 
-pub const SURFACE: Color = Color::from_rgb(0x29 as f32 / 255.0, 0x2C as f32 / 255.0, 0x33 as f32 / 255.0);
-pub const ACCENT: Color = Color::from_rgb(0x30 as f32 / 255.0, 0x34 as f32 / 255.0, 0x3D as f32 / 255.0);
+pub const FONT_SIZE_SMALLER: f32 = 12.0;
+pub const FONT_SIZE_SMALL: f32 = 13.0;
+pub const FONT_SIZE_STANDARD: f32 = 14.0;
+pub const FONT_SIZE_LARGE: f32 = 20.0;
+
+pub const ICON_FONT_SIZE_TINY: u16 = 16;
+pub const ICON_FONT_SIZE_SMALLER: u16 = 20;
+pub const ICON_FONT_SIZE_SMALL: u16 = 24;
+pub const ICON_FONT_SIZE_MEDIUM: u16 = 34;
+pub const ICON_FONT_SIZE_BIG: u16 = 96;
+
+pub const ICON_FONT_SIZE_TOOLBAR: u16 = 24;
+
+pub const SIDEBAR_WIDTH: u16 = 200;
+
+pub const WINDOW_INITIAL_WIDTH: u32 = 1028;
+pub const WINDOW_INITIAL_HEIGHT: u32 = 640;
+
+pub const WINDOW_MIN_WIDTH: u32 = 800;
+pub const WINDOW_MIN_HEIGHT: u32 = 450;

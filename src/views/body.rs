@@ -17,11 +17,11 @@ use std::sync::Arc;
 use amp_client::playbooks::Playbook;
 use iced::widget::{horizontal_space, Rule};
 use iced::{Alignment, Command, Length, Subscription};
-use iced_aw::graphics::icons::icon_to_char;
 use iced_aw::{Icon, ICON_FONT};
 
 use crate::context::Context;
 use crate::styles;
+use crate::styles::constants::{FONT_SIZE_SMALLER, ICON_FONT_SIZE_TOOLBAR, SPACING_SMALL};
 use crate::views::detail::inspect::{self, Information};
 use crate::views::detail::logs::{self, Logs};
 use crate::views::detail::stats::{self, Stats};
@@ -117,20 +117,23 @@ impl Body {
                 .width(Length::Fill)
                 .align_items(Alignment::Center),
         )
+        .style(styles::Container::Toolbar)
         .padding(16)
         .into()
     }
 
     fn header(&self) -> Element<Message> {
-        let title = Column::new()
-            .push(Text::new(&self.playbook.title))
-            .push(Text::new("Running").size(14).style(styles::Text::Success));
+        let title = Column::new().push(Text::new(&self.playbook.title)).push(
+            Text::new("Running")
+                .size(FONT_SIZE_SMALLER)
+                .style(styles::Text::Success),
+        );
 
         Row::new()
             .push(
-                Text::new(icon_to_char(Icon::List).to_string())
+                Text::new(Icon::List.to_string())
                     .font(ICON_FONT)
-                    .width(Length::Fixed(20.0)),
+                    .size(ICON_FONT_SIZE_TOOLBAR),
             )
             .push(title)
             .align_items(Alignment::Center)
@@ -139,41 +142,19 @@ impl Body {
     }
 
     fn actions(&self) -> Element<Message> {
+        let button = |icon: Icon, on_press| {
+            Button::new(Text::new(icon.to_string()).font(ICON_FONT).size(ICON_FONT_SIZE_TOOLBAR))
+                .style(styles::Button::Icon)
+                .on_press(on_press)
+        };
+
         Row::new()
-            .push(
-                Button::new(
-                    Text::new(icon_to_char(Icon::Play).to_string())
-                        .font(ICON_FONT)
-                        .width(Length::Fixed(20.0)),
-                )
-                .on_press(Message::ButtonPressed),
-            )
-            .push(
-                Button::new(
-                    Text::new(icon_to_char(Icon::Stop).to_string())
-                        .font(ICON_FONT)
-                        .width(Length::Fixed(20.0)),
-                )
-                .on_press(Message::ButtonPressed),
-            )
-            .push(
-                Button::new(
-                    Text::new(icon_to_char(Icon::ArrowRepeat).to_string())
-                        .font(ICON_FONT)
-                        .width(Length::Fixed(20.0)),
-                )
-                .on_press(Message::ButtonPressed),
-            )
-            .push(
-                Button::new(
-                    Text::new(icon_to_char(Icon::X).to_string())
-                        .font(ICON_FONT)
-                        .width(Length::Fixed(20.0)),
-                )
-                .on_press(Message::ButtonPressed),
-            )
+            .push(button(Icon::Play, Message::ButtonPressed))
+            .push(button(Icon::Stop, Message::ButtonPressed))
+            .push(button(Icon::ArrowRepeat, Message::ButtonPressed))
+            .push(button(Icon::X, Message::ButtonPressed))
             .align_items(Alignment::Center)
-            .spacing(4)
+            .spacing(SPACING_SMALL)
             .into()
     }
 

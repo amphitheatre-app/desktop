@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use iced::widget::button::{self, Appearance, StyleSheet};
-use iced::{color, Color};
-
 use super::Theme;
+use iced::widget::button::{Appearance, StyleSheet};
 
 #[derive(Debug, Clone, Copy, Default)]
 pub enum Button {
     #[default]
     Default,
     Element,
+    Icon,
+    Primary,
 }
 
 impl StyleSheet for Theme {
@@ -30,28 +30,26 @@ impl StyleSheet for Theme {
     fn active(&self, style: &Self::Style) -> Appearance {
         match style {
             Button::Default => Appearance {
-                background: Some(Color::TRANSPARENT.into()),
-                border_radius: 6.0.into(),
+                text_color: self.text,
                 border_width: 1.0,
-                border_color: color!(0x474B56),
-                text_color: color!(0xffffff),
+                border_radius: 6.0.into(),
+                border_color: iced::Color { a: 0.1, ..self.text },
                 ..Appearance::default()
             },
             Button::Element => Appearance::default(),
+            Button::Icon => Appearance::default(),
+            Button::Primary => Appearance {
+                text_color: self.text,
+                border_width: 1.0,
+                border_radius: 6.0.into(),
+                border_color: iced::Color { a: 0.4, ..self.primary },
+                background: Some(self.primary.into()),
+                ..Appearance::default()
+            },
         }
     }
 
-    fn hovered(&self, style: &Self::Style) -> button::Appearance {
-        match style {
-            Button::Default => Appearance {
-                background: Some(color!(0x474B56).into()),
-                border_radius: 6.0.into(),
-                border_width: 1.0,
-                border_color: color!(0x474B56),
-                text_color: color!(0xffffff),
-                ..Appearance::default()
-            },
-            Button::Element => Appearance::default(),
-        }
+    fn hovered(&self, style: &Self::Style) -> Appearance {
+        self.active(style)
     }
 }

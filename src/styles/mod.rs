@@ -19,7 +19,10 @@ pub use button::Button;
 
 pub mod card;
 pub mod constants;
-pub mod container;
+
+mod container;
+pub use container::Container;
+
 pub mod modal;
 pub mod rule;
 pub mod scrollable;
@@ -31,6 +34,31 @@ mod text;
 pub use text::Text;
 
 /// The custom theme for the application.
-/// All the widgets will implement for this theme.
-#[derive(Debug, Clone, Copy, Default)]
-pub struct Theme;
+/// [iced example](https://github.com/iced-rs/iced/blob/master/examples/styling/src/main.rs)
+/// [apple color guidelines](https://developer.apple.com/design/human-interface-guidelines/color)
+#[derive(Clone, Copy, Debug)]
+pub struct Theme {
+    background: iced::Color,
+    text: iced::Color,
+    primary: iced::Color,
+    success: iced::Color,
+    danger: iced::Color,
+}
+
+impl Theme {
+    pub fn new() -> Self {
+        Self {
+            background: iced::Color::from_rgba8(30, 30, 30, 1.0),
+            text: iced::Color::from_rgba8(221, 221, 221, 1.0),
+            primary: iced::Color::from_rgba8(10, 132, 255, 1.0),
+            success: iced::Color::from_rgba8(48, 209, 81, 1.0),
+            danger: iced::Color::from_rgba8(255, 69, 58, 1.0),
+        }
+    }
+}
+
+impl Default for Theme {
+    fn default() -> Self {
+        Self::new()
+    }
+}

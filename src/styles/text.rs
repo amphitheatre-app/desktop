@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use iced::color;
 use iced::widget::text::{Appearance, StyleSheet};
+use iced::Color;
 
 use super::Theme;
 
 #[derive(Debug, Clone, Copy, Default)]
 pub enum Text {
     #[default]
+    Default,
     Primary,
     Secondary,
     Success,
@@ -31,10 +32,11 @@ impl StyleSheet for Theme {
 
     fn appearance(&self, style: Self::Style) -> Appearance {
         let color = match style {
-            Text::Primary => color!(0xC9CCD3),
-            Text::Secondary => color!(0x757983),
-            Text::Success => color!(0x49914C),
-            Text::Danger => color!(0xDF5658),
+            Text::Default => self.text,
+            Text::Primary => self.primary,
+            Text::Secondary => Color { a: 0.25, ..self.text },
+            Text::Success => self.success,
+            Text::Danger => self.danger,
         };
 
         Appearance { color: Some(color) }

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::styles;
+use crate::styles::constants::ICON_FONT_SIZE_TOOLBAR;
 use crate::widgets::Element;
 use crate::widgets::Renderer;
 use crate::widgets::Row;
@@ -19,6 +21,8 @@ use crate::widgets::{Button, Card, Column, Container, Scrollable, Text, TextInpu
 use iced::widget::horizontal_space;
 use iced::Alignment;
 use iced::{alignment::Horizontal, widget::Component, Length};
+use iced_aw::Icon;
+use iced_aw::ICON_FONT;
 
 pub struct Compose<Message> {
     form: Form,
@@ -84,11 +88,26 @@ impl<Message: Clone> Component<Message, Renderer> for Compose<Message> {
     }
 
     fn view(&self, _state: &Self::State) -> Element<Self::Event> {
+        let close_button = Button::new(
+            Text::new(Icon::XCircleFill.to_string())
+                .font(ICON_FONT)
+                .size(ICON_FONT_SIZE_TOOLBAR),
+        )
+        .style(styles::Button::Element)
+        .on_press(Event::CancelButtonPressed);
+
         let element = Card::new(
-            Text::new("Compose a new playbook")
-                .size(20)
+            Row::new()
+                .push(
+                    Text::new("Compose a new playbook")
+                        .size(20)
+                        .width(Length::Shrink)
+                        .horizontal_alignment(Horizontal::Left),
+                )
+                .push(horizontal_space(Length::Fill))
+                .push(close_button)
                 .width(Length::Fill)
-                .horizontal_alignment(Horizontal::Left),
+                .align_items(Alignment::Center),
             self.form(),
         )
         .foot(self.actions())
@@ -105,6 +124,11 @@ impl<Message: Clone> Component<Message, Renderer> for Compose<Message> {
 
 impl<Message> Compose<Message> {
     fn form(&self) -> Element<Event> {
+        let help = Text::new(
+            "Please give your playbook a clear title and description to convey its purpose and content effectively. Additionally, provide a GitHub URL or local file path as the repository.",
+        ).style(styles::Text::Secondary)
+        .into();
+
         let title = Column::with_children(vec![
             Text::new("Add a title").into(),
             TextInput::new("Title", &self.form.title)
@@ -129,14 +153,19 @@ impl<Message> Compose<Message> {
         ])
         .into();
 
-        Column::with_children(vec![title, description, repository])
+        Column::with_children(vec![help, title, description, repository])
             .spacing(16)
             .into()
     }
 
     fn actions(&self) -> Element<Event> {
-        let cancel_button = Button::new(Text::new("Cancel")).on_press(Event::CancelButtonPressed);
-        let submit_button = Button::new(Text::new("Submit")).on_press(Event::SubmitButtonPressed);
+        let cancel_button = Button::new(Text::new("Cancel").style(styles::Text::Secondary))
+            .style(styles::Button::Element)
+            .on_press(Event::CancelButtonPressed);
+        let submit_button = Button::new(Text::new("Start compose").horizontal_alignment(Horizontal::Center))
+            .style(styles::Button::Primary)
+            .width(Length::FillPortion(3))
+            .on_press(Event::SubmitButtonPressed);
 
         Container::new(
             Row::new()

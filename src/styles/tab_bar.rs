@@ -12,33 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use iced::{color, Color};
 use iced_aw::tab_bar::{Appearance, StyleSheet};
 
-use super::{constants::SURFACE, Theme};
+use super::Theme;
 
 impl StyleSheet for Theme {
     type Style = ();
 
     fn active(&self, _style: &Self::Style, is_active: bool) -> Appearance {
-        let mut appearance = Appearance::default();
-
-        let text_color = if is_active { color!(0xC9CCD3) } else { color!(0x848993) };
-
-        appearance.tab_label_background = SURFACE.into();
-        appearance.tab_label_border_width = 0.0;
-        appearance.tab_label_border_color = Color::TRANSPARENT;
-        appearance.icon_color = text_color;
-        appearance.text_color = text_color;
-
-        appearance
+        Appearance {
+            tab_label_background: iced::Color::TRANSPARENT.into(),
+            tab_label_border_color: iced::Color::TRANSPARENT,
+            text_color: if is_active {
+                self.text
+            } else {
+                iced::Color { a: 0.1, ..self.text }
+            },
+            ..Default::default()
+        }
     }
 
     fn hovered(&self, style: &Self::Style, is_active: bool) -> Appearance {
-        Appearance {
-            icon_color: color!(0xC9CCD3),
-            text_color: color!(0xC9CCD3),
-            ..self.active(style, is_active)
-        }
+        self.active(style, is_active)
     }
 }

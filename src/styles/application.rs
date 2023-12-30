@@ -13,17 +13,16 @@
 // limitations under the License.
 
 use iced::application::{Appearance, StyleSheet};
-use iced::color;
 
-use super::{constants::SURFACE, Theme};
+use super::Theme;
 
 impl StyleSheet for Theme {
     type Style = ();
 
     fn appearance(&self, _style: &Self::Style) -> Appearance {
         Appearance {
-            background_color: SURFACE,
-            text_color: color!(0xC9CCD3),
+            background_color: self.background,
+            text_color: self.text,
         }
     }
 }

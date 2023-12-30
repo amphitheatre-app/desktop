@@ -18,6 +18,7 @@ use iced::{executor, Application, Command, Length, Subscription};
 use iced_aw::split;
 
 use crate::context::Context;
+use crate::styles::constants::{SIDEBAR_WIDTH, WINDOW_MIN_WIDTH};
 use crate::styles::Theme;
 use crate::views::body::{self, Body};
 use crate::views::sidebar::{self, Sidebar};
@@ -109,8 +110,8 @@ impl Application for App {
             split::Axis::Vertical,
             Message::SplitResized,
         )
-        .min_size_first(200)
-        .min_size_second(790)
+        .min_size_first(SIDEBAR_WIDTH)
+        .min_size_second(WINDOW_MIN_WIDTH as u16)
         .width(Length::Fill)
         .height(Length::Fill)
         .spacing(1.0)

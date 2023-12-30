@@ -14,7 +14,6 @@
 
 use super::Theme;
 
-use iced::color;
 use iced::widget::rule::{self, Appearance, StyleSheet};
 
 impl StyleSheet for Theme {
@@ -22,7 +21,7 @@ impl StyleSheet for Theme {
 
     fn appearance(&self, _style: &Self::Style) -> Appearance {
         Appearance {
-            color: color!(0x474B56),
+            color: iced::Color::BLACK,
             width: 1,
             radius: 0.0.into(),
             fill_mode: rule::FillMode::Full,

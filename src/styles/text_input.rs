@@ -22,38 +22,35 @@ impl StyleSheet for Theme {
 
     fn active(&self, _style: &Self::Style) -> Appearance {
         Appearance {
-            background: color!(0x292C33).into(),
+            background: iced::Color::TRANSPARENT.into(),
             border_radius: 6.0.into(),
             border_width: 1.0,
-            border_color: color!(0x474B56),
-            icon_color: color!(0xC9CCD3),
+            border_color: iced::Color { a: 0.1, ..self.text },
+            icon_color: iced::Color { a: 0.1, ..self.text },
         }
     }
 
-    fn focused(&self, _style: &Self::Style) -> Appearance {
+    fn focused(&self, style: &Self::Style) -> Appearance {
         Appearance {
-            background: color!(0x292C33).into(),
-            border_radius: 6.0.into(),
-            border_width: 1.0,
-            border_color: color!(0x474B56),
-            icon_color: color!(0xC9CCD3),
+            border_color: self.primary,
+            ..self.active(style)
         }
     }
 
     fn placeholder_color(&self, _style: &Self::Style) -> iced::Color {
-        color!(0x474B56)
+        iced::Color { a: 0.1, ..self.text }
     }
 
     fn value_color(&self, _style: &Self::Style) -> iced::Color {
-        color!(0xC9CCD3)
+        self.text
     }
 
     fn selection_color(&self, _style: &Self::Style) -> iced::Color {
-        color!(0x474B56)
+        self.primary
     }
 
     fn disabled_color(&self, _style: &Self::Style) -> Color {
-        color!(0xC9CCD3)
+        iced::Color { a: 0.1, ..self.text }
     }
 
     fn disabled(&self, _style: &Self::Style) -> Appearance {

@@ -34,18 +34,7 @@ impl StyleSheet for Theme {
         }
     }
 
-    fn hovered(&self, _style: &Self::Style, _is_mouse_over_scrollbar: bool) -> Scrollbar {
-        Scrollbar {
-            background: Default::default(),
-            border_radius: 0.0.into(),
-            border_width: 0.0,
-            border_color: Default::default(),
-            scroller: Scroller {
-                color: Default::default(),
-                border_radius: 0.0.into(),
-                border_width: 0.0,
-                border_color: Default::default(),
-            },
-        }
+    fn hovered(&self, style: &Self::Style, _is_mouse_over_scrollbar: bool) -> Scrollbar {
+        self.active(style)
     }
 }

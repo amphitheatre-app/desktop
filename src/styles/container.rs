@@ -20,12 +20,35 @@ use super::Theme;
 pub enum Container {
     #[default]
     Default,
+    Toolbar,
+    Sidebar,
 }
 
 impl StyleSheet for Theme {
     type Style = Container;
 
-    fn appearance(&self, _style: &Self::Style) -> Appearance {
-        Appearance::default()
+    fn appearance(&self, style: &Self::Style) -> Appearance {
+        let background_color = match style {
+            Container::Default => iced::Color::TRANSPARENT,
+            Container::Toolbar => {
+                let mut c = self.background;
+                c.r += 0.03;
+                c.g += 0.03;
+                c.b += 0.03;
+                c
+            }
+            Container::Sidebar => {
+                let mut c = self.background;
+                c.r += 0.05;
+                c.g += 0.05;
+                c.b += 0.05;
+                c
+            }
+        };
+
+        Appearance {
+            background: Some(background_color.into()),
+            ..Appearance::default()
+        }
     }
 }

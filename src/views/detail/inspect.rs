@@ -23,6 +23,7 @@ use iced_aw::TabLabel;
 
 use crate::cmd::actor::refresh_actor_info;
 use crate::context::Context;
+use crate::styles::constants::SPACING_NORMAL;
 use crate::widgets::tabs::Tab;
 use crate::widgets::{empty::empty, Column, Element, Row, Scrollable, Text};
 
@@ -84,7 +85,7 @@ impl Information {
                         )
                         .push(Rule::horizontal(1))
                         .width(Length::Fill)
-                        .spacing(16)
+                        .spacing(SPACING_NORMAL)
                         .into(),
                 );
             }
@@ -92,7 +93,7 @@ impl Information {
 
         let content = Column::with_children(children)
             .padding(16)
-            .spacing(16)
+            .spacing(SPACING_NORMAL)
             .width(Length::Fill);
         Scrollable::new(content).into()
     }

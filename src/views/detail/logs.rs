@@ -24,6 +24,7 @@ use iced_futures::{subscription, BoxStream};
 use reqwest_eventsource::Event;
 
 use crate::context::Context;
+use crate::styles::constants::SPACING_SMALL;
 use crate::widgets::tabs::Tab;
 use crate::widgets::{Column, Element, Scrollable, Text};
 
@@ -81,7 +82,7 @@ impl Logs {
                 .collect(),
         )
         .width(Length::Fill)
-        .spacing(10);
+        .spacing(SPACING_SMALL);
 
         Scrollable::new(content)
             .id(self.scrollable_id.clone())

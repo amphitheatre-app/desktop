@@ -25,6 +25,7 @@ use iced_aw::{Icon, ICON_FONT};
 use crate::cmd::playbook::refresh_playbooks;
 use crate::context::Context;
 use crate::styles;
+use crate::styles::constants::{ICON_FONT_SIZE_TINY, SPACING_NORMAL};
 use crate::widgets::{Button, Column, Element, Modal, Row, Scrollable, Text, TextInput};
 
 use super::compose::{self, Compose};
@@ -108,7 +109,10 @@ impl Sidebar {
 
     pub fn view(&self) -> Element<Message> {
         let playbooks = self.playbooks.iter().fold(
-            Column::new().width(Length::Fill).height(Length::Fill),
+            Column::new()
+                .width(Length::Fill)
+                .height(Length::Fill)
+                .spacing(SPACING_NORMAL),
             |column, playbook| {
                 let item = item(&playbook.title, &playbook.description);
                 // let height = item.as_widget().height();
@@ -130,7 +134,10 @@ impl Sidebar {
             .padding(16)
             .spacing(16);
 
-        Container::new(content).height(Length::Fill).into()
+        Container::new(content)
+            .style(styles::Container::Sidebar)
+            .height(Length::Fill)
+            .into()
     }
 }
 
@@ -181,9 +188,10 @@ impl Sidebar {
 
     fn button(&self) -> Element<Message> {
         let underlay = Button::new(
-            Text::new(icon_to_char(Icon::Plus).to_string())
+            Text::new(Icon::Plus.to_string())
                 .font(ICON_FONT)
-                .width(Length::Fixed(20.0)),
+                .size(ICON_FONT_SIZE_TINY)
+                .width(Length::Shrink),
         )
         .on_press(Message::CreateButtonPressed);
 
@@ -224,9 +232,7 @@ impl Display for State {
 }
 
 fn item<'a>(title: impl ToString, _description: impl ToString) -> Element<'a, Message> {
-    let icon = Text::new(icon_to_char(Icon::Box).to_string())
-        .font(ICON_FONT)
-        .size(14.0);
+    let icon = Text::new(String::from(Icon::Box)).font(ICON_FONT).size(14.0);
 
     // let content = Column::new()
     //     .push(Text::new(title.to_string()))

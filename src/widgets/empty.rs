@@ -16,6 +16,8 @@ use iced::alignment::{Alignment, Horizontal};
 use iced::widget::{component, Column, Component, Text};
 use iced::{Element, Length};
 
+use crate::styles::constants::{FONT_SIZE_LARGE, FONT_SIZE_STANDARD, SPACING_NORMAL};
+
 use super::{Container, Renderer};
 
 pub struct EmptyState {
@@ -46,13 +48,13 @@ impl<Message> Component<Message, Renderer> for EmptyState {
 
     fn view(&self, _state: &Self::State) -> Element<Self::Event, Renderer> {
         let tagline = Text::new(&self.tagline)
-            .size(20)
+            .size(FONT_SIZE_LARGE)
             .width(Length::Fill)
             .horizontal_alignment(Horizontal::Center);
 
         let message = if let Some(message) = &self.message {
             Text::new(message)
-                .size(16)
+                .size(FONT_SIZE_STANDARD)
                 .width(Length::Fill)
                 .horizontal_alignment(Horizontal::Center)
         } else {
@@ -65,7 +67,7 @@ impl<Message> Component<Message, Renderer> for EmptyState {
         let content = Column::new()
             .width(Length::Fill)
             .align_items(Alignment::Center)
-            .spacing(16)
+            .spacing(SPACING_NORMAL)
             .push(tagline)
             .push(message);
 

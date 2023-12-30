@@ -12,22 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use iced::Color;
+use super::Theme;
 use iced_aw::split::{Appearance, StyleSheet};
-
-use super::{constants::ACCENT, Theme};
 
 impl StyleSheet for Theme {
     type Style = ();
 
     fn active(&self, _style: &Self::Style) -> Appearance {
         Appearance {
-            first_background: Some(ACCENT.into()),
-            divider_background: ACCENT.into(),
-            divider_border_color: ACCENT,
             border_width: 0.0,
-            border_color: Color::TRANSPARENT,
-            ..Appearance::default()
+            divider_background: iced::Color::BLACK.into(),
+            divider_border_color: iced::Color::BLACK,
+
+            ..Default::default()
         }
     }
 
