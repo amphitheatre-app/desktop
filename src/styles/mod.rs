@@ -23,6 +23,7 @@ pub mod constants;
 mod container;
 pub use container::Container;
 
+pub mod checkbox;
 pub mod modal;
 pub mod rule;
 pub mod scrollable;

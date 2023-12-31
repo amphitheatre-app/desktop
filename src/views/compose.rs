@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::path::Path;
+
 use crate::styles;
 use crate::styles::constants::*;
-use crate::widgets::Element;
-use crate::widgets::Renderer;
-use crate::widgets::Row;
-use crate::widgets::{Button, Card, Column, Container, Scrollable, Text, TextInput};
-use iced::widget::horizontal_space;
-use iced::Alignment;
-use iced::{alignment::Horizontal, widget::Component, Length};
+use crate::widgets::{Button, Card, Checkbox, Column, Container, Scrollable, Text, TextInput};
+use crate::widgets::{Element, Renderer, Row};
+use iced::widget::{horizontal_space, Component};
+use iced::{alignment::Horizontal, Alignment, Length};
+use native_dialog::FileDialog;
 
 pub struct Compose<Message> {
     form: Form,
@@ -36,6 +36,7 @@ pub enum Event {
 
     RepositoryChanged(String),
     SelectFileButtonPressed,
+    LiveUpdateChecked(bool),
 
     CancelButtonPressed,
     SubmitButtonPressed,
@@ -46,6 +47,7 @@ pub struct Form {
     title: String,
     description: String,
     repository: String,
+    live: bool,
 }
 
 impl<Message: Clone> Compose<Message> {
@@ -82,7 +84,18 @@ impl<Message: Clone> Component<Message, Renderer> for Compose<Message> {
                 self.form.repository = repository;
                 Some((self.on_change)(self.form.clone()))
             }
-            Event::SelectFileButtonPressed => None,
+            Event::SelectFileButtonPressed => {
+                if let Ok(Some(path)) = FileDialog::new().show_open_single_dir() {
+                    self.form.repository = path.to_str().unwrap_or_default().to_string();
+                    Some((self.on_change)(self.form.clone()))
+                } else {
+                    None
+                }
+            }
+            Event::LiveUpdateChecked(live) => {
+                self.form.live = live;
+                Some((self.on_change)(self.form.clone()))
+            }
             Event::CancelButtonPressed => Some(self.on_cancel.clone()),
             Event::SubmitButtonPressed => Some(self.on_submit.clone()),
         }
@@ -107,13 +120,15 @@ impl<Message: Clone> Component<Message, Renderer> for Compose<Message> {
 impl<Message> Compose<Message> {
     fn form(&self) -> Element<Event> {
         let help = Text::new(
-            "Please give your playbook a clear title and description to convey its purpose and content effectively. Additionally, provide a GitHub URL or local file path as the repository.",
-        ).style(styles::Text::Secondary)
+            "Please give your playbook a clear title and description to convey its purpose \
+            and content effectively. Additionally, provide a GIT URL or local file path as the repository.",
+        )
+        .style(styles::Text::Secondary)
         .into();
 
         let title = Column::with_children(vec![
-            Text::new("Add a title").into(),
-            TextInput::new("Title", &self.form.title)
+            Text::new("Name your playbook").into(),
+            TextInput::new("Untitled", &self.form.title)
                 .on_input(Event::TitleChanged)
                 .into(),
         ])
@@ -127,7 +142,7 @@ impl<Message> Compose<Message> {
         ])
         .into();
 
-        let repo_placeholder = "An SSH URL, like git@github.com:user/repo.git";
+        let repo_placeholder = "The repository to be cloned, or the local path to the project";
         let repository = Column::with_children(vec![
             Text::new("Repository").into(),
             Row::new()
@@ -138,9 +153,12 @@ impl<Message> Compose<Message> {
         ])
         .into();
 
-        Column::with_children(vec![help, title, description, repository])
-            .spacing(SPACING_LARGE)
-            .into()
+        let mut fields = vec![help, title, description, repository];
+        if Path::new(&self.form.repository).exists() {
+            fields.push(Checkbox::new("Running in development mode", self.form.live, Event::LiveUpdateChecked).into());
+        }
+
+        Column::with_children(fields).spacing(SPACING_LARGE).into()
     }
 
     fn actions(&self) -> Element<Event> {

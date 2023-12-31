@@ -1,6 +1,6 @@
 [package]
 name = "desktop"
-version = "0.3.6"
+version = "0.3.7"
 edition = "2021"
 
 [[bin]]
@@ -20,6 +20,7 @@ iced = { version = "0.10.0", features = ["tokio", "debug", "lazy"] }
 iced_aw = { version = "0.7.0" }
 iced_futures = "0.7.0"
 ignore = "0.4.21"
+native-dialog = { version = "0.7.0", features = ["windows_dpi_awareness", "windows_visual_styles"] }
 notify = "6.1.1"
 rand = "0.8.5"
 reqwest-eventsource = "0.5.0"
