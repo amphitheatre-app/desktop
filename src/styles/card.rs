@@ -32,6 +32,7 @@ impl StyleSheet for Theme {
             head_background: color.into(),
             foot_background: color.into(),
             border_width: 0.0,
+            close_color: self.text,
             ..Appearance::default()
         }
     }

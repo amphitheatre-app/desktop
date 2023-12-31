@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use crate::styles;
-use crate::styles::constants::ICON_FONT_SIZE_TOOLBAR;
+use crate::styles::constants::*;
 use crate::widgets::Element;
 use crate::widgets::Renderer;
 use crate::widgets::Row;
@@ -21,8 +21,6 @@ use crate::widgets::{Button, Card, Column, Container, Scrollable, Text, TextInpu
 use iced::widget::horizontal_space;
 use iced::Alignment;
 use iced::{alignment::Horizontal, widget::Component, Length};
-use iced_aw::Icon;
-use iced_aw::ICON_FONT;
 
 pub struct Compose<Message> {
     form: Form,
@@ -35,7 +33,9 @@ pub struct Compose<Message> {
 pub enum Event {
     TitleChanged(String),
     DescriptionChanged(String),
+
     RepositoryChanged(String),
+    SelectFileButtonPressed,
 
     CancelButtonPressed,
     SubmitButtonPressed,
@@ -82,40 +82,22 @@ impl<Message: Clone> Component<Message, Renderer> for Compose<Message> {
                 self.form.repository = repository;
                 Some((self.on_change)(self.form.clone()))
             }
+            Event::SelectFileButtonPressed => None,
             Event::CancelButtonPressed => Some(self.on_cancel.clone()),
             Event::SubmitButtonPressed => Some(self.on_submit.clone()),
         }
     }
 
     fn view(&self, _state: &Self::State) -> Element<Self::Event> {
-        let close_button = Button::new(
-            Text::new(Icon::XCircleFill.to_string())
-                .font(ICON_FONT)
-                .size(ICON_FONT_SIZE_TOOLBAR),
-        )
-        .style(styles::Button::Element)
-        .on_press(Event::CancelButtonPressed);
-
-        let element = Card::new(
-            Row::new()
-                .push(
-                    Text::new("Compose a new playbook")
-                        .size(20)
-                        .width(Length::Shrink)
-                        .horizontal_alignment(Horizontal::Left),
-                )
-                .push(horizontal_space(Length::Fill))
-                .push(close_button)
-                .width(Length::Fill)
-                .align_items(Alignment::Center),
-            self.form(),
-        )
-        .foot(self.actions())
-        .padding(16.0);
+        let title = Text::new("Compose a new playbook").size(FONT_SIZE_LARGE);
+        let element = Card::new(title, self.form())
+            .close_size(ICON_FONT_SIZE_TOOLBAR as f32)
+            .on_close(Event::CancelButtonPressed)
+            .foot(self.actions())
+            .padding(SPACING_LARGE as f32);
 
         let content = Scrollable::new(element);
         Container::new(Column::new().push(content).max_width(480))
-            .padding(10)
             .center_x()
             .center_y()
             .into()
@@ -145,16 +127,19 @@ impl<Message> Compose<Message> {
         ])
         .into();
 
+        let repo_placeholder = "An SSH URL, like git@github.com:user/repo.git";
         let repository = Column::with_children(vec![
             Text::new("Repository").into(),
-            TextInput::new("An SSH URL, like git@github.com:user/repo.git", &self.form.repository)
-                .on_input(Event::RepositoryChanged)
+            Row::new()
+                .push(TextInput::new(repo_placeholder, &self.form.repository).on_input(Event::RepositoryChanged))
+                .push(Button::new(Text::new("Browse")).on_press(Event::SelectFileButtonPressed))
+                .spacing(SPACING_SMALL)
                 .into(),
         ])
         .into();
 
         Column::with_children(vec![help, title, description, repository])
-            .spacing(16)
+            .spacing(SPACING_LARGE)
             .into()
     }
 
@@ -175,7 +160,6 @@ impl<Message> Compose<Message> {
                 .width(Length::Fill)
                 .align_items(Alignment::Center),
         )
-        .padding(16)
         .into()
     }
 }
