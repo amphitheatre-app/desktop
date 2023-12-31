@@ -18,13 +18,13 @@ use std::sync::Arc;
 use amp_client::playbooks::Playbook;
 use futures::StreamExt;
 use iced::widget::scrollable;
-use iced::{Command, Length, Subscription};
+use iced::{Command, Font, Length, Subscription};
 use iced_aw::TabLabel;
 use iced_futures::{subscription, BoxStream};
 use reqwest_eventsource::Event;
 
 use crate::context::Context;
-use crate::styles::constants::SPACING_SMALL;
+use crate::styles::constants::{FONT_SIZE_SMALL, SPACING_SMALL};
 use crate::widgets::tabs::Tab;
 use crate::widgets::{Column, Element, Scrollable, Text};
 
@@ -78,7 +78,7 @@ impl Logs {
             self.messages
                 .iter()
                 .cloned()
-                .map(|message| Text::new(message).size(13).into())
+                .map(|message| Text::new(message).size(FONT_SIZE_SMALL).font(Font::MONOSPACE).into())
                 .collect(),
         )
         .width(Length::Fill)

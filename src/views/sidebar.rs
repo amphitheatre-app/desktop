@@ -17,6 +17,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use amp_client::playbooks::Playbook;
+use iced::alignment::Horizontal;
 use iced::widget::Container;
 use iced::{Alignment, Command, Length, Subscription};
 use iced_aw::graphics::icons::icon_to_char;
@@ -189,9 +190,10 @@ impl Sidebar {
     fn button(&self) -> Element<Message> {
         let underlay = Button::new(
             Text::new(Icon::Plus.to_string())
+                .horizontal_alignment(Horizontal::Center)
                 .font(ICON_FONT)
                 .size(ICON_FONT_SIZE_TINY)
-                .width(Length::Shrink),
+                .width(Length::Fixed(20.0)),
         )
         .on_press(Message::CreateButtonPressed);
 
