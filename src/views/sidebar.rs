@@ -15,6 +15,7 @@
 use std::fmt::Display;
 use std::sync::Arc;
 use std::time::Duration;
+use tracing::debug;
 
 use amp_client::playbooks::Playbook;
 use iced::alignment::Horizontal;
@@ -25,8 +26,8 @@ use iced_aw::{Icon, ICON_FONT};
 
 use crate::cmd::playbook::refresh_playbooks;
 use crate::context::Context;
-use crate::styles;
-use crate::styles::constants::{ICON_FONT_SIZE_TINY, SPACING_NORMAL};
+use crate::styles::{self, constants::*};
+use crate::widgets::lists::SidebarPlaybookItem;
 use crate::widgets::{Button, Column, Element, Modal, Row, Scrollable, Text, TextInput};
 
 use super::compose::{self, Compose};
@@ -39,6 +40,7 @@ pub struct Sidebar {
     state: State,
     show_modal: bool,
     compose_form: compose::Form,
+    selected_playbook: Option<Playbook>,
 }
 
 impl Default for Sidebar {
@@ -71,6 +73,7 @@ impl Sidebar {
             state: State::Connecting,
             show_modal: false,
             compose_form: compose::Form::default(),
+            selected_playbook: None,
         }
     }
 
@@ -87,7 +90,8 @@ impl Sidebar {
             Message::CreateButtonPressed => self.show_modal = true,
             Message::TextInputChanged(query) => self.query = query,
             Message::PlaybookSelected(playbook) => {
-                println!("Playbook selected: {:?}", playbook);
+                debug!("Playbook selected: {:?}", playbook);
+                self.selected_playbook = Some(playbook);
             }
             Message::CloseComposeModal => {
                 self.show_modal = false;
@@ -115,13 +119,10 @@ impl Sidebar {
                 .height(Length::Fill)
                 .spacing(SPACING_NORMAL),
             |column, playbook| {
-                let item = item(&playbook.title, &playbook.description);
-                // let height = item.as_widget().height();
                 column.push(
-                    Button::new(item)
-                        .style(styles::Button::Element)
-                        .width(Length::Fill)
-                        .on_press(Message::PlaybookSelected(playbook.clone())),
+                    SidebarPlaybookItem::new(playbook.clone())
+                        .active(self.selected_playbook.as_ref().is_some_and(|p| p.id == playbook.id))
+                        .on_press(Message::PlaybookSelected),
                 )
             },
         );
@@ -231,24 +232,4 @@ impl Display for State {
             State::Disconnected => write!(f, "Disconnected. Retrying..."),
         }
     }
-}
-
-fn item<'a>(title: impl ToString, _description: impl ToString) -> Element<'a, Message> {
-    let icon = Text::new(String::from(Icon::Box)).font(ICON_FONT).size(14.0);
-
-    // let content = Column::new()
-    //     .push(Text::new(title.to_string()))
-    //     .push(
-    //         Text::new(_description.to_string())
-    //             .style(theme::Text::Secondary)
-    //             .size(14),
-    //     )
-    //     .width(Length::Fill);
-
-    let content = Row::new()
-        .push(icon)
-        .push(Text::new(title.to_string()))
-        .align_items(Alignment::Center)
-        .spacing(8);
-    Container::new(content).into()
 }

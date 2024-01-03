@@ -70,10 +70,12 @@ impl Application for App {
 
     fn update(&mut self, message: Self::Message) -> Command<Message> {
         match message {
-            Message::SidebarMessage(sidebar::Message::PlaybookSelected(playbook)) => {
-                self.body = Some(Body::new(self.ctx.clone(), playbook.clone()))
+            Message::SidebarMessage(message) => {
+                if let sidebar::Message::PlaybookSelected(playbook) = &message {
+                    self.body = Some(Body::new(self.ctx.clone(), playbook.clone()));
+                }
+                return self.sidebar.update(message).map(Message::SidebarMessage);
             }
-            Message::SidebarMessage(message) => return self.sidebar.update(message).map(Message::SidebarMessage),
             Message::BodyMessage(message) => {
                 if let Some(body) = &mut self.body {
                     return body.update(message).map(Message::BodyMessage);
