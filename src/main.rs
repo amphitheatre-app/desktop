@@ -42,5 +42,5 @@ fn main() -> Result<()> {
         },
         ..Settings::default()
     })
-    .map_err(IcedError)
+    .map_err(|e| IcedError(e.to_string()))
 }

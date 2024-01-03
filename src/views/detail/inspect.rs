@@ -16,21 +16,21 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Duration;
 
+use crate::cmd::actor::refresh_actor_info;
+use crate::context::Context;
+use crate::errors::Result;
+use crate::styles::constants::SPACING_NORMAL;
+use crate::widgets::tabs::Tab;
+use crate::widgets::{empty::empty, Column, Element, Row, Scrollable, Text};
 use amp_client::playbooks::Playbook;
 use iced::widget::Rule;
 use iced::{Command, Length, Subscription};
 use iced_aw::TabLabel;
 
-use crate::cmd::actor::refresh_actor_info;
-use crate::context::Context;
-use crate::styles::constants::SPACING_NORMAL;
-use crate::widgets::tabs::Tab;
-use crate::widgets::{empty::empty, Column, Element, Row, Scrollable, Text};
-
 #[derive(Clone, Debug)]
 pub enum Message {
     Initializing,
-    InfoLoaded(HashMap<String, HashMap<String, String>>),
+    InfoLoaded(Result<HashMap<String, HashMap<String, String>>>),
 }
 
 pub struct Information {
@@ -55,7 +55,7 @@ impl Information {
                 let name = "amp-example-go".to_string();
                 return Command::perform(refresh_actor_info(self.ctx.clone(), pid, name), Message::InfoLoaded);
             }
-            Message::InfoLoaded(data) => self.data = data,
+            Message::InfoLoaded(data) => self.data = data.unwrap_or_default(),
         }
 
         Command::none()

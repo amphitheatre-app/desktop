@@ -13,28 +13,29 @@
 // limitations under the License.
 
 use crate::context::Context;
+use crate::errors::{Errors, Result};
 use std::{collections::HashMap, sync::Arc};
 
 pub async fn refresh_actor_info(
     ctx: Arc<Context>,
     pid: impl ToString,
     name: impl ToString,
-) -> HashMap<String, HashMap<String, String>> {
-    ctx.client
+) -> Result<HashMap<String, HashMap<String, String>>> {
+    ctx.client()?
         .actors()
         .info(&pid.to_string(), &name.to_string())
-        .map(|data| serde_json::from_value(data).unwrap())
-        .unwrap_or_default()
+        .map_err(|e| Errors::ClientError(e.to_string()))
+        .map(|data| serde_json::from_value(data).map_err(|e| Errors::SerdeJsonError(e.to_string())))?
 }
 
 pub async fn refresh_actor_stats(
     ctx: Arc<Context>,
     pid: impl ToString,
     name: impl ToString,
-) -> HashMap<String, String> {
-    ctx.client
+) -> Result<HashMap<String, String>> {
+    ctx.client()?
         .actors()
         .stats(&pid.to_string(), &name.to_string())
-        .map(|data| serde_json::from_value(data).unwrap())
-        .unwrap_or_default()
+        .map_err(|e| Errors::ClientError(e.to_string()))
+        .map(|data| serde_json::from_value(data).map_err(|e| Errors::SerdeJsonError(e.to_string())))?
 }

@@ -17,18 +17,18 @@ use std::sync::Arc;
 use std::time::Duration;
 use tracing::debug;
 
+use crate::cmd::playbook::refresh_playbooks;
+use crate::context::Context;
+use crate::errors::Result;
+use crate::styles::{self, constants::*};
+use crate::widgets::lists::SidebarPlaybookItem;
+use crate::widgets::{Button, Column, Element, Modal, Row, Scrollable, Text, TextInput};
 use amp_client::playbooks::Playbook;
 use iced::alignment::Horizontal;
 use iced::widget::Container;
 use iced::{Alignment, Command, Length, Subscription};
 use iced_aw::graphics::icons::icon_to_char;
 use iced_aw::{Icon, ICON_FONT};
-
-use crate::cmd::playbook::refresh_playbooks;
-use crate::context::Context;
-use crate::styles::{self, constants::*};
-use crate::widgets::lists::SidebarPlaybookItem;
-use crate::widgets::{Button, Column, Element, Modal, Row, Scrollable, Text, TextInput};
 
 use super::compose::{self, Compose};
 
@@ -52,7 +52,7 @@ impl Default for Sidebar {
 #[derive(Clone, Debug)]
 pub enum Message {
     Initializing,
-    PlaybooksLoaded(Vec<Playbook>),
+    PlaybooksLoaded(Result<Vec<Playbook>>),
 
     ContextSelectorPressed,
     CreateButtonPressed,
@@ -83,7 +83,7 @@ impl Sidebar {
                 return Command::perform(refresh_playbooks(self.ctx.clone()), Message::PlaybooksLoaded);
             }
             Message::PlaybooksLoaded(playbooks) => {
-                self.playbooks = playbooks;
+                self.playbooks = playbooks.unwrap_or_default();
                 self.state = State::Connected;
             }
             Message::ContextSelectorPressed => {}
@@ -156,9 +156,12 @@ impl Sidebar {
             .push(Text::new(text).size(14).style(styles::Text::Secondary))
             .align_items(Alignment::Center);
 
-        let context = self.ctx.cluster.read().unwrap();
+        let config = self.ctx.configuration.read().unwrap();
+        let context = config.context.as_ref().unwrap();
+        let title = context.current().map(|c| c.title.as_str()).unwrap_or("UNKNOWN");
+
         let heading = Column::new()
-            .push(Text::new(context.title.to_string()))
+            .push(Text::new(title.to_string()))
             .push(state)
             .width(Length::Fill);
 

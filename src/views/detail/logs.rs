@@ -136,15 +136,18 @@ impl subscription::Recipe for Receiver {
     }
 
     fn stream(self: Box<Self>, _: subscription::EventStream) -> BoxStream<Self::Output> {
-        futures::stream::unfold(self.ctx.client.actors().logs(&self.pid, &self.name), |mut es| async {
-            let event = es.next().await;
-            match event {
-                Some(Ok(Event::Open)) => Some((Message::Received(String::from(OPEN_STREAM_MESSAGE)), es)),
-                Some(Ok(Event::Message(message))) => Some((Message::Received(message.data), es)),
-                Some(Err(e)) => Some((Message::Errored(e.to_string()), es)),
-                _ => Some((Message::Errored(format!("{:#?}", event)), es)),
-            }
-        })
+        futures::stream::unfold(
+            self.ctx.client().unwrap().actors().logs(&self.pid, &self.name),
+            |mut es| async {
+                let event = es.next().await;
+                match event {
+                    Some(Ok(Event::Open)) => Some((Message::Received(String::from(OPEN_STREAM_MESSAGE)), es)),
+                    Some(Ok(Event::Message(message))) => Some((Message::Received(message.data), es)),
+                    Some(Err(e)) => Some((Message::Errored(e.to_string()), es)),
+                    _ => Some((Message::Errored(format!("{:#?}", event)), es)),
+                }
+            },
+        )
         .boxed()
     }
 }

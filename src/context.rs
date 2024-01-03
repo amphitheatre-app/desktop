@@ -12,31 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use amp_client::client::Client;
-use amp_common::config::{Cluster, Configuration};
-
 use crate::errors::{Errors, Result};
-
+use amp_client::client::Client;
+use amp_common::config::{Cluster, Configuration, ContextConfiguration};
+use std::fmt::Debug;
 use std::sync::RwLock;
-use std::{fmt::Debug, sync::Arc};
 
 /// Context holds the current context state
 pub struct Context {
     pub configuration: RwLock<Configuration>,
-    pub cluster: RwLock<Cluster>,
-    pub client: Arc<Client>,
 }
 
 impl Default for Context {
     fn default() -> Self {
-        let configuration = Configuration::default();
-        let cluster = get_context(&configuration).unwrap_or_default();
-        let client = Client::new(&format!("{}/v1", &cluster.server), cluster.token.clone());
-
         Self {
-            configuration: RwLock::new(configuration),
-            cluster: RwLock::new(cluster),
-            client: Arc::new(client),
+            configuration: RwLock::new(Configuration::default()),
         }
     }
 }
@@ -45,7 +35,6 @@ impl Debug for Context {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("Context")
             .field("configuration", &self.configuration)
-            .field("cluster", &self.cluster)
             .finish()
     }
 }
@@ -53,16 +42,28 @@ impl Debug for Context {
 impl Context {
     /// Initialize a new context
     pub fn init() -> Result<Context> {
-        let path = Configuration::path().map_err(Errors::InvalidConfigPath)?;
-        let configuration = Configuration::load(path).map_err(Errors::FailedLoadConfiguration)?;
-        let cluster = get_context(&configuration)?;
-        let client = Client::new(&format!("{}/v1", &cluster.server), cluster.token.clone());
+        let path = Configuration::path().map_err(|e| Errors::InvalidConfigPath(e.to_string()))?;
+        let configuration = Configuration::load(path).map_err(|e| Errors::FailedLoadConfiguration(e.to_string()))?;
 
         Ok(Context {
             configuration: RwLock::new(configuration),
-            cluster: RwLock::new(cluster),
-            client: Arc::new(client),
         })
+    }
+
+    /// Get client with current context
+    pub fn client(&self) -> Result<Client> {
+        let cluster = get_context(&self.configuration.read().unwrap())?;
+        let client = Client::new(&format!("{}/v1", &cluster.server), cluster.token.clone());
+        Ok(client)
+    }
+
+    /// Get the contexts from the configuration
+    pub fn contexts(&self) -> Result<ContextConfiguration> {
+        let configuration = self
+            .configuration
+            .read()
+            .map_err(|e| Errors::FailedLoadConfiguration(e.to_string()))?;
+        Ok(configuration.context.clone().unwrap_or_default())
     }
 }
 

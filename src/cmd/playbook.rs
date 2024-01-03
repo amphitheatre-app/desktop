@@ -14,10 +14,14 @@
 
 use std::sync::Arc;
 
+use crate::errors::{Errors, Result};
 use amp_client::playbooks::Playbook;
 
 use crate::context::Context;
 
-pub async fn refresh_playbooks(ctx: Arc<Context>) -> Vec<Playbook> {
-    ctx.client.playbooks().list(None).unwrap_or_default()
+pub async fn refresh_playbooks(ctx: Arc<Context>) -> Result<Vec<Playbook>> {
+    ctx.client()?
+        .playbooks()
+        .list(None)
+        .map_err(|e| Errors::ClientError(e.to_string()))
 }

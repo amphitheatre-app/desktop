@@ -16,20 +16,20 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Duration;
 
+use crate::cmd::actor::refresh_actor_stats;
+use crate::context::Context;
+use crate::errors::Result;
+use crate::widgets::tabs::Tab;
+use crate::widgets::{Column, Container, Element, Text};
 use amp_client::playbooks::Playbook;
 use iced::widget::{Row, Rule};
 use iced::{Alignment, Command, Length, Subscription};
 use iced_aw::TabLabel;
 
-use crate::cmd::actor::refresh_actor_stats;
-use crate::context::Context;
-use crate::widgets::tabs::Tab;
-use crate::widgets::{Column, Container, Element, Text};
-
 #[derive(Clone, Debug)]
 pub enum Message {
     Initializing,
-    StatsLoaded(HashMap<String, String>),
+    StatsLoaded(Result<HashMap<String, String>>),
 }
 
 pub struct Stats {
@@ -54,7 +54,7 @@ impl Stats {
                 let name = "amp-example-go".to_string();
                 return Command::perform(refresh_actor_stats(self.ctx.clone(), pid, name), Message::StatsLoaded);
             }
-            Message::StatsLoaded(data) => self.data = data,
+            Message::StatsLoaded(data) => self.data = data.unwrap_or_default(),
         }
 
         Command::none()

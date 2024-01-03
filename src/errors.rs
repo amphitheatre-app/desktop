@@ -12,27 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::path::StripPrefixError;
-
-use amp_common::http;
-pub use anyhow::*;
 use thiserror::Error;
 
 pub type Result<T> = std::result::Result<T, Errors>;
 
-#[derive(Debug, Error)]
+#[derive(Debug, Error, Clone)]
 pub enum Errors {
     #[error("Invalid configuration path")]
-    InvalidConfigPath(#[source] confy::ConfyError),
+    InvalidConfigPath(String),
 
     #[error("Failed to load configuration")]
-    FailedLoadConfiguration(#[source] anyhow::Error),
+    FailedLoadConfiguration(String),
 
     #[error("Current context not found, please use `amp context` for help")]
     NotFoundCurrentContext,
 
     #[error("Client error: {0}")]
-    ClientError(http::HTTPError),
+    ClientError(String),
 
     #[error("Failed to load manifest: {0}")]
     FailedLoadManifest(String),
@@ -41,51 +37,54 @@ pub enum Errors {
     FailedDeletePlaybook(String),
 
     #[error("Failed to delete context: {0}")]
-    FailedDeleteContext(anyhow::Error),
+    FailedDeleteContext(String),
 
     #[allow(dead_code)]
     #[error("Not found context: {0}")]
     NotFoundContext(String),
 
     #[error("Failed to save configuration")]
-    FailedSaveConfiguration(anyhow::Error),
+    FailedSaveConfiguration(String),
 
     #[error("Failed to serialize toml")]
     TomlSerializeError(toml::ser::Error),
 
+    #[error("Failed to deserialize from toml")]
+    SerdeJsonError(String),
+
     #[error("Failed to save manifest: {0}")]
-    FailedSaveManifest(std::io::Error),
+    FailedSaveManifest(String),
 
     #[error("Failed to create playbook: {0}")]
-    FailedCreatePlaybook(http::HTTPError),
+    FailedCreatePlaybook(String),
 
     #[error("Failed to finish tar: {0}")]
-    FailedFinishTar(std::io::Error),
+    FailedFinishTar(String),
 
     #[error("Walk directory error: {0}")]
     WalkError(ignore::Error),
 
     #[error("Failed to strip prefix: {0}")]
-    FailedStripPrefix(StripPrefixError),
+    FailedStripPrefix(String),
 
     #[error("Failed to append path: {0}")]
-    FailedAppendPath(std::io::Error),
+    FailedAppendPath(String),
 
     #[error("Failed to create watcher: {0}")]
-    FailedCreateWatcher(notify::Error),
+    FailedCreateWatcher(String),
 
     #[error("Failed to watch directory: {0}")]
-    FailedWatchDirectory(notify::Error),
+    FailedWatchDirectory(String),
 
     #[error("Not found available contexts")]
     NotFoundContexts,
 
     #[error("Failed to select context: {0}")]
-    FailedSelectContext(anyhow::Error),
+    FailedSelectContext(String),
 
     #[error("Failed to add context: {0}")]
-    FailedAddContext(anyhow::Error),
+    FailedAddContext(String),
 
     #[error("Some error occurred: {0}")]
-    IcedError(#[from] iced::Error),
+    IcedError(String),
 }
