@@ -22,6 +22,7 @@ pub enum Button {
     Element,
     Icon,
     Primary,
+    Menu,
 }
 
 impl StyleSheet for Theme {
@@ -46,10 +47,20 @@ impl StyleSheet for Theme {
                 background: Some(self.primary.into()),
                 ..Appearance::default()
             },
+            Button::Menu => Appearance::default(),
         }
     }
 
     fn hovered(&self, style: &Self::Style) -> Appearance {
-        self.active(style)
+        match style {
+            Button::Menu => Appearance {
+                text_color: self.text,
+                border_width: 0.0,
+                border_radius: 6.0.into(),
+                background: Some(self.primary.into()),
+                ..Appearance::default()
+            },
+            _ => self.active(style),
+        }
     }
 }

@@ -91,10 +91,21 @@ impl Sidebar {
                     error!("Failed to refresh playbooks: {}", e);
                 }
             },
-            Message::PlaybooksLoaded(playbooks) => {
-                self.playbooks = playbooks.unwrap_or_default();
-                self.status = ConnectionStatus::Connected;
-            }
+            Message::PlaybooksLoaded(result) => match result {
+                Ok(playbooks) => {
+                    debug!(
+                        "Playbooks loaded: {:?}",
+                        playbooks.iter().map(|p| p.id.clone()).collect::<Vec<_>>()
+                    );
+                    self.playbooks = playbooks;
+                    self.status = ConnectionStatus::Connected;
+                }
+                Err(e) => {
+                    error!("Failed to load playbooks: {}", e);
+                    self.playbooks = vec![];
+                    self.status = ConnectionStatus::Disconnected;
+                }
+            },
             Message::ContextChanged(name) => {
                 debug!("The current context was changed: {:?}", name);
                 return Command::perform(switch_context(self.ctx.clone(), name), Message::RefreshPlaybooks);

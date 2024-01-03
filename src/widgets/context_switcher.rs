@@ -11,21 +11,25 @@
 
 use std::collections::HashMap;
 
+use crate::widgets::Button;
 use amp_common::config::Cluster;
 use iced::{widget::Component, Alignment, Length};
-use iced_aw::{Icon, ICON_FONT};
+use iced_aw::{Icon, ItemWidth, MenuBar, MenuTree, ICON_FONT};
 use tracing::debug;
 
-use crate::{styles, utils::connection_status::ConnectionStatus};
+use crate::{
+    styles::{self},
+    utils::connection_status::ConnectionStatus,
+};
 
-use super::{Button, Column, Container, Element, Renderer, Row, Text};
+use super::{Column, Container, Element, Renderer, Row, Text};
 
 #[derive(Default)]
 pub struct ContextSwitcher<Message> {
-    _name: String,
+    name: String,
     title: String,
 
-    _clusters: HashMap<String, Cluster>,
+    clusters: HashMap<String, Cluster>,
     status: ConnectionStatus,
 
     on_change: Option<Box<dyn Fn(String) -> Message>>,
@@ -33,15 +37,15 @@ pub struct ContextSwitcher<Message> {
 
 #[derive(Clone)]
 pub enum Event {
-    ButtonPressed,
+    ItemPressed(String),
 }
 
 impl<Message> ContextSwitcher<Message> {
     pub fn new(name: String, title: String, clusters: HashMap<String, Cluster>, status: ConnectionStatus) -> Self {
         Self {
-            _name: name,
+            name,
             title,
-            _clusters: clusters,
+            clusters,
             status,
             on_change: None,
         }
@@ -59,9 +63,13 @@ impl<Message> Component<Message, Renderer> for ContextSwitcher<Message> {
 
     fn update(&mut self, _state: &mut Self::State, event: Self::Event) -> Option<Message> {
         match event {
-            Event::ButtonPressed => {
-                debug!("The context switcher pressed");
-                self.on_change.as_ref().map(|f| f("default".to_string()))
+            Event::ItemPressed(name) => {
+                debug!("The context switcher pressed: {}", name);
+                // If the name is the same as the current context, do nothing
+                if name.eq(&self.name) {
+                    return None;
+                }
+                self.on_change.as_ref().map(|f| f(name))
             }
         }
     }
@@ -74,27 +82,51 @@ impl<Message> Component<Message, Renderer> for ContextSwitcher<Message> {
         };
         let text = self.status.to_string();
         let state = Row::new()
-            .push(Text::new("•").size(14).style(style))
+            .push(
+                Text::new("•")
+                    .size(20)
+                    .line_height(1.0)
+                    .style(style)
+                    .vertical_alignment(iced::alignment::Vertical::Top),
+            )
             .push(Text::new(text).size(14).style(styles::Text::Secondary))
             .align_items(Alignment::Center);
 
-        let heading = Column::new()
+        let title = Column::new()
             .push(Text::new(&self.title))
             .push(state)
+            .width(Length::Fill)
+            .into();
+
+        let icon = Text::new(Icon::ChevronExpand.to_string())
+            .style(styles::Text::Secondary)
+            .font(ICON_FONT)
+            .size(16.0)
+            .into();
+
+        let header = Row::with_children(vec![title, icon])
+            .align_items(Alignment::Center)
             .width(Length::Fill);
 
-        Container::new(
-            Button::new(
-                Row::new()
-                    .push(heading)
-                    .push(Text::new(Icon::ChevronExpand.to_string()).font(ICON_FONT).size(16.0))
-                    .align_items(Alignment::Center)
-                    .width(Length::Fill),
-            )
-            .style(styles::Button::Element)
-            .on_press(Event::ButtonPressed),
-        )
-        .into()
+        let items = self
+            .clusters
+            .iter()
+            .map(|(name, cluster)| {
+                MenuTree::new(
+                    Button::new(Text::new(&cluster.title))
+                        .style(styles::Button::Menu)
+                        .width(Length::Fill)
+                        .on_press(Event::ItemPressed(name.clone())),
+                )
+            })
+            .collect();
+
+        let content = MenuBar::new(vec![MenuTree::with_children(header, items)])
+            .width(Length::Fill)
+            .item_width(ItemWidth::Uniform(190))
+            .main_offset(14);
+
+        Container::new(content).width(Length::Fill).into()
     }
 }
 

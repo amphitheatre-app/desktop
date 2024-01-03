@@ -24,6 +24,7 @@ mod container;
 pub use container::Container;
 
 pub mod checkbox;
+pub mod menu;
 pub mod modal;
 pub mod rule;
 pub mod scrollable;
