@@ -14,11 +14,11 @@
 
 use iced::alignment::{Alignment, Horizontal};
 use iced::widget::{component, Column, Component, Text};
-use iced::{Element, Length};
+use iced::Length;
 
 use crate::styles::constants::{FONT_SIZE_LARGE, FONT_SIZE_STANDARD, SPACING_NORMAL};
 
-use super::{Container, Renderer};
+use super::{Container, Element, Renderer};
 
 pub struct EmptyState {
     tagline: String,
@@ -46,7 +46,7 @@ impl<Message> Component<Message, Renderer> for EmptyState {
         None
     }
 
-    fn view(&self, _state: &Self::State) -> Element<Self::Event, Renderer> {
+    fn view(&self, _state: &Self::State) -> Element<Self::Event> {
         let tagline = Text::new(&self.tagline)
             .size(FONT_SIZE_LARGE)
             .width(Length::Fill)
@@ -80,7 +80,7 @@ impl<Message> Component<Message, Renderer> for EmptyState {
     }
 }
 
-impl<'a, Message> From<EmptyState> for Element<'a, Message, Renderer>
+impl<'a, Message> From<EmptyState> for Element<'a, Message>
 where
     Message: 'a,
 {
