@@ -12,23 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::fmt::Display;
+use iced_aw::{Icon, ICON_FONT};
 use std::sync::Arc;
 use std::time::Duration;
 use tracing::debug;
+
+use amp_client::playbooks::Playbook;
+use iced::alignment::Horizontal;
+use iced::widget::Container;
+use iced::{Command, Length, Subscription};
 
 use crate::cmd::playbook::refresh_playbooks;
 use crate::context::Context;
 use crate::errors::Result;
 use crate::styles::{self, constants::*};
+use crate::utils::connection_status::ConnectionStatus;
 use crate::widgets::lists::SidebarPlaybookItem;
-use crate::widgets::{Button, Column, Element, Modal, Row, Scrollable, Text, TextInput};
-use amp_client::playbooks::Playbook;
-use iced::alignment::Horizontal;
-use iced::widget::Container;
-use iced::{Alignment, Command, Length, Subscription};
-use iced_aw::graphics::icons::icon_to_char;
-use iced_aw::{Icon, ICON_FONT};
+use crate::widgets::*;
 
 use super::compose::{self, Compose};
 
@@ -37,7 +37,7 @@ pub struct Sidebar {
     ctx: Arc<Context>,
     query: String,
     playbooks: Vec<Playbook>,
-    state: State,
+    status: ConnectionStatus,
     show_modal: bool,
     compose_form: compose::Form,
     selected_playbook: Option<Playbook>,
@@ -54,7 +54,7 @@ pub enum Message {
     Initializing,
     PlaybooksLoaded(Result<Vec<Playbook>>),
 
-    ContextSelectorPressed,
+    ContextChanged(String),
     CreateButtonPressed,
     TextInputChanged(String),
     PlaybookSelected(Playbook),
@@ -70,7 +70,7 @@ impl Sidebar {
             ctx,
             query: String::new(),
             playbooks: vec![],
-            state: State::Connecting,
+            status: ConnectionStatus::default(),
             show_modal: false,
             compose_form: compose::Form::default(),
             selected_playbook: None,
@@ -84,9 +84,16 @@ impl Sidebar {
             }
             Message::PlaybooksLoaded(playbooks) => {
                 self.playbooks = playbooks.unwrap_or_default();
-                self.state = State::Connected;
+                self.status = ConnectionStatus::Connected;
             }
-            Message::ContextSelectorPressed => {}
+            Message::ContextChanged(name) => {
+                debug!("The current context was changed: {:?}", name);
+                // let mut config = self.ctx.configuration.write().unwrap();
+                // config.context.unwrap().select(&name);
+                // config.save(path)
+
+                // return Command::perform(refresh_playbooks(self.ctx.clone()), Message::PlaybooksLoaded);
+            }
             Message::CreateButtonPressed => self.show_modal = true,
             Message::TextInputChanged(query) => self.query = query,
             Message::PlaybookSelected(playbook) => {
@@ -127,8 +134,11 @@ impl Sidebar {
             },
         );
 
+        let config = self.ctx.configuration.read().unwrap();
+        let context = config.context.as_ref().unwrap();
+
         let content = Column::new()
-            .push(self.context_selector())
+            .push(ContextSwitcher::new(context.clone(), self.status.clone()).on_change(Message::ContextChanged))
             .push(self.omnibox())
             .push(Scrollable::new(
                 Container::new(playbooks).width(Length::Fill).height(Length::Shrink),
@@ -144,45 +154,6 @@ impl Sidebar {
 }
 
 impl Sidebar {
-    fn context_selector(&self) -> Element<Message> {
-        let style = match self.state {
-            State::Connecting => styles::Text::Secondary,
-            State::Connected => styles::Text::Success,
-            State::Disconnected => styles::Text::Danger,
-        };
-        let text = self.state.to_string();
-        let state = Row::new()
-            .push(Text::new("•").size(14).style(style))
-            .push(Text::new(text).size(14).style(styles::Text::Secondary))
-            .align_items(Alignment::Center);
-
-        let config = self.ctx.configuration.read().unwrap();
-        let context = config.context.as_ref().unwrap();
-        let title = context.current().map(|c| c.title.as_str()).unwrap_or("UNKNOWN");
-
-        let heading = Column::new()
-            .push(Text::new(title.to_string()))
-            .push(state)
-            .width(Length::Fill);
-
-        Container::new(
-            Button::new(
-                Row::new()
-                    .push(heading)
-                    .push(
-                        Text::new(icon_to_char(Icon::ChevronExpand).to_string())
-                            .font(ICON_FONT)
-                            .size(16.0),
-                    )
-                    .align_items(Alignment::Center)
-                    .width(Length::Fill),
-            )
-            .style(styles::Button::Element)
-            .on_press(Message::ContextSelectorPressed),
-        )
-        .into()
-    }
-
     fn omnibox(&self) -> Element<Message> {
         Row::new()
             .push(TextInput::new("Search", &self.query).on_input(Message::TextInputChanged))
@@ -216,23 +187,5 @@ impl Sidebar {
             .backdrop(Message::CloseComposeModal)
             .on_esc(Message::CloseComposeModal)
             .into()
-    }
-}
-
-#[derive(Clone, Debug)]
-pub enum State {
-    Connecting,
-    Connected,
-    Disconnected,
-}
-
-// impl std::fmt::Display for State
-impl Display for State {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            State::Connecting => write!(f, "Connecting..."),
-            State::Connected => write!(f, "Connected"),
-            State::Disconnected => write!(f, "Disconnected. Retrying..."),
-        }
     }
 }
