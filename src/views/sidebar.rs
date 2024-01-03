@@ -13,15 +13,17 @@
 // limitations under the License.
 
 use iced_aw::{Icon, ICON_FONT};
+
 use std::sync::Arc;
 use std::time::Duration;
-use tracing::debug;
+use tracing::{debug, error};
 
 use amp_client::playbooks::Playbook;
 use iced::alignment::Horizontal;
 use iced::widget::Container;
 use iced::{Command, Length, Subscription};
 
+use crate::cmd::config::switch_context;
 use crate::cmd::playbook::refresh_playbooks;
 use crate::context::Context;
 use crate::errors::Result;
@@ -52,6 +54,7 @@ impl Default for Sidebar {
 #[derive(Clone, Debug)]
 pub enum Message {
     Initializing,
+    RefreshPlaybooks(Result<()>),
     PlaybooksLoaded(Result<Vec<Playbook>>),
 
     ContextChanged(String),
@@ -82,17 +85,19 @@ impl Sidebar {
             Message::Initializing => {
                 return Command::perform(refresh_playbooks(self.ctx.clone()), Message::PlaybooksLoaded);
             }
+            Message::RefreshPlaybooks(arg) => match arg {
+                Ok(_) => return Command::perform(refresh_playbooks(self.ctx.clone()), Message::PlaybooksLoaded),
+                Err(e) => {
+                    error!("Failed to refresh playbooks: {}", e);
+                }
+            },
             Message::PlaybooksLoaded(playbooks) => {
                 self.playbooks = playbooks.unwrap_or_default();
                 self.status = ConnectionStatus::Connected;
             }
             Message::ContextChanged(name) => {
                 debug!("The current context was changed: {:?}", name);
-                // let mut config = self.ctx.configuration.write().unwrap();
-                // config.context.unwrap().select(&name);
-                // config.save(path)
-
-                // return Command::perform(refresh_playbooks(self.ctx.clone()), Message::PlaybooksLoaded);
+                return Command::perform(switch_context(self.ctx.clone(), name), Message::RefreshPlaybooks);
             }
             Message::CreateButtonPressed => self.show_modal = true,
             Message::TextInputChanged(query) => self.query = query,
@@ -110,13 +115,14 @@ impl Sidebar {
                 self.show_modal = false;
                 self.compose_form = compose::Form::default();
             }
-        }
+        };
+
         Command::none()
     }
 
     /// poll playbooks from the server every 5 seconds
     pub fn subscription(&self) -> Subscription<Message> {
-        iced::time::every(Duration::from_secs(5)).map(|_| Message::Initializing)
+        iced::time::every(Duration::from_secs(5)).map(|_| Message::RefreshPlaybooks(Ok(())))
     }
 
     pub fn view(&self) -> Element<Message> {
@@ -134,11 +140,16 @@ impl Sidebar {
             },
         );
 
+        let (name, cluster) = self.ctx.context().unwrap_or_default();
         let config = self.ctx.configuration.read().unwrap();
         let context = config.context.as_ref().unwrap();
 
+        let context_switcher =
+            ContextSwitcher::new(name, cluster.title, context.clusters().clone(), self.status.clone())
+                .on_change(Message::ContextChanged);
+
         let content = Column::new()
-            .push(ContextSwitcher::new(context.clone(), self.status.clone()).on_change(Message::ContextChanged))
+            .push(context_switcher)
             .push(self.omnibox())
             .push(Scrollable::new(
                 Container::new(playbooks).width(Length::Fill).height(Length::Shrink),

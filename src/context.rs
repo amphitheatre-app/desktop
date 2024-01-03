@@ -52,9 +52,22 @@ impl Context {
 
     /// Get client with current context
     pub fn client(&self) -> Result<Client> {
-        let cluster = get_context(&self.configuration.read().unwrap())?;
+        let (_, cluster) = self.context()?;
         let client = Client::new(&format!("{}/v1", &cluster.server), cluster.token.clone());
         Ok(client)
+    }
+
+    /// Get the current context from the configuration
+    pub fn context(&self) -> Result<(String, Cluster)> {
+        let configuration = self
+            .configuration
+            .read()
+            .map_err(|e| Errors::FailedLoadConfiguration(e.to_string()))?;
+        if let Some(context) = &configuration.context {
+            return context.current().ok_or(Errors::NotFoundCurrentContext);
+        }
+
+        Err(Errors::NotFoundCurrentContext)
     }
 
     /// Get the contexts from the configuration
@@ -65,15 +78,4 @@ impl Context {
             .map_err(|e| Errors::FailedLoadConfiguration(e.to_string()))?;
         Ok(configuration.context.clone().unwrap_or_default())
     }
-}
-
-/// Get the current context from the configuration
-fn get_context(configuration: &Configuration) -> Result<Cluster> {
-    if let Some(context) = &configuration.context {
-        if let Some(current) = context.current() {
-            return Ok(current.to_owned());
-        }
-    }
-
-    Err(Errors::NotFoundCurrentContext)
 }

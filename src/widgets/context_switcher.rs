@@ -9,7 +9,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use amp_common::config::ContextConfiguration;
+use std::collections::HashMap;
+
+use amp_common::config::Cluster;
 use iced::{widget::Component, Alignment, Length};
 use iced_aw::{Icon, ICON_FONT};
 use tracing::debug;
@@ -20,7 +22,10 @@ use super::{Button, Column, Container, Element, Renderer, Row, Text};
 
 #[derive(Default)]
 pub struct ContextSwitcher<Message> {
-    context: ContextConfiguration,
+    _name: String,
+    title: String,
+
+    _clusters: HashMap<String, Cluster>,
     status: ConnectionStatus,
 
     on_change: Option<Box<dyn Fn(String) -> Message>>,
@@ -32,9 +37,11 @@ pub enum Event {
 }
 
 impl<Message> ContextSwitcher<Message> {
-    pub fn new(context: ContextConfiguration, status: ConnectionStatus) -> Self {
+    pub fn new(name: String, title: String, clusters: HashMap<String, Cluster>, status: ConnectionStatus) -> Self {
         Self {
-            context,
+            _name: name,
+            title,
+            _clusters: clusters,
             status,
             on_change: None,
         }
@@ -54,7 +61,7 @@ impl<Message> Component<Message, Renderer> for ContextSwitcher<Message> {
         match event {
             Event::ButtonPressed => {
                 debug!("The context switcher pressed");
-                None
+                self.on_change.as_ref().map(|f| f("default".to_string()))
             }
         }
     }
@@ -71,8 +78,10 @@ impl<Message> Component<Message, Renderer> for ContextSwitcher<Message> {
             .push(Text::new(text).size(14).style(styles::Text::Secondary))
             .align_items(Alignment::Center);
 
-        let title = self.context.current().map(|c| c.title.as_str()).unwrap_or("UNKNOWN");
-        let heading = Column::new().push(Text::new(title)).push(state).width(Length::Fill);
+        let heading = Column::new()
+            .push(Text::new(&self.title))
+            .push(state)
+            .width(Length::Fill);
 
         Container::new(
             Button::new(
