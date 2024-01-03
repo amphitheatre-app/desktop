@@ -16,6 +16,9 @@ pub mod empty;
 pub mod lists;
 pub mod tabs;
 
+mod context_switcher;
+pub use context_switcher::ContextSwitcher;
+
 use crate::styles::Theme;
 
 pub type Renderer = iced::Renderer<Theme>;

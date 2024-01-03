@@ -12,5 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod connection_status;
-pub mod strings;
+use std::fmt::Display;
+
+#[derive(Clone, Debug, Default)]
+pub enum ConnectionStatus {
+    #[default]
+    Connecting,
+    Connected,
+    Disconnected,
+}
+
+// impl std::fmt::Display for State
+impl Display for ConnectionStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ConnectionStatus::Connecting => write!(f, "Connecting..."),
+            ConnectionStatus::Connected => write!(f, "Connected"),
+            ConnectionStatus::Disconnected => write!(f, "Disconnected. Retrying..."),
+        }
+    }
+}
