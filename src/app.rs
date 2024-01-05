@@ -74,6 +74,10 @@ impl Application for App {
                 if let sidebar::Message::PlaybookSelected(playbook) = &message {
                     self.body = Some(Body::new(self.ctx.clone(), playbook.clone()));
                 }
+                // Reset the body when the context changes.
+                if let sidebar::Message::ContextChanged(_) = &message {
+                    self.body = None;
+                }
                 return self.sidebar.update(message).map(Message::SidebarMessage);
             }
             Message::BodyMessage(message) => {

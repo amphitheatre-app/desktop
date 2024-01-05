@@ -108,6 +108,7 @@ impl Sidebar {
             },
             Message::ContextChanged(name) => {
                 debug!("The current context was changed: {:?}", name);
+                self.selected_playbook = None;
                 return Command::perform(switch_context(self.ctx.clone(), name), Message::RefreshPlaybooks);
             }
             Message::CreateButtonPressed => self.show_modal = true,
