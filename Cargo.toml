@@ -10,7 +10,7 @@ path = "src/main.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.78"
+anyhow = "1.0.79"
 amp-client = { git = "https://github.com/amphitheatre-app/amp-client-rust", tag="v0.6.2" }
 amp-common = { git = "https://github.com/amphitheatre-app/common", tag="v0.6.1" }
 confy = "0.5.1"
