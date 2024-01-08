@@ -1,4 +1,4 @@
-// Copyright 2023 The Amphitheatre Authors.
+// Copyright 2024 The Amphitheatre Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,20 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::sync::Arc;
+
+use amp_client::client::Client;
 use amp_common::config::Configuration;
 
 use crate::context::Context;
 use crate::errors::{Errors, Result};
-use std::sync::Arc;
 
 pub async fn switch_context(ctx: Arc<Context>, name: String) -> Result<()> {
     let mut configuration = ctx.configuration.write().unwrap();
     let context = configuration.context.as_mut().unwrap();
 
+    // switch the context
     context
         .select(&name)
         .map_err(|e| Errors::FailedSelectContext(e.to_string()))?;
 
+    // reload the client
+    let (_, cluster) = context.current().ok_or(Errors::NotFoundCurrentContext)?;
+    let mut client = ctx.client.write().unwrap();
+    *client = Client::new(&format!("{}/v1", &cluster.server), cluster.token.clone());
+
+    // save the configuration
     let path = Configuration::path().map_err(|e| Errors::InvalidConfigPath(e.to_string()))?;
     configuration
         .save(path)

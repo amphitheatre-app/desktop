@@ -744,7 +744,7 @@ dependencies = [
 
 [[package]]
 name = "desktop"
-version = "0.4.5"
+version = "0.5.0"
 dependencies = [
  "amp-client",
  "amp-common",
@@ -761,8 +761,10 @@ dependencies = [
  "rand",
  "reqwest-eventsource",
  "serde_json",
+ "tar",
  "thiserror",
  "time",
+ "tokio",
  "toml 0.8.8",
  "tracing",
  "tracing-subscriber",
@@ -3788,6 +3790,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "tar"
+version = "0.4.40"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b16afcea1f22891c49a00c751c7b63b2233284064f11a200fc624137c51e2ddb"
+dependencies = [
+ "filetime",
+ "libc",
+ "xattr",
+]
+
+[[package]]
 name = "termcolor"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5173,6 +5186,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e0b1513b141123073ce54d5bb1d33f801f17508fbd61e02060b1214e96d39c56"
 dependencies = [
  "nix 0.25.1",
+]
+
+[[package]]
+name = "xattr"
+version = "1.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "914566e6413e7fa959cc394fb30e563ba80f3541fbd40816d4c05a0fc3f2a0f1"
+dependencies = [
+ "libc",
+ "linux-raw-sys",
+ "rustix",
 ]
 
 [[package]]

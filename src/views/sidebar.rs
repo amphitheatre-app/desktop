@@ -34,7 +34,6 @@ use crate::widgets::*;
 
 use super::compose::{self, Compose};
 
-#[derive(Debug)]
 pub struct Sidebar {
     ctx: Arc<Context>,
     query: String,
@@ -43,12 +42,6 @@ pub struct Sidebar {
     show_modal: bool,
     compose_form: compose::Form,
     selected_playbook: Option<Playbook>,
-}
-
-impl Default for Sidebar {
-    fn default() -> Self {
-        Self::new(Arc::new(Context::default()))
-    }
 }
 
 #[derive(Clone, Debug)]
@@ -170,9 +163,9 @@ impl Sidebar {
             },
         );
 
-        let (name, cluster) = self.ctx.context().unwrap_or_default();
         let config = self.ctx.configuration.read().unwrap();
         let context = config.context.as_ref().unwrap();
+        let (name, cluster) = context.current().unwrap_or_default();
 
         let context_switcher =
             ContextSwitcher::new(name, cluster.title, context.clusters().clone(), self.status.clone())

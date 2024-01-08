@@ -1,4 +1,4 @@
-// Copyright 2023 The Amphitheatre Authors.
+// Copyright 2024 The Amphitheatre Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,9 @@ pub async fn refresh_actor_info(
     pid: impl ToString,
     name: impl ToString,
 ) -> Result<HashMap<String, HashMap<String, String>>> {
-    ctx.client()?
+    ctx.client
+        .read()
+        .unwrap()
         .actors()
         .info(&pid.to_string(), &name.to_string())
         .map_err(|e| Errors::ClientError(e.to_string()))
@@ -33,7 +35,9 @@ pub async fn refresh_actor_stats(
     pid: impl ToString,
     name: impl ToString,
 ) -> Result<HashMap<String, String>> {
-    ctx.client()?
+    ctx.client
+        .read()
+        .unwrap()
         .actors()
         .stats(&pid.to_string(), &name.to_string())
         .map_err(|e| Errors::ClientError(e.to_string()))

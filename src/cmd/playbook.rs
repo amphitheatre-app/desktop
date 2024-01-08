@@ -12,20 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use std::path::Path;
 use std::{path::PathBuf, sync::Arc};
 
+use crate::context::Context;
 use crate::errors::{Errors, Result};
+use crate::utils::{uploader, watcher};
+
 use amp_client::playbooks::{Playbook, PlaybookPayload, Playbooks};
 use amp_common::{
     resource::{CharacterSpec, Preface},
     schema::Character,
 };
-use tracing::{debug, info};
-
-use crate::context::Context;
+use tracing::{debug, error, info};
 
 pub async fn refresh_playbooks(ctx: Arc<Context>) -> Result<Vec<Playbook>> {
-    ctx.client()?
+    ctx.client
+        .read()
+        .unwrap()
         .playbooks()
         .list(None)
         .map_err(|e| Errors::ClientError(e.to_string()))
@@ -36,16 +40,30 @@ pub async fn compose(
     title: impl ToString,
     description: impl ToString,
     preface: impl ToString,
-    _live: bool,
+    live: bool,
 ) -> Result<Playbook> {
+    let playbook: Playbook;
+
     if preface.to_string().starts_with("http") {
-        pull(&ctx, title, description, preface)
+        playbook = pull(&ctx, title, description, preface)?;
     } else {
-        Err(Errors::FailedCreatePlaybook(
-            "The local manifest file is not supported yet.".to_string(),
-        ))
-        // load(&ctx, title, description, preface, true, !live).await
-    }
+        let path = PathBuf::from(preface.to_string()).join(".amp.toml");
+        let workspace = path.parent().unwrap().to_path_buf();
+
+        let manifest = Character::load(path).map_err(|e| Errors::FailedLoadManifest(e.to_string()))?;
+        let actor = &manifest.meta.name;
+
+        let character = CharacterSpec {
+            live: true,
+            once: !live,
+            ..CharacterSpec::from(&manifest)
+        };
+
+        playbook = load(&ctx, title, description, &character)?;
+        sync(ctx, &playbook, actor, &workspace, live)?;
+    };
+
+    Ok(playbook)
 }
 
 /// Create a playbook from the remote git repository.
@@ -56,7 +74,7 @@ fn pull(
     repository: impl ToString,
 ) -> Result<Playbook> {
     create(
-        ctx.client()?.playbooks(),
+        ctx.client.read().unwrap().playbooks(),
         PlaybookPayload {
             title: title.to_string(),
             description: description.to_string(),
@@ -67,30 +85,44 @@ fn pull(
 
 /// Create a playbook from the local manifest file.
 #[allow(dead_code)]
-async fn load(
+fn load(
     ctx: &Context,
     title: impl ToString,
     description: impl ToString,
-    path: impl ToString,
-    live: bool,
-    once: bool,
+    character: &CharacterSpec,
 ) -> Result<Playbook> {
-    let path = PathBuf::from(path.to_string()).join(".amp.toml");
-    let manifest = Character::load(path).map_err(|e| Errors::FailedLoadManifest(e.to_string()))?;
-    let character = CharacterSpec {
-        live,
-        once,
-        ..CharacterSpec::from(&manifest)
-    };
-
-    return create(
-        ctx.client()?.playbooks(),
+    create(
+        ctx.client.read().unwrap().playbooks(),
         PlaybookPayload {
             title: title.to_string(),
             description: description.to_string(),
-            preface: Preface::manifest(&character),
+            preface: Preface::manifest(character),
         },
-    );
+    )
+}
+
+fn sync(ctx: Arc<Context>, playbook: &Playbook, actor: &str, workspace: &Path, live: bool) -> Result<()> {
+    info!("Syncing the full sources into the server...");
+    uploader::upload(&ctx.client.read().unwrap().actors(), &playbook.id, actor, workspace)?;
+
+    if !live {
+        return Ok(());
+    }
+
+    let workspace = workspace.to_path_buf();
+    let actor = actor.to_string().clone();
+    let client = ctx.client.clone();
+    let pid1 = playbook.id.clone();
+
+    info!("Watching file changes and sync the changed files.");
+    tokio::spawn(async move {
+        let client = client.read().unwrap();
+        if let Err(err) = watcher::watch(&workspace, &client, &pid1, &actor) {
+            error!("The watcher is stopped: {:?}", err);
+        }
+    });
+
+    Ok(())
 }
 
 /// Create a playbook from the given payload.
@@ -106,7 +138,9 @@ fn create(client: Playbooks, payload: PlaybookPayload) -> Result<Playbook> {
 }
 
 pub async fn close_playbook(ctx: Arc<Context>, pid: String) -> Result<u16> {
-    ctx.client()?
+    ctx.client
+        .read()
+        .unwrap()
         .playbooks()
         .delete(&pid)
         .map_err(|e| Errors::FailedDeletePlaybook(e.to_string()))

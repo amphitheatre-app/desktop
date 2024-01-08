@@ -1,6 +1,6 @@
 [package]
 name = "desktop"
-version = "0.4.5"
+version = "0.5.0"
 edition = "2021"
 
 [[bin]]
@@ -24,8 +24,10 @@ native-dialog = { version = "0.7.0", features = ["windows_dpi_awareness", "windo
 notify = "6.1.1"
 rand = "0.8.5"
 reqwest-eventsource = "0.5.0"
+tar = "0.4.40"
 thiserror = "1.0"
 time = { version = "0.3.5", features = ["local-offset"] }
+tokio = { version = "1.35.1", features = ["full"] }
 toml = "0.8"
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }

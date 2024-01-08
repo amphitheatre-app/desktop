@@ -1,4 +1,4 @@
-// Copyright 2023 The Amphitheatre Authors.
+// Copyright 2024 The Amphitheatre Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,8 @@ use desktop::styles::constants::*;
 use iced::{window, Application, Settings};
 use tracing_subscriber::EnvFilter;
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     // Initialize tracing
     std::env::set_var("RUST_LOG", "desktop=trace");
     let filter = EnvFilter::builder().from_env_lossy();

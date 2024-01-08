@@ -1,4 +1,4 @@
-// Copyright 2023 The Amphitheatre Authors.
+// Copyright 2024 The Amphitheatre Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,28 +14,25 @@
 
 use crate::errors::{Errors, Result};
 use amp_client::client::Client;
-use amp_common::config::{Cluster, Configuration, ContextConfiguration};
-use std::fmt::Debug;
-use std::sync::RwLock;
+use amp_common::config::{Cluster, Configuration};
+use std::sync::{Arc, RwLock};
 
 /// Context holds the current context state
 pub struct Context {
     pub configuration: RwLock<Configuration>,
+    pub client: Arc<RwLock<Client>>,
 }
 
 impl Default for Context {
     fn default() -> Self {
-        Self {
-            configuration: RwLock::new(Configuration::default()),
-        }
-    }
-}
+        let configuration = Configuration::default();
+        let (_, cluster) = context(&configuration).unwrap_or_default();
+        let client = Client::new(&format!("{}/v1", &cluster.server), cluster.token.clone());
 
-impl Debug for Context {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Context")
-            .field("configuration", &self.configuration)
-            .finish()
+        Context {
+            configuration: RwLock::new(configuration),
+            client: Arc::new(RwLock::new(client)),
+        }
     }
 }
 
@@ -45,37 +42,20 @@ impl Context {
         let path = Configuration::path().map_err(|e| Errors::InvalidConfigPath(e.to_string()))?;
         let configuration = Configuration::load(path).map_err(|e| Errors::FailedLoadConfiguration(e.to_string()))?;
 
+        let (_, cluster) = context(&configuration)?;
+        let client = Client::new(&format!("{}/v1", &cluster.server), cluster.token.clone());
+
         Ok(Context {
             configuration: RwLock::new(configuration),
+            client: Arc::new(RwLock::new(client)),
         })
     }
+}
 
-    /// Get client with current context
-    pub fn client(&self) -> Result<Client> {
-        let (_, cluster) = self.context()?;
-        let client = Client::new(&format!("{}/v1", &cluster.server), cluster.token.clone());
-        Ok(client)
+/// Get the current context from the configuration
+fn context(configuration: &Configuration) -> Result<(String, Cluster)> {
+    if let Some(context) = &configuration.context {
+        return context.current().ok_or(Errors::NotFoundCurrentContext);
     }
-
-    /// Get the current context from the configuration
-    pub fn context(&self) -> Result<(String, Cluster)> {
-        let configuration = self
-            .configuration
-            .read()
-            .map_err(|e| Errors::FailedLoadConfiguration(e.to_string()))?;
-        if let Some(context) = &configuration.context {
-            return context.current().ok_or(Errors::NotFoundCurrentContext);
-        }
-
-        Err(Errors::NotFoundCurrentContext)
-    }
-
-    /// Get the contexts from the configuration
-    pub fn contexts(&self) -> Result<ContextConfiguration> {
-        let configuration = self
-            .configuration
-            .read()
-            .map_err(|e| Errors::FailedLoadConfiguration(e.to_string()))?;
-        Ok(configuration.context.clone().unwrap_or_default())
-    }
+    Err(Errors::NotFoundCurrentContext)
 }

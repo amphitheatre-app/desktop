@@ -1,4 +1,4 @@
-// Copyright 2023 The Amphitheatre Authors.
+// Copyright 2024 The Amphitheatre Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -109,7 +109,7 @@ impl Tab for Logs {
 }
 
 struct Receiver {
-    ctx: Arc<Context>,
+    es: reqwest_eventsource::EventSource,
     pid: String,
     name: String,
 }
@@ -117,7 +117,7 @@ struct Receiver {
 impl Receiver {
     pub fn new(ctx: Arc<Context>, pid: &str, name: &str) -> Self {
         Self {
-            ctx,
+            es: ctx.client.read().unwrap().actors().logs(pid, name),
             pid: String::from(pid),
             name: String::from(name),
         }
@@ -136,18 +136,15 @@ impl subscription::Recipe for Receiver {
     }
 
     fn stream(self: Box<Self>, _: subscription::EventStream) -> BoxStream<Self::Output> {
-        futures::stream::unfold(
-            self.ctx.client().unwrap().actors().logs(&self.pid, &self.name),
-            |mut es| async {
-                let event = es.next().await;
-                match event {
-                    Some(Ok(Event::Open)) => Some((Message::Received(String::from(OPEN_STREAM_MESSAGE)), es)),
-                    Some(Ok(Event::Message(message))) => Some((Message::Received(message.data), es)),
-                    Some(Err(e)) => Some((Message::Errored(e.to_string()), es)),
-                    _ => Some((Message::Errored(format!("{:#?}", event)), es)),
-                }
-            },
-        )
+        futures::stream::unfold(self.es, |mut es| async {
+            let event = es.next().await;
+            match event {
+                Some(Ok(Event::Open)) => Some((Message::Received(String::from(OPEN_STREAM_MESSAGE)), es)),
+                Some(Ok(Event::Message(message))) => Some((Message::Received(message.data), es)),
+                Some(Err(e)) => Some((Message::Errored(e.to_string()), es)),
+                _ => Some((Message::Errored(format!("{:#?}", event)), es)),
+            }
+        })
         .boxed()
     }
 }
