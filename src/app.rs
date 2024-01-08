@@ -18,6 +18,7 @@ use iced::{executor, Application, Command, Length, Subscription};
 use iced_aw::split;
 use tracing::error;
 
+use crate::cmd::playbook::close_playbook;
 use crate::context::Context;
 use crate::styles::constants::{SIDEBAR_WIDTH, WINDOW_MIN_WIDTH};
 use crate::styles::Theme;
@@ -74,12 +75,15 @@ impl Application for App {
             Message::SidebarMessage(message) => {
                 if let sidebar::Message::PlaybookSelected(result) = &message {
                     match result {
-                        Ok(playbook) => self.body = Some(Body::new(self.ctx.clone(), playbook.clone())),
-                        Err(e) => {
-                            error!("Failed to select playbook: {}", e);
-                            self.body = None;
-                        }
-                    };
+                        Some(result) => match result {
+                            Ok(playbook) => self.body = Some(Body::new(self.ctx.clone(), playbook.clone())),
+                            Err(e) => {
+                                error!("Failed to select playbook: {}", e);
+                                self.body = None;
+                            }
+                        },
+                        None => self.body = None,
+                    }
                 }
                 // Reset the body when the context changes.
                 if let sidebar::Message::ContextChanged(_) = &message {
@@ -88,8 +92,14 @@ impl Application for App {
                 return self.sidebar.update(message).map(Message::SidebarMessage);
             }
             Message::BodyMessage(message) => {
+                if let body::Message::CloseButtonPressed(playbook) = message {
+                    return Command::perform(close_playbook(self.ctx.clone(), playbook.id.clone()), |_| {
+                        Message::SidebarMessage(sidebar::Message::PlaybookSelected(None))
+                    });
+                }
+
                 if let Some(body) = &mut self.body {
-                    return body.update(message).map(Message::BodyMessage);
+                    return body.update(message.clone()).map(Message::BodyMessage);
                 }
             }
             Message::SplitResized(position) => self.divider_position = Some(position),

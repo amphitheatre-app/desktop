@@ -60,7 +60,7 @@ pub enum Message {
     ContextChanged(String),
     CreateButtonPressed,
     TextInputChanged(String),
-    PlaybookSelected(Result<Playbook>),
+    PlaybookSelected(Option<Result<Playbook>>),
 
     CloseComposeModal,
     ComposeFormChanged(compose::Form),
@@ -83,6 +83,7 @@ impl Sidebar {
     pub fn update(&mut self, message: Message) -> Command<Message> {
         match message {
             Message::Initializing => {
+                self.selected_playbook = None;
                 return Command::perform(refresh_playbooks(self.ctx.clone()), Message::PlaybooksLoaded);
             }
             Message::RefreshPlaybooks(arg) => match arg {
@@ -113,16 +114,20 @@ impl Sidebar {
             }
             Message::CreateButtonPressed => self.show_modal = true,
             Message::TextInputChanged(query) => self.query = query,
-            Message::PlaybookSelected(result) => match result {
-                Ok(playbook) => {
-                    debug!("Playbook selected: {:?}", playbook);
-                    self.selected_playbook = Some(playbook);
+            Message::PlaybookSelected(result) => {
+                if let Some(result) = result {
+                    match result {
+                        Ok(playbook) => {
+                            debug!("Playbook selected: {:?}", playbook);
+                            self.selected_playbook = Some(playbook);
+                        }
+                        Err(e) => {
+                            error!("Failed to select playbook: {}", e);
+                            self.selected_playbook = None;
+                        }
+                    }
                 }
-                Err(e) => {
-                    error!("Failed to select playbook: {}", e);
-                    self.selected_playbook = None;
-                }
-            },
+            }
             Message::CloseComposeModal => {
                 self.show_modal = false;
                 self.compose_form = compose::Form::default();
@@ -137,7 +142,7 @@ impl Sidebar {
 
                 return Command::perform(
                     compose(self.ctx.clone(), form.title, form.description, form.preface, form.live),
-                    Message::PlaybookSelected,
+                    |p| Message::PlaybookSelected(Some(p)),
                 );
             }
         };
@@ -160,7 +165,7 @@ impl Sidebar {
                 column.push(
                     SidebarPlaybookItem::new(playbook.clone())
                         .active(self.selected_playbook.as_ref().is_some_and(|p| p.id == playbook.id))
-                        .on_press(|p| Message::PlaybookSelected(Ok(p))),
+                        .on_press(|p| Message::PlaybookSelected(Some(Ok(p)))),
                 )
             },
         );

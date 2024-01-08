@@ -104,3 +104,10 @@ fn create(client: Playbooks, payload: PlaybookPayload) -> Result<Playbook> {
 
     Ok(playbook)
 }
+
+pub async fn close_playbook(ctx: Arc<Context>, pid: String) -> Result<u16> {
+    ctx.client()?
+        .playbooks()
+        .delete(&pid)
+        .map_err(|e| Errors::FailedDeletePlaybook(e.to_string()))
+}

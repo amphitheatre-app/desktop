@@ -1,4 +1,4 @@
-// Copyright 2023 The Amphitheatre Authors.
+// Copyright 2024 The Amphitheatre Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ pub struct Body {
 pub enum Message {
     Initializing,
 
-    ButtonPressed,
+    CloseButtonPressed(Playbook),
     TabSelected(TabId),
 
     Logs(logs::Message),
@@ -76,7 +76,7 @@ impl Body {
                     Command::perform(async {}, |_| Message::Stats(stats::Message::Initializing)),
                 ]);
             }
-            Message::ButtonPressed => {}
+            Message::CloseButtonPressed(_) => {}
             Message::TabSelected(tab) => self.active_tab = tab,
             Message::Logs(message) => return self.logs.update(message).map(Message::Logs),
             Message::Info(message) => return self.info.update(message).map(Message::Info),
@@ -149,10 +149,10 @@ impl Body {
         };
 
         Row::new()
-            .push(button(Icon::Play, Message::ButtonPressed))
-            .push(button(Icon::Stop, Message::ButtonPressed))
-            .push(button(Icon::ArrowRepeat, Message::ButtonPressed))
-            .push(button(Icon::X, Message::ButtonPressed))
+            // .push(button(Icon::Play, Message::ButtonPressed))
+            // .push(button(Icon::Stop, Message::ButtonPressed))
+            // .push(button(Icon::ArrowRepeat, Message::ButtonPressed))
+            .push(button(Icon::X, Message::CloseButtonPressed(self.playbook.clone())))
             .align_items(Alignment::Center)
             .spacing(SPACING_SMALL)
             .into()
