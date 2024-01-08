@@ -1,4 +1,4 @@
-// Copyright 2023 The Amphitheatre Authors.
+// Copyright 2024 The Amphitheatre Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ use iced::widget::Container;
 use iced::{Command, Length, Subscription};
 
 use crate::cmd::config::switch_context;
-use crate::cmd::playbook::refresh_playbooks;
+use crate::cmd::playbook::{compose, refresh_playbooks};
 use crate::context::Context;
 use crate::errors::Result;
 use crate::styles::{self, constants::*};
@@ -60,7 +60,7 @@ pub enum Message {
     ContextChanged(String),
     CreateButtonPressed,
     TextInputChanged(String),
-    PlaybookSelected(Playbook),
+    PlaybookSelected(Result<Playbook>),
 
     CloseComposeModal,
     ComposeFormChanged(compose::Form),
@@ -113,10 +113,16 @@ impl Sidebar {
             }
             Message::CreateButtonPressed => self.show_modal = true,
             Message::TextInputChanged(query) => self.query = query,
-            Message::PlaybookSelected(playbook) => {
-                debug!("Playbook selected: {:?}", playbook);
-                self.selected_playbook = Some(playbook);
-            }
+            Message::PlaybookSelected(result) => match result {
+                Ok(playbook) => {
+                    debug!("Playbook selected: {:?}", playbook);
+                    self.selected_playbook = Some(playbook);
+                }
+                Err(e) => {
+                    error!("Failed to select playbook: {}", e);
+                    self.selected_playbook = None;
+                }
+            },
             Message::CloseComposeModal => {
                 self.show_modal = false;
                 self.compose_form = compose::Form::default();
@@ -125,7 +131,14 @@ impl Sidebar {
             Message::ComposeFormSubmit => {
                 println!("Form submitted: {:?}", self.compose_form);
                 self.show_modal = false;
+
+                let form = self.compose_form.clone();
                 self.compose_form = compose::Form::default();
+
+                return Command::perform(
+                    compose(self.ctx.clone(), form.title, form.description, form.preface, form.live),
+                    Message::PlaybookSelected,
+                );
             }
         };
 
@@ -147,7 +160,7 @@ impl Sidebar {
                 column.push(
                     SidebarPlaybookItem::new(playbook.clone())
                         .active(self.selected_playbook.as_ref().is_some_and(|p| p.id == playbook.id))
-                        .on_press(Message::PlaybookSelected),
+                        .on_press(|p| Message::PlaybookSelected(Ok(p))),
                 )
             },
         );

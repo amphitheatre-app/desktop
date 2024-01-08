@@ -1,4 +1,4 @@
-// Copyright 2023 The Amphitheatre Authors.
+// Copyright 2024 The Amphitheatre Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,10 +44,10 @@ pub enum Event {
 
 #[derive(Clone, Debug, Default)]
 pub struct Form {
-    title: String,
-    description: String,
-    repository: String,
-    live: bool,
+    pub title: String,
+    pub description: String,
+    pub preface: String,
+    pub live: bool,
 }
 
 impl<Message: Clone> Compose<Message> {
@@ -81,12 +81,12 @@ impl<Message: Clone> Component<Message, Renderer> for Compose<Message> {
                 Some((self.on_change)(self.form.clone()))
             }
             Event::RepositoryChanged(repository) => {
-                self.form.repository = repository;
+                self.form.preface = repository;
                 Some((self.on_change)(self.form.clone()))
             }
             Event::SelectFileButtonPressed => {
                 if let Ok(Some(path)) = FileDialog::new().show_open_single_dir() {
-                    self.form.repository = path.to_str().unwrap_or_default().to_string();
+                    self.form.preface = path.to_str().unwrap_or_default().to_string();
                     Some((self.on_change)(self.form.clone()))
                 } else {
                     None
@@ -146,7 +146,7 @@ impl<Message> Compose<Message> {
         let repository = Column::with_children(vec![
             Text::new("Repository").into(),
             Row::new()
-                .push(TextInput::new(repo_placeholder, &self.form.repository).on_input(Event::RepositoryChanged))
+                .push(TextInput::new(repo_placeholder, &self.form.preface).on_input(Event::RepositoryChanged))
                 .push(Button::new(Text::new("Browse")).on_press(Event::SelectFileButtonPressed))
                 .spacing(SPACING_SMALL)
                 .into(),
@@ -154,7 +154,7 @@ impl<Message> Compose<Message> {
         .into();
 
         let mut fields = vec![help, title, description, repository];
-        if Path::new(&self.form.repository).exists() {
+        if Path::new(&self.form.preface).exists() {
             fields.push(Checkbox::new("Running in development mode", self.form.live, Event::LiveUpdateChecked).into());
         }
 

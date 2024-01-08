@@ -1,4 +1,4 @@
-// Copyright 2023 The Amphitheatre Authors.
+// Copyright 2024 The Amphitheatre Authors.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@ use std::sync::Arc;
 
 use iced::{executor, Application, Command, Length, Subscription};
 use iced_aw::split;
+use tracing::error;
 
 use crate::context::Context;
 use crate::styles::constants::{SIDEBAR_WIDTH, WINDOW_MIN_WIDTH};
@@ -71,8 +72,14 @@ impl Application for App {
     fn update(&mut self, message: Self::Message) -> Command<Message> {
         match message {
             Message::SidebarMessage(message) => {
-                if let sidebar::Message::PlaybookSelected(playbook) = &message {
-                    self.body = Some(Body::new(self.ctx.clone(), playbook.clone()));
+                if let sidebar::Message::PlaybookSelected(result) = &message {
+                    match result {
+                        Ok(playbook) => self.body = Some(Body::new(self.ctx.clone(), playbook.clone())),
+                        Err(e) => {
+                            error!("Failed to select playbook: {}", e);
+                            self.body = None;
+                        }
+                    };
                 }
                 // Reset the body when the context changes.
                 if let sidebar::Message::ContextChanged(_) = &message {
