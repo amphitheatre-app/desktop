@@ -81,6 +81,14 @@ applications. Therefore, the first time you run it on MacOS, instead of
 double-clicking, right-click and choose "Open". This will successfully open the
 app.
 
+**_What platforms are supported?_**
+
+Amphitheatre Desktop can run on Windows, macOS and Linux on a great range of CPU
+architectures. However, the x86_64 architecture is the main focus in
+development. Official builds for the ARM64 architecture are also provided for
+macOS and Linux. It is likely possible to compile the application on other
+platforms as well.
+
 In any case don't hesitate to [open an
 issue](https://github.com/amphitheatre-app/desktop/issues), and I will do my
 best to help you!
