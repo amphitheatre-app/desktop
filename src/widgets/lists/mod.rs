@@ -9,5 +9,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod sidebar_playbook_item;
-pub use sidebar_playbook_item::SidebarPlaybookItem;
+mod playbook_item;
+pub use playbook_item::PlaybookItem;
+
+mod character_item;
+pub use character_item::CharacterItem;

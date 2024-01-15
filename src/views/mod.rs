@@ -13,6 +13,7 @@
 // limitations under the License.
 
 pub mod body;
+pub mod cast;
 pub mod compose;
 pub mod detail;
 pub mod sidebar;

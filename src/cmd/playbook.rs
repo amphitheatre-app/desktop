@@ -19,14 +19,15 @@ use crate::context::Context;
 use crate::errors::{Errors, Result};
 use crate::utils::{uploader, watcher};
 
-use amp_client::playbooks::{Playbook, PlaybookPayload, Playbooks};
+use amp_client::playbooks::{PlaybookPayload, Playbooks};
+use amp_common::resource::PlaybookSpec;
 use amp_common::{
     resource::{CharacterSpec, Preface},
     schema::Character,
 };
 use tracing::{debug, error, info};
 
-pub async fn refresh_playbooks(ctx: Arc<Context>) -> Result<Vec<Playbook>> {
+pub async fn refresh_playbooks(ctx: Arc<Context>) -> Result<Vec<PlaybookSpec>> {
     ctx.client
         .read()
         .unwrap()
@@ -41,8 +42,8 @@ pub async fn compose(
     description: impl ToString,
     preface: impl ToString,
     live: bool,
-) -> Result<Playbook> {
-    let playbook: Playbook;
+) -> Result<PlaybookSpec> {
+    let playbook: PlaybookSpec;
 
     if preface.to_string().starts_with("http") {
         playbook = pull(&ctx, title, description, preface)?;
@@ -60,7 +61,7 @@ pub async fn compose(
         };
 
         playbook = load(&ctx, title, description, &character)?;
-        sync(ctx, &playbook, actor, &workspace, live)?;
+        sync(ctx, playbook.clone(), actor, &workspace, live)?;
     };
 
     Ok(playbook)
@@ -72,7 +73,7 @@ fn pull(
     title: impl ToString,
     description: impl ToString,
     repository: impl ToString,
-) -> Result<Playbook> {
+) -> Result<PlaybookSpec> {
     create(
         ctx.client.read().unwrap().playbooks(),
         PlaybookPayload {
@@ -90,7 +91,7 @@ fn load(
     title: impl ToString,
     description: impl ToString,
     character: &CharacterSpec,
-) -> Result<Playbook> {
+) -> Result<PlaybookSpec> {
     create(
         ctx.client.read().unwrap().playbooks(),
         PlaybookPayload {
@@ -101,7 +102,7 @@ fn load(
     )
 }
 
-fn sync(ctx: Arc<Context>, playbook: &Playbook, actor: &str, workspace: &Path, live: bool) -> Result<()> {
+fn sync(ctx: Arc<Context>, playbook: PlaybookSpec, actor: &str, workspace: &Path, live: bool) -> Result<()> {
     info!("Syncing the full sources into the server...");
     uploader::upload(&ctx.client.read().unwrap().actors(), &playbook.id, actor, workspace)?;
 
@@ -126,7 +127,7 @@ fn sync(ctx: Arc<Context>, playbook: &Playbook, actor: &str, workspace: &Path, l
 }
 
 /// Create a playbook from the given payload.
-fn create(client: Playbooks, payload: PlaybookPayload) -> Result<Playbook> {
+fn create(client: Playbooks, payload: PlaybookPayload) -> Result<PlaybookSpec> {
     let playbook = client
         .create(payload)
         .map_err(|e| Errors::FailedCreatePlaybook(e.to_string()))?;
@@ -137,11 +138,11 @@ fn create(client: Playbooks, payload: PlaybookPayload) -> Result<Playbook> {
     Ok(playbook)
 }
 
-pub async fn close_playbook(ctx: Arc<Context>, pid: String) -> Result<u16> {
+pub async fn close_playbook(ctx: Arc<Context>, pid: impl ToString) -> Result<u16> {
     ctx.client
         .read()
         .unwrap()
         .playbooks()
-        .delete(&pid)
+        .delete(&pid.to_string())
         .map_err(|e| Errors::FailedDeletePlaybook(e.to_string()))
 }

@@ -15,7 +15,7 @@
 use std::hash::Hash;
 use std::sync::Arc;
 
-use amp_client::playbooks::Playbook;
+use amp_common::resource::{CharacterSpec, PlaybookSpec};
 use futures::StreamExt;
 use iced::widget::scrollable;
 use iced::{Command, Font, Length, Subscription};
@@ -36,16 +36,18 @@ pub enum Message {
 
 pub struct Logs {
     ctx: Arc<Context>,
-    playbook: Playbook,
+    playbook: PlaybookSpec,
+    character: CharacterSpec,
     messages: Vec<String>,
     scrollable_id: scrollable::Id,
 }
 
 impl Logs {
-    pub fn new(ctx: Arc<Context>, playbook: Playbook) -> Self {
+    pub fn new(ctx: Arc<Context>, playbook: PlaybookSpec, character: CharacterSpec) -> Self {
         Self {
             ctx,
             playbook,
+            character,
             messages: vec![],
             scrollable_id: scrollable::Id::unique(),
         }
@@ -69,7 +71,7 @@ impl Logs {
         Subscription::from_recipe(Receiver::new(
             self.ctx.clone(),
             &self.playbook.id,
-            &String::from("amp-example-go"),
+            &self.character.meta.name,
         ))
     }
 

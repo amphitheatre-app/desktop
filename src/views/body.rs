@@ -14,7 +14,7 @@
 
 use std::sync::Arc;
 
-use amp_client::playbooks::Playbook;
+use amp_common::resource::{CharacterSpec, PlaybookSpec};
 use iced::widget::{horizontal_space, Rule};
 use iced::{Alignment, Command, Length, Subscription};
 use iced_aw::{Icon, ICON_FONT};
@@ -30,7 +30,8 @@ use crate::widgets::{Button, Column, Container, Element, Row, Tabs, Text};
 
 // #[derive(Default)]
 pub struct Body {
-    playbook: Playbook,
+    playbook: PlaybookSpec,
+    _character: CharacterSpec,
     active_tab: TabId,
     logs: Logs,
     info: Information,
@@ -41,7 +42,7 @@ pub struct Body {
 pub enum Message {
     Initializing,
 
-    CloseButtonPressed(Playbook),
+    CloseButtonPressed(Box<PlaybookSpec>),
     TabSelected(TabId),
 
     Logs(logs::Message),
@@ -58,13 +59,14 @@ pub enum TabId {
 }
 
 impl Body {
-    pub fn new(ctx: Arc<Context>, playbook: Playbook) -> Self {
+    pub fn new(ctx: Arc<Context>, playbook: PlaybookSpec, character: CharacterSpec) -> Self {
         Self {
             playbook: playbook.clone(),
+            _character: character.clone(),
             active_tab: TabId::default(),
-            logs: Logs::new(ctx.clone(), playbook.clone()),
-            info: Information::new(ctx.clone(), playbook.clone()),
-            stats: Stats::new(ctx.clone(), playbook.clone()),
+            logs: Logs::new(ctx.clone(), playbook.clone(), character.clone()),
+            info: Information::new(ctx.clone(), playbook.clone(), character.clone()),
+            stats: Stats::new(ctx.clone(), playbook.clone(), character.clone()),
         }
     }
 
@@ -123,19 +125,30 @@ impl Body {
     }
 
     fn header(&self) -> Element<Message> {
-        let title = Column::new().push(Text::new(&self.playbook.title)).push(
-            Text::new("Running")
-                .size(FONT_SIZE_SMALLER)
-                .style(styles::Text::Success),
+        let mut items = vec![];
+        if let Some(characters) = &self.playbook.characters {
+            if characters.len() > 1 {
+                items.push(
+                    Text::new(Icon::List.to_string())
+                        .font(ICON_FONT)
+                        .size(ICON_FONT_SIZE_TOOLBAR)
+                        .into(),
+                );
+            }
+        }
+
+        items.push(
+            Column::new()
+                .push(Text::new(&self.playbook.title))
+                .push(
+                    Text::new("Running")
+                        .size(FONT_SIZE_SMALLER)
+                        .style(styles::Text::Success),
+                )
+                .into(),
         );
 
-        Row::new()
-            .push(
-                Text::new(Icon::List.to_string())
-                    .font(ICON_FONT)
-                    .size(ICON_FONT_SIZE_TOOLBAR),
-            )
-            .push(title)
+        Row::with_children(items)
             .align_items(Alignment::Center)
             .spacing(8)
             .into()
@@ -152,7 +165,10 @@ impl Body {
             // .push(button(Icon::Play, Message::ButtonPressed))
             // .push(button(Icon::Stop, Message::ButtonPressed))
             // .push(button(Icon::ArrowRepeat, Message::ButtonPressed))
-            .push(button(Icon::X, Message::CloseButtonPressed(self.playbook.clone())))
+            .push(button(
+                Icon::X,
+                Message::CloseButtonPressed(Box::new(self.playbook.clone())),
+            ))
             .align_items(Alignment::Center)
             .spacing(SPACING_SMALL)
             .into()

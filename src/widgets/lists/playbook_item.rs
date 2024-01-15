@@ -9,7 +9,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use amp_client::playbooks::Playbook;
+use amp_common::resource::PlaybookSpec;
 use iced::widget::Component;
 use iced::Alignment;
 use iced::Length;
@@ -24,14 +24,14 @@ use crate::widgets::Renderer;
 use crate::widgets::Row;
 use crate::widgets::Text;
 
-pub struct SidebarPlaybookItem<Message> {
-    playbook: Playbook,
+pub struct PlaybookItem<Message> {
+    playbook: PlaybookSpec,
     active: bool,
-    on_press: Option<Box<dyn Fn(Playbook) -> Message>>,
+    on_press: Option<Box<dyn Fn(PlaybookSpec) -> Message>>,
 }
 
-impl<Message> SidebarPlaybookItem<Message> {
-    pub fn new(playbook: Playbook) -> Self {
+impl<Message> PlaybookItem<Message> {
+    pub fn new(playbook: PlaybookSpec) -> Self {
         Self {
             playbook,
             active: false,
@@ -42,7 +42,7 @@ impl<Message> SidebarPlaybookItem<Message> {
     /// Sets the message that will be produced when the [`Button`] is pressed.
     ///
     /// Unless `on_press` is called, the [`Button`] will be disabled.
-    pub fn on_press(mut self, on_press: impl Fn(Playbook) -> Message + 'static) -> Self {
+    pub fn on_press(mut self, on_press: impl Fn(PlaybookSpec) -> Message + 'static) -> Self {
         self.on_press = Some(Box::new(on_press));
         self
     }
@@ -59,7 +59,7 @@ pub enum Event {
     ButtonPressed,
 }
 
-impl<Message> Component<Message, Renderer> for SidebarPlaybookItem<Message> {
+impl<Message> Component<Message, Renderer> for PlaybookItem<Message> {
     type State = ();
     type Event = Event;
 
@@ -92,11 +92,11 @@ impl<Message> Component<Message, Renderer> for SidebarPlaybookItem<Message> {
     }
 }
 
-impl<'a, Message> From<SidebarPlaybookItem<Message>> for Element<'a, Message>
+impl<'a, Message> From<PlaybookItem<Message>> for Element<'a, Message>
 where
     Message: 'a + Clone,
 {
-    fn from(item: SidebarPlaybookItem<Message>) -> Self {
+    fn from(item: PlaybookItem<Message>) -> Self {
         iced::widget::component(item)
     }
 }

@@ -14,15 +14,17 @@
 
 use std::sync::Arc;
 
+use amp_common::resource::{CharacterSpec, PlaybookSpec};
 use iced::{executor, Application, Command, Length, Subscription};
 use iced_aw::split;
-use tracing::error;
+use tracing::debug;
 
 use crate::cmd::playbook::close_playbook;
 use crate::context::Context;
 use crate::styles::constants::{SIDEBAR_WIDTH, WINDOW_MIN_WIDTH};
 use crate::styles::Theme;
 use crate::views::body::{self, Body};
+use crate::views::cast::{self, Cast};
 use crate::views::sidebar::{self, Sidebar};
 use crate::widgets::empty::empty;
 use crate::widgets::{Element, Split};
@@ -32,6 +34,7 @@ pub enum Message {
     // Messages from the sub views.
     SidebarMessage(sidebar::Message),
     BodyMessage(body::Message),
+    CastMessage(cast::Message),
 
     // Messages from self actions.
     SplitResized(u16),
@@ -41,7 +44,11 @@ pub struct App {
     ctx: Arc<Context>,
     sidebar: Sidebar,
     body: Option<Body>,
+    cast: Option<Cast>,
     divider_position: Option<u16>,
+
+    selected_playbook: Option<PlaybookSpec>,
+    selected_character: Option<CharacterSpec>,
 }
 
 impl Application for App {
@@ -55,7 +62,10 @@ impl Application for App {
             ctx: ctx.clone(),
             sidebar: Sidebar::new(ctx.clone()),
             body: None,
+            cast: None,
             divider_position: Some(220),
+            selected_playbook: None,
+            selected_character: None,
         };
 
         let commands = Command::batch(vec![
@@ -74,32 +84,62 @@ impl Application for App {
         match message {
             Message::SidebarMessage(message) => {
                 if let sidebar::Message::PlaybookSelected(result) = &message {
-                    match result {
-                        Some(result) => match result {
-                            Ok(playbook) => self.body = Some(Body::new(self.ctx.clone(), playbook.clone())),
-                            Err(e) => {
-                                error!("Failed to select playbook: {}", e);
-                                self.body = None;
+                    self.body = None;
+                    self.cast = None;
+
+                    if let Some(Ok(playbook)) = result {
+                        self.selected_playbook = Some(playbook.clone());
+                        if let Some(characters) = &playbook.characters {
+                            debug!("characters: {:?}", characters);
+                            if characters.len() > 1 {
+                                self.cast = Some(Cast::new(self.ctx.clone(), playbook.clone()));
+                            } else {
+                                self.body = Some(Body::new(
+                                    self.ctx.clone(),
+                                    playbook.clone(),
+                                    characters.first().unwrap().clone(),
+                                ));
                             }
-                        },
-                        None => self.body = None,
+                        }
                     }
                 }
                 // Reset the body when the context changes.
                 if let sidebar::Message::ContextChanged(_) = &message {
                     self.body = None;
+                    self.cast = None;
                 }
                 return self.sidebar.update(message).map(Message::SidebarMessage);
             }
             Message::BodyMessage(message) => {
                 if let body::Message::CloseButtonPressed(playbook) = message {
-                    return Command::perform(close_playbook(self.ctx.clone(), playbook.id.clone()), |_| {
+                    return Command::perform(close_playbook(self.ctx.clone(), playbook.id), |_| {
                         Message::SidebarMessage(sidebar::Message::PlaybookSelected(None))
                     });
                 }
 
                 if let Some(body) = &mut self.body {
                     return body.update(message.clone()).map(Message::BodyMessage);
+                }
+            }
+            Message::CastMessage(message) => {
+                if let cast::Message::CloseButtonPressed(playbook) = message {
+                    return Command::perform(close_playbook(self.ctx.clone(), playbook.id), |_| {
+                        Message::SidebarMessage(sidebar::Message::PlaybookSelected(None))
+                    });
+                }
+
+                if let cast::Message::CharacterSelected(character) = &message {
+                    self.selected_character = Some(*character.clone());
+
+                    self.body = Some(Body::new(
+                        self.ctx.clone(),
+                        self.selected_playbook.clone().unwrap(),
+                        *character.clone(),
+                    ));
+                }
+
+                if let Some(actors) = &mut self.cast {
+                    return actors.update(message.clone()).map(Message::CastMessage);
                 }
             }
             Message::SplitResized(position) => self.divider_position = Some(position),
@@ -115,16 +155,33 @@ impl Application for App {
                 .map(|body| body.subscription())
                 .unwrap_or(Subscription::none())
                 .map(Message::BodyMessage),
+            self.cast
+                .as_ref()
+                .map(|actors| actors.subscription())
+                .unwrap_or(Subscription::none())
+                .map(Message::CastMessage),
         ])
     }
 
     fn view(&self) -> Element<Self::Message> {
         let first = self.sidebar.view().map(Message::SidebarMessage);
-        let second = self
-            .body
-            .as_ref()
-            .map(|body| body.view().map(Message::BodyMessage))
-            .unwrap_or(empty("No playbook selected").into());
+        // let second = self
+        //     .body
+        //     .as_ref()
+        //     .map(|body| body.view().map(Message::BodyMessage))
+        //     .unwrap_or(empty("No playbook selected").into());
+
+        // the second view is the actors view if playbook is selected,
+        // and the actors of playbook is more than 1.
+        // the second view is the body view if playbook is selected,
+        // and the self.actor is selected.
+        let second = if let Some(body) = &self.body {
+            body.view().map(Message::BodyMessage)
+        } else if let Some(actors) = &self.cast {
+            actors.view().map(Message::CastMessage)
+        } else {
+            empty("No playbook selected").into()
+        };
 
         Split::new(
             first,

@@ -21,7 +21,7 @@ use crate::context::Context;
 use crate::errors::Result;
 use crate::widgets::tabs::Tab;
 use crate::widgets::{Column, Container, Element, Text};
-use amp_client::playbooks::Playbook;
+use amp_common::resource::{CharacterSpec, PlaybookSpec};
 use iced::widget::{Row, Rule};
 use iced::{Alignment, Command, Length, Subscription};
 use iced_aw::TabLabel;
@@ -35,23 +35,25 @@ pub enum Message {
 pub struct Stats {
     ctx: Arc<Context>,
     data: HashMap<String, String>,
-    playbook: Playbook,
+    playbook: PlaybookSpec,
+    character: CharacterSpec,
 }
 
 impl Stats {
-    pub fn new(ctx: Arc<Context>, playbook: Playbook) -> Self {
+    pub fn new(ctx: Arc<Context>, playbook: PlaybookSpec, character: CharacterSpec) -> Self {
         Self {
             ctx,
             data: Default::default(),
             playbook,
+            character,
         }
     }
 
     pub fn update(&mut self, message: Message) -> Command<Message> {
         match message {
             Message::Initializing => {
-                let pid = self.playbook.id.to_string();
-                let name = "amp-example-go".to_string();
+                let pid = self.playbook.id.clone();
+                let name = self.character.meta.name.clone();
                 return Command::perform(refresh_actor_stats(self.ctx.clone(), pid, name), Message::StatsLoaded);
             }
             Message::StatsLoaded(data) => self.data = data.unwrap_or_default(),

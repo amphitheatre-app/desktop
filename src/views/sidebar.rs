@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use amp_common::resource::PlaybookSpec;
 use iced_aw::{Icon, ICON_FONT};
 
 use std::sync::Arc;
 use std::time::Duration;
 use tracing::{debug, error};
 
-use amp_client::playbooks::Playbook;
 use iced::alignment::Horizontal;
 use iced::widget::Container;
 use iced::{Command, Length, Subscription};
@@ -29,7 +29,7 @@ use crate::context::Context;
 use crate::errors::Result;
 use crate::styles::{self, constants::*};
 use crate::utils::connection_status::ConnectionStatus;
-use crate::widgets::lists::SidebarPlaybookItem;
+use crate::widgets::lists::PlaybookItem;
 use crate::widgets::*;
 
 use super::compose::{self, Compose};
@@ -37,23 +37,23 @@ use super::compose::{self, Compose};
 pub struct Sidebar {
     ctx: Arc<Context>,
     query: String,
-    playbooks: Vec<Playbook>,
+    playbooks: Vec<PlaybookSpec>,
     status: ConnectionStatus,
     show_modal: bool,
     compose_form: compose::Form,
-    selected_playbook: Option<Playbook>,
+    selected_playbook: Option<PlaybookSpec>,
 }
 
 #[derive(Clone, Debug)]
 pub enum Message {
     Initializing,
     RefreshPlaybooks(Result<()>),
-    PlaybooksLoaded(Result<Vec<Playbook>>),
+    PlaybooksLoaded(Result<Vec<PlaybookSpec>>),
 
     ContextChanged(String),
     CreateButtonPressed,
     TextInputChanged(String),
-    PlaybookSelected(Option<Result<Playbook>>),
+    PlaybookSelected(Option<Result<PlaybookSpec>>),
 
     CloseComposeModal,
     ComposeFormChanged(compose::Form),
@@ -127,7 +127,7 @@ impl Sidebar {
             }
             Message::ComposeFormChanged(form) => self.compose_form = form,
             Message::ComposeFormSubmit => {
-                println!("Form submitted: {:?}", self.compose_form);
+                debug!("Form submitted: {:?}", self.compose_form);
                 self.show_modal = false;
 
                 let form = self.compose_form.clone();
@@ -156,7 +156,7 @@ impl Sidebar {
                 .spacing(SPACING_NORMAL),
             |column, playbook| {
                 column.push(
-                    SidebarPlaybookItem::new(playbook.clone())
+                    PlaybookItem::new(playbook.clone())
                         .active(self.selected_playbook.as_ref().is_some_and(|p| p.id == playbook.id))
                         .on_press(|p| Message::PlaybookSelected(Some(Ok(p)))),
                 )
