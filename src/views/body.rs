@@ -26,12 +26,12 @@ use crate::views::detail::inspect::{self, Information};
 use crate::views::detail::logs::{self, Logs};
 use crate::views::detail::stats::{self, Stats};
 use crate::widgets::tabs::Tab;
-use crate::widgets::{Button, Column, Container, Element, Row, Tabs, Text};
+use crate::widgets::{Button, CharacterSwitcher, Column, Container, Element, Row, Tabs, Text};
 
 // #[derive(Default)]
 pub struct Body {
     playbook: PlaybookSpec,
-    _character: CharacterSpec,
+    character: CharacterSpec,
     active_tab: TabId,
     logs: Logs,
     info: Information,
@@ -44,6 +44,7 @@ pub enum Message {
 
     CloseButtonPressed(Box<PlaybookSpec>),
     TabSelected(TabId),
+    CharacterSelected(Box<CharacterSpec>),
 
     Logs(logs::Message),
     Info(inspect::Message),
@@ -62,7 +63,7 @@ impl Body {
     pub fn new(ctx: Arc<Context>, playbook: PlaybookSpec, character: CharacterSpec) -> Self {
         Self {
             playbook: playbook.clone(),
-            _character: character.clone(),
+            character: character.clone(),
             active_tab: TabId::default(),
             logs: Logs::new(ctx.clone(), playbook.clone(), character.clone()),
             info: Information::new(ctx.clone(), playbook.clone(), character.clone()),
@@ -80,6 +81,9 @@ impl Body {
             }
             Message::CloseButtonPressed(_) => {}
             Message::TabSelected(tab) => self.active_tab = tab,
+            Message::CharacterSelected(character) => {
+                self.character = *character;
+            }
             Message::Logs(message) => return self.logs.update(message).map(Message::Logs),
             Message::Info(message) => return self.info.update(message).map(Message::Info),
             Message::Stats(message) => return self.stats.update(message).map(Message::Stats),
@@ -115,7 +119,7 @@ impl Body {
             Row::new()
                 .push(self.header())
                 .push(horizontal_space(Length::Fill))
-                .push(self.actions())
+                // .push(self.actions())
                 .width(Length::Fill)
                 .align_items(Alignment::Center),
         )
@@ -129,9 +133,8 @@ impl Body {
         if let Some(characters) = &self.playbook.characters {
             if characters.len() > 1 {
                 items.push(
-                    Text::new(Icon::List.to_string())
-                        .font(ICON_FONT)
-                        .size(ICON_FONT_SIZE_TOOLBAR)
+                    CharacterSwitcher::new(self.character.clone(), characters.clone())
+                        .on_change(|p| Message::CharacterSelected(Box::new(p)))
                         .into(),
                 );
             }
@@ -139,7 +142,7 @@ impl Body {
 
         items.push(
             Column::new()
-                .push(Text::new(&self.playbook.title))
+                .push(Text::new(&self.character.meta.name))
                 .push(
                     Text::new("Running")
                         .size(FONT_SIZE_SMALLER)
@@ -154,6 +157,7 @@ impl Body {
             .into()
     }
 
+    #[allow(dead_code)]
     fn actions(&self) -> Element<Message> {
         let button = |icon: Icon, on_press| {
             Button::new(Text::new(icon.to_string()).font(ICON_FONT).size(ICON_FONT_SIZE_TOOLBAR))

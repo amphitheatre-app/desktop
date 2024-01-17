@@ -19,6 +19,9 @@ pub mod tabs;
 mod context_switcher;
 pub use context_switcher::ContextSwitcher;
 
+mod character_switcher;
+pub use character_switcher::CharacterSwitcher;
+
 use crate::styles::Theme;
 
 pub type Renderer = iced::Renderer<Theme>;

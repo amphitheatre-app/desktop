@@ -1,6 +1,6 @@
 [package]
 name = "desktop"
-version = "0.6.0"
+version = "0.6.1"
 edition = "2021"
 
 [[bin]]
@@ -11,8 +11,8 @@ path = "src/main.rs"
 
 [dependencies]
 anyhow = "1.0.79"
-amp-client = { git = "https://github.com/amphitheatre-app/amp-client-rust", tag="v0.7.1" }
-amp-common = { git = "https://github.com/amphitheatre-app/common", tag="v0.7.1" }
+amp-client = { git = "https://github.com/amphitheatre-app/amp-client-rust", tag="v0.7.2" }
+amp-common = { git = "https://github.com/amphitheatre-app/common", tag="v0.7.2" }
 confy = "0.6.0"
 futures = "0.3"
 once_cell = "1.15"

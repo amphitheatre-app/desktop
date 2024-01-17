@@ -117,6 +117,16 @@ impl Application for App {
                     });
                 }
 
+                if let body::Message::CharacterSelected(character) = &message {
+                    self.selected_character = Some(*character.clone());
+
+                    self.body = Some(Body::new(
+                        self.ctx.clone(),
+                        self.selected_playbook.clone().unwrap(),
+                        *character.clone(),
+                    ));
+                }
+
                 if let Some(body) = &mut self.body {
                     return body.update(message.clone()).map(Message::BodyMessage);
                 }
