@@ -72,7 +72,7 @@ name = "amp-client"
 version = "0.7.2"
 source = "git+https://github.com/amphitheatre-app/amp-client-rust?tag=v0.7.2#c2be152c056ccc64bb1a6edc5e21fe9ff98dcbeb"
 dependencies = [
- "amp-common",
+ "amp-common 0.7.2",
  "futures",
  "reqwest-eventsource",
  "serde",
@@ -84,6 +84,34 @@ dependencies = [
 name = "amp-common"
 version = "0.7.2"
 source = "git+https://github.com/amphitheatre-app/common?tag=v0.7.2#eb4a212317901c24be7dae2b4ef541760e1c3340"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "confy",
+ "convert_case",
+ "data-encoding",
+ "dirs",
+ "json_comments",
+ "k8s-openapi",
+ "kube",
+ "notify",
+ "oci-distribution",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror",
+ "toml",
+ "tracing",
+ "ureq",
+ "url",
+ "utoipa",
+ "validator",
+]
+
+[[package]]
+name = "amp-common"
+version = "0.7.7"
+source = "git+https://github.com/amphitheatre-app/common?tag=v0.7.7#663f18822f1a3cad634ef38396698c9add0e2f22"
 dependencies = [
  "anyhow",
  "chrono",
@@ -740,7 +768,7 @@ name = "desktop"
 version = "0.6.1"
 dependencies = [
  "amp-client",
- "amp-common",
+ "amp-common 0.7.7",
  "anyhow",
  "confy",
  "futures",
@@ -4682,7 +4710,7 @@ dependencies = [
  "js-sys",
  "log",
  "naga",
- "parking_lot 0.12.1",
+ "parking_lot 0.11.2",
  "profiling",
  "raw-window-handle",
  "smallvec",
@@ -4707,7 +4735,7 @@ dependencies = [
  "codespan-reporting",
  "log",
  "naga",
- "parking_lot 0.12.1",
+ "parking_lot 0.11.2",
  "profiling",
  "raw-window-handle",
  "rustc-hash",
@@ -4746,7 +4774,7 @@ dependencies = [
  "metal",
  "naga",
  "objc",
- "parking_lot 0.12.1",
+ "parking_lot 0.11.2",
  "profiling",
  "range-alloc",
  "raw-window-handle",
