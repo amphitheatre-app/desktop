@@ -11,7 +11,7 @@ path = "src/main.rs"
 
 [dependencies]
 anyhow = "1.0.79"
-amp-client = { git = "https://github.com/amphitheatre-app/amp-client-rust", tag="v0.7.2" }
+amp-client = { git = "https://github.com/amphitheatre-app/amp-client-rust", tag="v0.7.6" }
 amp-common = { git = "https://github.com/amphitheatre-app/common", tag="v0.7.2" }
 confy = "0.6.0"
 futures = "0.3"
