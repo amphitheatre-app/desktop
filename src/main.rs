@@ -21,7 +21,7 @@ use desktop::app::App;
 use desktop::context::Context;
 use desktop::errors::{Errors::IcedError, Result};
 use desktop::styles::constants::*;
-use iced::{window, Application, Settings};
+use iced::{window, Application, Settings, Size};
 use tracing_subscriber::EnvFilter;
 
 #[tokio::main]
@@ -37,8 +37,8 @@ async fn main() -> Result<()> {
     App::run(Settings {
         flags: Arc::new(Context::init()?),
         window: window::Settings {
-            size: (WINDOW_INITIAL_WIDTH, WINDOW_INITIAL_HEIGHT),
-            min_size: Some((WINDOW_INITIAL_WIDTH, WINDOW_INITIAL_HEIGHT)),
+            size: Size::new(WINDOW_INITIAL_WIDTH, WINDOW_INITIAL_HEIGHT),
+            min_size: Some(Size::new(WINDOW_INITIAL_WIDTH, WINDOW_INITIAL_HEIGHT)),
             ..window::Settings::default()
         },
         ..Settings::default()

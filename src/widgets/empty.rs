@@ -13,13 +13,13 @@
 // limitations under the License.
 
 use iced::alignment::{Alignment, Horizontal};
-use iced::widget::{component, Column, Component, Text};
+use iced::widget::{component, Component};
 use iced::Length;
 
 use crate::styles::constants::{FONT_SIZE_LARGE, FONT_SIZE_STANDARD, SPACING_NORMAL};
 use crate::styles::Theme;
 
-use super::{Container, Element};
+use super::{Column, Container, Element, Text};
 
 pub struct EmptyState {
     tagline: String,

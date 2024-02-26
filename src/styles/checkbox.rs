@@ -43,7 +43,7 @@ impl StyleSheet for Theme {
         self.active(style, is_checked)
     }
 
-    fn disabled(&self, style: &Self::Style, is_checked: bool) -> Appearance {
+    fn disabled(&self, _style: &Self::Style, _is_checked: bool) -> Appearance {
         Appearance {
             background: iced::Color::TRANSPARENT.into(),
             icon_color: iced::Color { a: 0.1, ..self.text },

@@ -124,7 +124,7 @@ impl<Message> Component<Message, Theme> for ContextSwitcher<Message> {
             })
             .collect();
 
-        let root_menu_items = Item::with_menu(icon, Menu::new(items));
+        let root_menu_items = Item::with_menu(header, Menu::new(items).max_width(190.0));
         let content = MenuBar::new(vec![root_menu_items]).width(Length::Fill);
 
         Container::new(content).width(Length::Fill).into()

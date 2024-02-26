@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use iced::Border;
+use iced::Color;
 use iced_aw::style::menu_bar::{Appearance, StyleSheet};
 
 use super::Theme;
@@ -29,14 +29,8 @@ impl StyleSheet for Theme {
         };
 
         Appearance {
-            bar_background: color.into(),
-            bar_border: Border {
-                width: 1.0,
-                color: iced::Color { a: 0.1, ..self.text },
-                radius: 6.0.into(),
-            },
-            bar_background_expand: [8; 4].into(),
-            path: iced::Color::TRANSPARENT.into(),
+            bar_background: Color::TRANSPARENT.into(),
+            menu_background: color.into(),
             ..Default::default()
         }
     }

@@ -175,11 +175,6 @@ impl Application for App {
 
     fn view(&self) -> Element<Self::Message> {
         let first = self.sidebar.view().map(Message::SidebarMessage);
-        // let second = self
-        //     .body
-        //     .as_ref()
-        //     .map(|body| body.view().map(Message::BodyMessage))
-        //     .unwrap_or(empty("No playbook selected").into());
 
         // the second view is the actors view if playbook is selected,
         // and the actors of playbook is more than 1.

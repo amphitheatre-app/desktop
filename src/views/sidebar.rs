@@ -152,7 +152,7 @@ impl Sidebar {
         let playbooks = self.playbooks.iter().fold(
             Column::new()
                 .width(Length::Fill)
-                .height(Length::Fill)
+                // .height(Length::Fill)
                 .spacing(SPACING_NORMAL),
             |column, playbook| {
                 column.push(
@@ -174,11 +174,10 @@ impl Sidebar {
         let content = Column::new()
             .push(context_switcher)
             .push(self.omnibox())
-            .push(Scrollable::new(
-                Container::new(playbooks).width(Length::Fill).height(Length::Shrink),
-            ))
+            .push(Scrollable::new(playbooks).width(Length::Fill).height(Length::Shrink))
             .padding(16)
-            .spacing(16);
+            .spacing(16)
+            .height(Length::Fill);
 
         Container::new(content)
             .style(styles::Container::Sidebar)

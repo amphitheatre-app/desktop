@@ -79,9 +79,7 @@ impl Logs {
         let content = Column::with_children(
             self.messages
                 .iter()
-                .cloned()
-                .map(|message| Text::new(message).size(FONT_SIZE_SMALL).font(Font::MONOSPACE).into())
-                .collect(),
+                .map(|message| Text::new(message).size(FONT_SIZE_SMALL).font(Font::MONOSPACE).into()),
         )
         .width(Length::Fill)
         .spacing(SPACING_SMALL);

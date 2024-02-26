@@ -25,22 +25,31 @@ use super::Theme;
 impl StyleSheet for Theme {
     type Style = ();
 
-    fn active(&self, style: &Self::Style) -> Appearance {
+    fn active(&self, _style: &Self::Style) -> Appearance {
         Appearance {
             container: container::Appearance::default(),
             scrollbar: Scrollbar {
-                border: Border::default(),
-                background: Some(self.background.into()),
+                background: None,
+                border: Border {
+                    color: self.primary,
+                    width: 0.1,
+                    radius: 0.0.into(),
+                },
+
                 scroller: Scroller {
                     color: self.primary,
-                    border: Border::default(),
+                    border: Border {
+                        color: self.primary,
+                        width: 0.1,
+                        radius: 0.0.into(),
+                    },
                 },
             },
             gap: None,
         }
     }
 
-    fn hovered(&self, style: &Self::Style, is_mouse_over_scrollbar: bool) -> Appearance {
+    fn hovered(&self, style: &Self::Style, _is_mouse_over_scrollbar: bool) -> Appearance {
         self.active(style)
     }
 }
