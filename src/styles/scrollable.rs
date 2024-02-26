@@ -12,29 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use iced::widget::scrollable::{Scrollbar, Scroller, StyleSheet};
+use iced::{
+    widget::{
+        container,
+        scrollable::{Appearance, Scrollbar, Scroller, StyleSheet},
+    },
+    Border,
+};
 
 use super::Theme;
 
 impl StyleSheet for Theme {
     type Style = ();
 
-    fn active(&self, _style: &Self::Style) -> Scrollbar {
-        Scrollbar {
-            background: Default::default(),
-            border_radius: 0.0.into(),
-            border_width: 0.0,
-            border_color: Default::default(),
-            scroller: Scroller {
-                color: Default::default(),
-                border_radius: 0.0.into(),
-                border_width: 0.0,
-                border_color: Default::default(),
+    fn active(&self, style: &Self::Style) -> Appearance {
+        Appearance {
+            container: container::Appearance::default(),
+            scrollbar: Scrollbar {
+                border: Border::default(),
+                background: Some(self.background.into()),
+                scroller: Scroller {
+                    color: self.primary,
+                    border: Border::default(),
+                },
             },
+            gap: None,
         }
     }
 
-    fn hovered(&self, style: &Self::Style, _is_mouse_over_scrollbar: bool) -> Scrollbar {
+    fn hovered(&self, style: &Self::Style, is_mouse_over_scrollbar: bool) -> Appearance {
         self.active(style)
     }
 }

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use amp_common::resource::PlaybookSpec;
-use iced_aw::{Icon, ICON_FONT};
+use iced_aw::{BootstrapIcon as Icon, BOOTSTRAP_FONT as ICON_FONT};
 
 use std::sync::Arc;
 use std::time::Duration;

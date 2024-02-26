@@ -9,15 +9,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use crate::{styles::constants::ICON_FONT_SIZE_TOOLBAR, widgets::Button};
+use crate::{
+    styles::{self, constants::ICON_FONT_SIZE_TOOLBAR, Theme},
+    widgets::Button,
+};
 use amp_common::resource::CharacterSpec;
 use iced::{widget::Component, Length};
-use iced_aw::{Icon, ItemWidth, MenuBar, MenuTree, ICON_FONT};
+use iced_aw::{
+    menu::{Item, Menu, MenuBar},
+    BootstrapIcon as Icon, BOOTSTRAP_FONT as ICON_FONT,
+};
 use tracing::debug;
 
-use crate::styles::{self};
-
-use super::{Container, Element, Renderer, Text};
+use super::{Container, Element, Text};
 
 #[derive(Default)]
 pub struct CharacterSwitcher<Message> {
@@ -46,7 +50,7 @@ impl<Message> CharacterSwitcher<Message> {
     }
 }
 
-impl<Message> Component<Message, Renderer> for CharacterSwitcher<Message> {
+impl<Message> Component<Message, Theme> for CharacterSwitcher<Message> {
     type State = ();
     type Event = Event;
 
@@ -72,7 +76,7 @@ impl<Message> Component<Message, Renderer> for CharacterSwitcher<Message> {
             .characters
             .iter()
             .map(|character| {
-                MenuTree::new(
+                Item::new(
                     Button::new(Text::new(&character.meta.name))
                         .style(styles::Button::Menu)
                         .width(Length::Fill)
@@ -81,10 +85,8 @@ impl<Message> Component<Message, Renderer> for CharacterSwitcher<Message> {
             })
             .collect();
 
-        let content = MenuBar::new(vec![MenuTree::with_children(icon, items)])
-            .width(Length::Fill)
-            .item_width(ItemWidth::Uniform(190))
-            .main_offset(14);
+        let root_menu_items = Item::with_menu(icon, Menu::new(items));
+        let content = MenuBar::new(vec![root_menu_items]).width(Length::Fill);
 
         Container::new(content).into()
     }

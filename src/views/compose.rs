@@ -14,10 +14,10 @@
 
 use std::path::Path;
 
-use crate::styles;
 use crate::styles::constants::*;
+use crate::styles::{self, Theme};
 use crate::widgets::{Button, Card, Checkbox, Column, Container, Scrollable, Text, TextInput};
-use crate::widgets::{Element, Renderer, Row};
+use crate::widgets::{Element, Row};
 use iced::widget::{horizontal_space, Component};
 use iced::{alignment::Horizontal, Alignment, Length};
 use native_dialog::FileDialog;
@@ -66,7 +66,7 @@ impl<Message: Clone> Compose<Message> {
     }
 }
 
-impl<Message: Clone> Component<Message, Renderer> for Compose<Message> {
+impl<Message: Clone> Component<Message, Theme> for Compose<Message> {
     type State = ();
     type Event = Event;
 
@@ -107,7 +107,7 @@ impl<Message: Clone> Component<Message, Renderer> for Compose<Message> {
             .close_size(ICON_FONT_SIZE_TOOLBAR as f32)
             .on_close(Event::CancelButtonPressed)
             .foot(self.actions())
-            .padding(SPACING_LARGE as f32);
+            .padding(SPACING_LARGE.into());
 
         let content = Scrollable::new(element);
         Container::new(Column::new().push(content).max_width(480))
@@ -155,7 +155,11 @@ impl<Message> Compose<Message> {
 
         let mut fields = vec![help, title, description, repository];
         if Path::new(&self.form.preface).exists() {
-            fields.push(Checkbox::new("Running in development mode", self.form.live, Event::LiveUpdateChecked).into());
+            fields.push(
+                Checkbox::new("Running in development mode", self.form.live)
+                    .on_toggle(Event::LiveUpdateChecked)
+                    .into(),
+            );
         }
 
         Column::with_children(fields).spacing(SPACING_LARGE).into()
@@ -173,7 +177,7 @@ impl<Message> Compose<Message> {
         Container::new(
             Row::new()
                 .push(cancel_button)
-                .push(horizontal_space(Length::Fill))
+                .push(horizontal_space())
                 .push(submit_button)
                 .width(Length::Fill)
                 .align_items(Alignment::Center),

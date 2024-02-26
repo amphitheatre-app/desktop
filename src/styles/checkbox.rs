@@ -14,7 +14,10 @@
 
 use super::Theme;
 
-use iced::widget::checkbox::{Appearance, StyleSheet};
+use iced::{
+    widget::checkbox::{Appearance, StyleSheet},
+    Border,
+};
 
 impl StyleSheet for Theme {
     type Style = ();
@@ -23,12 +26,14 @@ impl StyleSheet for Theme {
         Appearance {
             background: iced::Color::TRANSPARENT.into(),
             icon_color: self.text,
-            border_radius: 0.0.into(),
-            border_width: 1.0,
-            border_color: if is_checked {
-                self.primary
-            } else {
-                iced::Color { a: 0.1, ..self.text }
+            border: Border {
+                radius: 0.0.into(),
+                width: 1.0,
+                color: if is_checked {
+                    self.primary
+                } else {
+                    iced::Color { a: 0.1, ..self.text }
+                },
             },
             text_color: Some(self.text),
         }
@@ -36,5 +41,18 @@ impl StyleSheet for Theme {
 
     fn hovered(&self, style: &Self::Style, is_checked: bool) -> Appearance {
         self.active(style, is_checked)
+    }
+
+    fn disabled(&self, style: &Self::Style, is_checked: bool) -> Appearance {
+        Appearance {
+            background: iced::Color::TRANSPARENT.into(),
+            icon_color: iced::Color { a: 0.1, ..self.text },
+            border: Border {
+                radius: 0.0.into(),
+                width: 1.0,
+                color: iced::Color { a: 0.1, ..self.text },
+            },
+            text_color: Some(self.text),
+        }
     }
 }

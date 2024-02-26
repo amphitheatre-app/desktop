@@ -13,14 +13,13 @@ use amp_common::resource::PlaybookSpec;
 use iced::widget::Component;
 use iced::Alignment;
 use iced::Length;
-use iced_aw::Icon;
-use iced_aw::ICON_FONT;
+use iced_aw::{BootstrapIcon as Icon, BOOTSTRAP_FONT as ICON_FONT};
 
 use crate::styles;
 use crate::styles::constants::ICON_FONT_SIZE_SIDEBAR;
+use crate::styles::Theme;
 use crate::widgets::Button;
 use crate::widgets::Element;
-use crate::widgets::Renderer;
 use crate::widgets::Row;
 use crate::widgets::Text;
 
@@ -59,7 +58,7 @@ pub enum Event {
     ButtonPressed,
 }
 
-impl<Message> Component<Message, Renderer> for PlaybookItem<Message> {
+impl<Message> Component<Message, Theme> for PlaybookItem<Message> {
     type State = ();
     type Event = Event;
 

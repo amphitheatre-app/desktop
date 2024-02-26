@@ -13,7 +13,10 @@
 // limitations under the License.
 
 use super::Theme;
-use iced::widget::button::{Appearance, StyleSheet};
+use iced::{
+    widget::button::{Appearance, StyleSheet},
+    Border,
+};
 
 #[derive(Debug, Clone, Copy, Default)]
 pub enum Button {
@@ -32,18 +35,22 @@ impl StyleSheet for Theme {
         match style {
             Button::Default => Appearance {
                 text_color: self.text,
-                border_width: 1.0,
-                border_radius: 6.0.into(),
-                border_color: iced::Color { a: 0.1, ..self.text },
+                border: Border {
+                    color: iced::Color { a: 0.1, ..self.text },
+                    width: 1.0,
+                    radius: 6.0.into(),
+                },
                 ..Appearance::default()
             },
             Button::Element => Appearance::default(),
             Button::Icon => Appearance::default(),
             Button::Primary => Appearance {
                 text_color: self.text,
-                border_width: 1.0,
-                border_radius: 6.0.into(),
-                border_color: iced::Color { a: 0.4, ..self.primary },
+                border: Border {
+                    color: iced::Color { a: 0.4, ..self.primary },
+                    width: 1.0,
+                    radius: 6.0.into(),
+                },
                 background: Some(self.primary.into()),
                 ..Appearance::default()
             },
@@ -55,8 +62,11 @@ impl StyleSheet for Theme {
         match style {
             Button::Menu => Appearance {
                 text_color: self.text,
-                border_width: 0.0,
-                border_radius: 6.0.into(),
+                border: Border {
+                    color: iced::Color::default(),
+                    width: 1.0,
+                    radius: 6.0.into(),
+                },
                 background: Some(self.primary.into()),
                 ..Appearance::default()
             },

@@ -17,7 +17,7 @@ use std::sync::Arc;
 use amp_common::resource::{CharacterSpec, PlaybookSpec};
 use iced::widget::{horizontal_space, Rule};
 use iced::{Alignment, Command, Length, Subscription};
-use iced_aw::{Icon, ICON_FONT};
+use iced_aw::{BootstrapIcon as Icon, BOOTSTRAP_FONT as ICON_FONT};
 
 use crate::context::Context;
 use crate::styles;
@@ -118,7 +118,7 @@ impl Body {
         Container::new(
             Row::new()
                 .push(self.header())
-                .push(horizontal_space(Length::Fill))
+                .push(horizontal_space())
                 // .push(self.actions())
                 .width(Length::Fill)
                 .align_items(Alignment::Center),

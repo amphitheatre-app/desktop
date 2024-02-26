@@ -17,8 +17,9 @@ use iced::widget::{component, Column, Component, Text};
 use iced::Length;
 
 use crate::styles::constants::{FONT_SIZE_LARGE, FONT_SIZE_STANDARD, SPACING_NORMAL};
+use crate::styles::Theme;
 
-use super::{Container, Element, Renderer};
+use super::{Container, Element};
 
 pub struct EmptyState {
     tagline: String,
@@ -38,7 +39,7 @@ impl EmptyState {
     }
 }
 
-impl<Message> Component<Message, Renderer> for EmptyState {
+impl<Message> Component<Message, Theme> for EmptyState {
     type State = ();
     type Event = ();
 

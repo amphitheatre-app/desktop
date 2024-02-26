@@ -13,7 +13,7 @@
 // limitations under the License.
 
 use iced::widget::text_input::{Appearance, StyleSheet};
-use iced::{color, Color};
+use iced::{color, Border, Color};
 
 use super::Theme;
 
@@ -23,16 +23,22 @@ impl StyleSheet for Theme {
     fn active(&self, _style: &Self::Style) -> Appearance {
         Appearance {
             background: iced::Color::TRANSPARENT.into(),
-            border_radius: 6.0.into(),
-            border_width: 1.0,
-            border_color: iced::Color { a: 0.1, ..self.text },
+            border: Border {
+                color: iced::Color { a: 0.1, ..self.text },
+                width: 1.0,
+                radius: 6.0.into(),
+            },
             icon_color: iced::Color { a: 0.1, ..self.text },
         }
     }
 
     fn focused(&self, style: &Self::Style) -> Appearance {
         Appearance {
-            border_color: self.primary,
+            border: Border {
+                color: self.primary,
+                width: 1.0,
+                radius: 6.0.into(),
+            },
             ..self.active(style)
         }
     }
@@ -56,9 +62,11 @@ impl StyleSheet for Theme {
     fn disabled(&self, _style: &Self::Style) -> Appearance {
         Appearance {
             background: color!(0x292C33).into(),
-            border_radius: 6.0.into(),
-            border_width: 1.0,
-            border_color: color!(0x474B56),
+            border: Border {
+                color: color!(0x474B56),
+                width: 1.0,
+                radius: 6.0.into(),
+            },
             icon_color: color!(0xC9CCD3),
         }
     }

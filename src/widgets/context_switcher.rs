@@ -11,18 +11,21 @@
 
 use std::collections::HashMap;
 
-use crate::widgets::Button;
+use crate::{
+    styles::{self, Theme},
+    widgets::Button,
+};
 use amp_common::config::Cluster;
 use iced::{widget::Component, Alignment, Length};
-use iced_aw::{Icon, ItemWidth, MenuBar, MenuTree, ICON_FONT};
+use iced_aw::{
+    menu::{Item, Menu, MenuBar},
+    BootstrapIcon as Icon, BOOTSTRAP_FONT as ICON_FONT,
+};
 use tracing::debug;
 
-use crate::{
-    styles::{self},
-    utils::connection_status::ConnectionStatus,
-};
+use crate::utils::connection_status::ConnectionStatus;
 
-use super::{Column, Container, Element, Renderer, Row, Text};
+use super::{Column, Container, Element, Row, Text};
 
 #[derive(Default)]
 pub struct ContextSwitcher<Message> {
@@ -57,7 +60,7 @@ impl<Message> ContextSwitcher<Message> {
     }
 }
 
-impl<Message> Component<Message, Renderer> for ContextSwitcher<Message> {
+impl<Message> Component<Message, Theme> for ContextSwitcher<Message> {
     type State = ();
     type Event = Event;
 
@@ -112,7 +115,7 @@ impl<Message> Component<Message, Renderer> for ContextSwitcher<Message> {
             .clusters
             .iter()
             .map(|(name, cluster)| {
-                MenuTree::new(
+                Item::new(
                     Button::new(Text::new(&cluster.title))
                         .style(styles::Button::Menu)
                         .width(Length::Fill)
@@ -121,10 +124,8 @@ impl<Message> Component<Message, Renderer> for ContextSwitcher<Message> {
             })
             .collect();
 
-        let content = MenuBar::new(vec![MenuTree::with_children(header, items)])
-            .width(Length::Fill)
-            .item_width(ItemWidth::Uniform(190))
-            .main_offset(14);
+        let root_menu_items = Item::with_menu(icon, Menu::new(items));
+        let content = MenuBar::new(vec![root_menu_items]).width(Length::Fill);
 
         Container::new(content).width(Length::Fill).into()
     }
