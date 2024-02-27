@@ -16,7 +16,7 @@ use std::sync::Arc;
 
 use amp_common::resource::{CharacterSpec, PlaybookSpec};
 use iced::{executor, Application, Command, Length, Subscription};
-use iced_aw::split;
+use iced_aw::{split, BOOTSTRAP_FONT_BYTES};
 use tracing::debug;
 
 use crate::cmd::playbook::close_playbook;
@@ -38,6 +38,8 @@ pub enum Message {
 
     // Messages from self actions.
     SplitResized(u16),
+
+    None,
 }
 
 pub struct App {
@@ -69,6 +71,7 @@ impl Application for App {
         };
 
         let commands = Command::batch(vec![
+            iced::font::load(BOOTSTRAP_FONT_BYTES).map(|_| Message::None),
             Command::perform(async {}, |_| Message::SidebarMessage(sidebar::Message::Initializing)),
             Command::perform(async {}, |_| Message::BodyMessage(body::Message::Initializing)),
         ]);
@@ -153,6 +156,7 @@ impl Application for App {
                 }
             }
             Message::SplitResized(position) => self.divider_position = Some(position),
+            Message::None => {}
         }
         Command::none()
     }
