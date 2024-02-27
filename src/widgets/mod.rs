@@ -14,13 +14,8 @@
 
 pub mod empty;
 pub mod lists;
+pub mod switchers;
 pub mod tabs;
-
-mod context_switcher;
-pub use context_switcher::ContextSwitcher;
-
-mod character_switcher;
-pub use character_switcher::CharacterSwitcher;
 
 use crate::styles::Theme;
 

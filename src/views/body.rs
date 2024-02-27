@@ -25,8 +25,9 @@ use crate::styles::constants::{FONT_SIZE_SMALLER, ICON_FONT_SIZE_TOOLBAR, SPACIN
 use crate::views::detail::inspect::{self, Information};
 use crate::views::detail::logs::{self, Logs};
 use crate::views::detail::stats::{self, Stats};
+use crate::widgets::switchers::CharacterSwitcher;
 use crate::widgets::tabs::Tab;
-use crate::widgets::{Button, CharacterSwitcher, Column, Container, Element, Row, Tabs, Text};
+use crate::widgets::{Button, Column, Container, Element, Row, Tabs, Text};
 
 // #[derive(Default)]
 pub struct Body {

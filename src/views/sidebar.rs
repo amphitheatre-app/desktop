@@ -32,6 +32,8 @@ use crate::utils::connection_status::ConnectionStatus;
 use crate::widgets::lists::PlaybookItem;
 use crate::widgets::*;
 
+use crate::widgets::switchers::ContextSwitcher;
+
 use super::compose::{self, Compose};
 
 pub struct Sidebar {

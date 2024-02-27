@@ -13,7 +13,7 @@ use std::collections::HashMap;
 
 use crate::{
     styles::{self, Theme},
-    widgets::Button,
+    widgets::{Button, Column, Container, Element, Row, Text},
 };
 use amp_common::config::Cluster;
 use iced::{widget::Component, Alignment, Length};
@@ -24,8 +24,6 @@ use iced_aw::{
 use tracing::debug;
 
 use crate::utils::connection_status::ConnectionStatus;
-
-use super::{Column, Container, Element, Row, Text};
 
 #[derive(Default)]
 pub struct ContextSwitcher<Message> {

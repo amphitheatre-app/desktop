@@ -11,7 +11,7 @@
 
 use crate::{
     styles::{self, constants::ICON_FONT_SIZE_TOOLBAR, Theme},
-    widgets::Button,
+    widgets::{Button, Container, Element, Text},
 };
 use amp_common::resource::CharacterSpec;
 use iced::{widget::Component, Length};
@@ -20,8 +20,6 @@ use iced_aw::{
     BootstrapIcon as Icon, BOOTSTRAP_FONT as ICON_FONT,
 };
 use tracing::debug;
-
-use super::{Container, Element, Text};
 
 #[derive(Default)]
 pub struct CharacterSwitcher<Message> {
