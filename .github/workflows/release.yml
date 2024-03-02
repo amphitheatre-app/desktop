@@ -9,52 +9,305 @@ permissions:
   contents: write
 
 env:
+  BIN: amphitheatre-desktop
   CARGO_TERM_COLOR: always
 
 jobs:
-  create-release:
-    name: Create Release
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: taiki-e/create-gh-release-action@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-  upload-assets:
-    name: Upload Assets
-    runs-on: ${{ matrix.os }}
+  build:
+    runs-on: ${{ matrix.os }}-latest
     strategy:
+      fail-fast: true
       matrix:
         include:
-          - os: ubuntu-latest
+          - platform: linux-i386
+            target: i686-unknown-linux-gnu
+            os: ubuntu
+          - platform: linux-amd64
             target: x86_64-unknown-linux-gnu
-            platform: linux-amd64
-          - os: ubuntu-latest
+            os: ubuntu
+          - platform: linux-arm64
             target: aarch64-unknown-linux-gnu
-            platform: linux-arm64
-          - os: macos-latest
+            os: ubuntu
+
+          - platform: darwin-amd64
             target: x86_64-apple-darwin
-            platform: darwin-amd64
-          - os: macos-latest
+            os: macos
+          - platform: darwin-arm64
             target: aarch64-apple-darwin
-            platform: darwin-arm64
-          - os: windows-latest
+            os: macos
+
+          - platform: windows-i386
+            target: i686-pc-windows-msvc
+            os: windows
+          - platform: windows-amd64
             target: x86_64-pc-windows-msvc
-            platform: windows-amd64
-#         - os: windows-latest
-#           target: aarch64-pc-windows-msvc
-#           platform: windows-arm64
+            os: windows
     steps:
-    - uses: actions/checkout@v4
-    - name: Install cross-compilation tools
-      uses: taiki-e/setup-cross-toolchain-action@v1
-      with:
-        target: ${{ matrix.target }}
-    - uses: taiki-e/upload-rust-binary-action@v1
-      with:
-        bin: amphitheatre-desktop
-        archive: $bin-${{ matrix.platform }}
-        target: ${{ matrix.target }}
-        token: ${{ secrets.GITHUB_TOKEN }}
-        include: LICENSE,README.md
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install Cross
+        if: matrix.os == 'ubuntu'
+        run: cargo install cross --git https://github.com/cross-rs/cross
+
+      - name: Build binary
+        if: matrix.os == 'ubuntu'
+        run: cross build --release --target ${{ matrix.target }}
+
+      - name: Build binary
+        if: matrix.os == 'macos' || matrix.os == 'windows'
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.BIN }}-${{ matrix.platform }}
+          path: |
+            target/*/release/${{ env.BIN }}
+            target/*/release/${{ env.BIN }}.exe
+          if-no-files-found: error
+
+  deb:
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: debian:latest
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - platform: linux-i386
+            target: i686-unknown-linux-gnu
+          - platform: linux-amd64
+            target: x86_64-unknown-linux-gnu
+          - platform: linux-arm64
+            target: aarch64-unknown-linux-gnu
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: apt-get update -y && apt-get install -y curl build-essential
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install packaging tools
+        run: cargo install cargo-deb
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.BIN }}-${{ matrix.platform }}
+          path: target/
+
+      - name: Package for Debian-based Linux distros
+        shell: bash
+        run: |
+          mkdir artifacts
+          cargo deb --no-build --no-strip --target ${{ matrix.target }}
+          mv target/${{ matrix.target }}/debian/*.deb artifacts/${{ env.BIN }}-${{ matrix.platform }}.deb
+
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.BIN }}-${{ matrix.platform }}.dmg
+          path: artifacts/
+          if-no-files-found: error
+
+  rpm:
+    needs: build
+    runs-on: ubuntu-latest
+    container:
+      image: fedora:latest
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - platform: linux-i386
+            target: i686-unknown-linux-gnu
+          - platform: linux-amd64
+            target: x86_64-unknown-linux-gnu
+          - platform: linux-arm64
+            target: aarch64-unknown-linux-gnu
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: dnf update -y && dnf install -y @development-tools
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install packaging tools
+        run: cargo install cargo-generate-rpm
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.BIN }}-${{ matrix.platform }}
+          path: target/
+
+      - name: Package for RPM-based Linux distros
+        shell: bash
+        run: |
+          mkdir artifacts
+          cargo generate-rpm --target ${{ matrix.target }}
+          mv target/${{ matrix.target }}/generate-rpm/*.rpm artifacts/${{ env.BIN }}-${{ matrix.platform }}.rpm
+
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.BIN }}-${{ matrix.platform }}.rpm
+          path: artifacts/
+          if-no-files-found: error
+
+  dmg:
+    needs: build
+    runs-on: macos-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - platform: darwin-amd64
+            target: x86_64-apple-darwin
+          - platform: darwin-arm64
+            target: aarch64-apple-darwin
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install packaging tools
+        run: |
+          cargo install toml-cli
+          brew install create-dmg
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.BIN }}-${{ matrix.platform }}
+          path: target/
+
+      - name: Package for macOS
+        shell: bash
+        run: |
+          APP_NAME="AmphitheatreDesktop.app"
+          VOL_NAME="Amphitheatre Desktop Installer"
+
+          RESOURCE_DIR=resources/packaging/macos
+          APP_DIR=target/release/bundle/osx/${APP_NAME}
+
+          BIN_FILE=target/${{ matrix.target }}/release/${{ env.BIN }}
+          DMG_NAME="${{ env.BIN }}-${{ matrix.platform }}.dmg"
+
+          chmod +x ${BIN_FILE}
+          VERSION=$(toml get Cargo.toml package.version --raw)
+          sed -i'.bak' \
+            -e "s/0\.0\.0/${VERSION}/g" \
+            -e "s/fffffff/${GITHUB_SHA:0:7}/g" \
+            ${RESOURCE_DIR}/Info.plist
+
+          mkdir -p ${APP_DIR}/Contents/{MacOS,Resources}
+          cp ${RESOURCE_DIR}/Info.plist ${APP_DIR}/Contents/
+          cp ${RESOURCE_DIR}/graphics/app.icns ${APP_DIR}/Contents/Resources/
+          cp ${BIN_FILE} ${APP_DIR}/Contents/MacOS/
+          cp ${RESOURCE_DIR}/wrapper.sh ${APP_DIR}/Contents/MacOS/
+
+          mkdir artifacts
+          create-dmg \
+            --volname "${VOL_NAME}" \
+            --background "${RESOURCE_DIR}/graphics/dmg-background.png" \
+            --window-pos 200 120 \
+            --window-size 900 450 \
+            --icon-size 100 \
+            --app-drop-link 620 240 \
+            --icon "${APP_NAME}" 300 240 \
+            --hide-extension "${APP_NAME}" \
+            "artifacts/${DMG_NAME}" \
+            "target/release/bundle/osx/"
+
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.BIN }}-${{ matrix.platform }}.dmg
+          path: artifacts/
+          if-no-files-found: error
+
+  msi:
+    needs: build
+    runs-on: windows-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - platform: windows-i386
+            target: i686-pc-windows-msvc
+          - platform: windows-amd64
+            target: x86_64-pc-windows-msvc
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        shell: powershell
+        run: |
+          Write-Host "::group::WiX Toolset"
+          Invoke-WebRequest `
+            -Uri "https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311-binaries.zip" `
+            -OutFile "$env:TEMP\wix-binaries.zip" -Verbose
+          Expand-Archive -LiteralPath "$env:TEMP\wix-binaries.zip" -DestinationPath "$env:TEMP\wix" -Verbose
+          Set-Item -Path env:Path -Value "$env:Path;$env:TEMP\wix"
+          Write-Host "::endgroup::"
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install packaging tools
+        run: cargo install cargo-wix
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.BIN }}-${{ matrix.platform }}
+          path: target/
+
+      - name: Package for Microsoft Windows
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Path artifacts
+          cargo wix --no-build --nocapture --target ${{ matrix.target }}
+          Move-Item -Path target\wix\*.msi -Destination .\artifacts\${{ env.BIN }}-${{ matrix.platform }}.msi
+
+      - name: Upload package artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.BIN }}-${{ matrix.platform }}.msi
+          path: artifacts/
+          if-no-files-found: error
+
+  release:
+    needs: [deb, rpm, dmg, msi]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: ${{ env.BIN }}-*.*
+          merge-multiple: true
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ env.BIN }}-*.*

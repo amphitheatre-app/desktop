@@ -1,13 +1,21 @@
 [package]
 name = "desktop"
-version = "0.6.4"
+description = "Open source GUI application that enables you to interact with Amphitheatre"
+version = "0.6.5"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+authors = ["Eguo Wang <wangeguo@gmail.com>"]
 edition = "2021"
+homepage = "https://amphitheatre.app"
+license = "Apache-2.0"
+license-file = "LICENSE"
+readme = "README.md"
+repository = "https://github.com/amphitheatre-app/desktop"
 
 [[bin]]
 name = "amphitheatre-desktop"
 path = "src/main.rs"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 amp-client = { git = "https://github.com/amphitheatre-app/amp-client-rust", tag = "v0.7.7" }
@@ -29,3 +37,63 @@ tokio = { version = "1.36.0", features = ["full"] }
 toml = "0.8"
 tracing = "0.1.40"
 tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+
+[package.metadata.deb]
+section="Development"
+assets = [
+    ["target/release/amphitheatre-desktop",                    "/usr/local/bin/",                                                  "755"],
+    ["resources/packaging/linux/app.desktop",                  "/usr/share/applications/amphitheatre-desktop.desktop",             "644"],
+    ["resources/packaging/linux/graphics/app_8x8.png",         "/usr/share/icons/hicolor/8x8/apps/amphitheatre-desktop.png",       "644"],
+    ["resources/packaging/linux/graphics/app_16x16.png",       "/usr/share/icons/hicolor/16x16/apps/amphitheatre-desktop.png",     "644"],
+    ["resources/packaging/linux/graphics/app_22x22.png",       "/usr/share/icons/hicolor/22x22/apps/amphitheatre-desktop.png",     "644"],
+    ["resources/packaging/linux/graphics/app_24x24.png",       "/usr/share/icons/hicolor/24x24/apps/amphitheatre-desktop.png",     "644"],
+    ["resources/packaging/linux/graphics/app_32x32.png",       "/usr/share/icons/hicolor/32x32/apps/amphitheatre-desktop.png",     "644"],
+    ["resources/packaging/linux/graphics/app_36x36.png",       "/usr/share/icons/hicolor/36x36/apps/amphitheatre-desktop.png",     "644"],
+    ["resources/packaging/linux/graphics/app_42x42.png",       "/usr/share/icons/hicolor/42x42/apps/amphitheatre-desktop.png",     "644"],
+    ["resources/packaging/linux/graphics/app_48x48.png",       "/usr/share/icons/hicolor/48x48/apps/amphitheatre-desktop.png",     "644"],
+    ["resources/packaging/linux/graphics/app_64x64.png",       "/usr/share/icons/hicolor/64x64/apps/amphitheatre-desktop.png",     "644"],
+    ["resources/packaging/linux/graphics/app_72x72.png",       "/usr/share/icons/hicolor/72x72/apps/amphitheatre-desktop.png",     "644"],
+    ["resources/packaging/linux/graphics/app_96x96.png",       "/usr/share/icons/hicolor/96x96/apps/amphitheatre-desktop.png",     "644"],
+    ["resources/packaging/linux/graphics/app_128x128.png",     "/usr/share/icons/hicolor/128x128/apps/amphitheatre-desktop.png",   "644"],
+    ["resources/packaging/linux/graphics/app_160x160.png",     "/usr/share/icons/hicolor/160x160/apps/amphitheatre-desktop.png",   "644"],
+    ["resources/packaging/linux/graphics/app_192x192.png",     "/usr/share/icons/hicolor/192x192/apps/amphitheatre-desktop.png",   "644"],
+    ["resources/packaging/linux/graphics/app_256x256.png",     "/usr/share/icons/hicolor/256x256/apps/amphitheatre-desktop.png",   "644"],
+    ["resources/packaging/linux/graphics/app_384x384.png",     "/usr/share/icons/hicolor/384x384/apps/amphitheatre-desktop.png",   "644"],
+    ["resources/packaging/linux/graphics/app_512x512.png",     "/usr/share/icons/hicolor/512x512/apps/amphitheatre-desktop.png",   "644"],
+    ["resources/packaging/linux/graphics/app_1024x1024.png",   "/usr/share/icons/hicolor/1024x1024/apps/amphitheatre-desktop.png", "644"]
+]
+
+[package.metadata.generate-rpm]
+assets = [
+    { source = "target/release/amphitheatre-desktop",                    dest = "/usr/local/bin/",                                                  mode = "755" },
+    { source = "resources/packaging/linux/app.desktop",                  dest = "/usr/share/applications/amphitheatre-desktop.desktop",             mode = "644" },
+    { source = "resources/packaging/linux/graphics/app_8x8.png",         dest = "/usr/share/icons/hicolor/8x8/apps/amphitheatre-desktop.png",       mode = "644" },
+    { source = "resources/packaging/linux/graphics/app_16x16.png",       dest = "/usr/share/icons/hicolor/16x16/apps/amphitheatre-desktop.png",     mode = "644" },
+    { source = "resources/packaging/linux/graphics/app_22x22.png",       dest = "/usr/share/icons/hicolor/22x22/apps/amphitheatre-desktop.png",     mode = "644" },
+    { source = "resources/packaging/linux/graphics/app_24x24.png",       dest = "/usr/share/icons/hicolor/24x24/apps/amphitheatre-desktop.png",     mode = "644" },
+    { source = "resources/packaging/linux/graphics/app_32x32.png",       dest = "/usr/share/icons/hicolor/32x32/apps/amphitheatre-desktop.png",     mode = "644" },
+    { source = "resources/packaging/linux/graphics/app_36x36.png",       dest = "/usr/share/icons/hicolor/36x36/apps/amphitheatre-desktop.png",     mode = "644" },
+    { source = "resources/packaging/linux/graphics/app_42x42.png",       dest = "/usr/share/icons/hicolor/42x42/apps/amphitheatre-desktop.png",     mode = "644" },
+    { source = "resources/packaging/linux/graphics/app_48x48.png",       dest = "/usr/share/icons/hicolor/48x48/apps/amphitheatre-desktop.png",     mode = "644" },
+    { source = "resources/packaging/linux/graphics/app_64x64.png",       dest = "/usr/share/icons/hicolor/64x64/apps/amphitheatre-desktop.png",     mode = "644" },
+    { source = "resources/packaging/linux/graphics/app_72x72.png",       dest = "/usr/share/icons/hicolor/72x72/apps/amphitheatre-desktop.png",     mode = "644" },
+    { source = "resources/packaging/linux/graphics/app_96x96.png",       dest = "/usr/share/icons/hicolor/96x96/apps/amphitheatre-desktop.png",     mode = "644" },
+    { source = "resources/packaging/linux/graphics/app_128x128.png",     dest = "/usr/share/icons/hicolor/128x128/apps/amphitheatre-desktop.png",   mode = "644" },
+    { source = "resources/packaging/linux/graphics/app_160x160.png",     dest = "/usr/share/icons/hicolor/160x160/apps/amphitheatre-desktop.png",   mode = "644" },
+    { source = "resources/packaging/linux/graphics/app_192x192.png",     dest = "/usr/share/icons/hicolor/192x192/apps/amphitheatre-desktop.png",   mode = "644" },
+    { source = "resources/packaging/linux/graphics/app_256x256.png",     dest = "/usr/share/icons/hicolor/256x256/apps/amphitheatre-desktop.png",   mode = "644" },
+    { source = "resources/packaging/linux/graphics/app_384x384.png",     dest = "/usr/share/icons/hicolor/384x384/apps/amphitheatre-desktop.png",   mode = "644" },
+    { source = "resources/packaging/linux/graphics/app_512x512.png",     dest = "/usr/share/icons/hicolor/512x512/apps/amphitheatre-desktop.png",   mode = "644" },
+    { source = "resources/packaging/linux/graphics/app_1024x1024.png",   dest = "/usr/share/icons/hicolor/1024x1024/apps/amphitheatre-desktop.png", mode = "644" }
+]
+
+[package.metadata.wix]
+eula = false
+include = [".\\resources\\packaging\\windows\\setup.wxs"]
+
+# If using the x86_64-pc-windows-msvc or the i686-pc-windows-msvc toolchain,
+# then an appropriate C RunTime (CRT) must be available on the host system
+# or the CRT must be statically compiled with the Rust binary (executable).
+# See https://volks73.github.io/cargo-wix/cargo_wix/index.html#c-runtime
+[target."cfg(windows)"]
+rustflags = ["-C", "target-feature=+crt-static"]

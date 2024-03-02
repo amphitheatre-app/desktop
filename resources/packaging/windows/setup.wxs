@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='windows-1252'?>
+
+<!--
+  Please do not remove these pre-processor If-Else blocks. These are used with
+  the `cargo wix` subcommand to automatically determine the installation
+  destination for 32-bit versus 64-bit installers. Removal of these lines will
+  cause installation errors.
+-->
+<?if $(sys.BUILDARCH) = x64 or $(sys.BUILDARCH) = arm64 ?>
+    <?define PlatformProgramFilesFolder = "ProgramFiles64Folder" ?>
+<?else ?>
+    <?define PlatformProgramFilesFolder = "ProgramFilesFolder" ?>
+<?endif ?>
+
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+
+    <Product
+        Id='*'
+        Name='Amphitheatre desktop'
+        UpgradeCode='BA184085-5CB9-4B9F-8E76-AA5CB7B78876'
+        Manufacturer='Eguo Wang'
+        Language='1033'
+        Codepage='1252'
+        Version='$(var.Version)'>
+
+        <Package Id='*'
+            Keywords='Installer'
+            Description='Open source GUI application that enables you to interact with Amphitheatre'
+            Manufacturer='Eguo Wang'
+            InstallerVersion='450'
+            Languages='1033'
+            Compressed='yes'
+            InstallScope='perMachine'
+            SummaryCodepage='1252'
+            />
+
+        <MajorUpgrade
+            Schedule='afterInstallInitialize'
+            DowngradeErrorMessage='A newer version of [ProductName] is already installed. Setup will now exit.'/>
+
+        <Media Id='1' Cabinet='media1.cab' EmbedCab='yes' DiskPrompt='CD-ROM #1'/>
+        <Property Id='DiskPrompt' Value='Amphitheatre desktop Installation'/>
+
+        <Directory Id='TARGETDIR' Name='SourceDir'>
+            <Directory Id='$(var.PlatformProgramFilesFolder)' Name='PFiles'>
+                <Directory Id='APPLICATIONFOLDER' Name='AmphitheatreDesktop'>
+                    <!--
+                      Disabling the license sidecar file in the installer is a two step process:
+
+                      1. Comment out or remove the `Component` tag along with its contents.
+                      2. Comment out or remove the `ComponentRef` tag with the "License" Id
+                         attribute value further down in this file.
+                    -->
+                    <Component Id='License' Guid='*'>
+                        <File Id='LicenseFile'
+                            DiskId='1'
+                            Source='LICENSE'
+                            KeyPath='yes'/>
+                    </Component>
+
+                    <Directory Id='Bin' Name='bin'>
+                        <Component Id='Path' Guid='F5BF6F74-6500-4F4D-96D2-30E5B7CC6052' KeyPath='yes'>
+                            <Environment
+                                Id='PATH'
+                                Name='PATH'
+                                Value='[Bin]'
+                                Permanent='no'
+                                Part='last'
+                                Action='set'
+                                System='yes'/>
+                        </Component>
+                        <Component Id='binary0' Guid='*'>
+                            <File
+                                Id='exe0'
+                                Name='amphitheatre-desktop.exe'
+                                DiskId='1'
+                                Source='$(var.CargoTargetBinDir)\amphitheatre-desktop.exe'
+                                KeyPath='yes'/>
+                        </Component>
+                    </Directory>
+                </Directory>
+            </Directory>
+        </Directory>
+
+        <Feature
+            Id='Binaries'
+            Title='Application'
+            Description='Installs all binaries and the license.'
+            Level='1'
+            ConfigurableDirectory='APPLICATIONFOLDER'
+            AllowAdvertise='no'
+            Display='expand'
+            Absent='disallow'>
+            <!--
+              Comment out or remove the following `ComponentRef` tag to remove
+              the license sidecar file from the installer.
+            -->
+            <ComponentRef Id='License'/>
+
+            <ComponentRef Id='binary0'/>
+
+            <Feature
+                Id='Environment'
+                Title='PATH Environment Variable'
+                Description='Add the install location of the [ProductName] executable to the PATH system environment variable. This allows the [ProductName] executable to be called from any location.'
+                Level='1'
+                Absent='allow'>
+                <ComponentRef Id='Path'/>
+            </Feature>
+        </Feature>
+
+        <SetProperty Id='ARPINSTALLLOCATION' Value='[APPLICATIONFOLDER]' After='CostFinalize'/>
+
+        <Icon Id='ProductICO' SourceFile='resources\packaging\windows\graphics\app.ico'/>
+        <Property Id='ARPPRODUCTICON' Value='ProductICO' />
+
+        <Property Id='ARPHELPLINK' Value='https://amphitheatre.app'/>
+
+        <UI>
+            <UIRef Id='WixUI_FeatureTree'/>
+            <Publish Dialog='WelcomeDlg' Control='Next' Event='NewDialog' Value='CustomizeDlg' Order='99'>1</Publish>
+            <Publish Dialog='CustomizeDlg' Control='Back' Event='NewDialog' Value='WelcomeDlg' Order='99'>1</Publish>
+
+        </UI>
+
+        <WixVariable Id="WixUIBannerBmp" Value="resources\packaging\windows\graphics\banner.bmp"/>
+        <WixVariable Id="WixUIDialogBmp" Value="resources\packaging\windows\graphics\dialog.bmp"/>
+    </Product>
+
+</Wix>

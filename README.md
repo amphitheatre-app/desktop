@@ -24,7 +24,7 @@ command line or a web browser. You can use Amphitheatre Desktop to instantly
 spin up fresh, automated dev environments in the cloud and start developing with
 on-demand pre-configured tools, libraries, and dependencies.
 
-![Amphitheatre Desktop Screenshot](./assets/images/screenshot.png)
+![Amphitheatre Desktop Screenshot](./resources/images/screenshot.png)
 
 ## Features
 

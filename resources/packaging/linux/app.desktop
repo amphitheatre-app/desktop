@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Amphitheatre desktop
+Comment=Open source GUI application that enables you to interact with Amphitheatre
+Categories=Development;
+Icon=amphitheatre-desktop
+Exec=/usr/local/bin/amphitheatre-desktop
+StartupWMClass=amphitheatre-desktop
+Terminal=false
