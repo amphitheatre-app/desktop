@@ -28,7 +28,7 @@ ignore = "0.4.22"
 native-dialog = { version = "0.7.0", features = ["windows_dpi_awareness", "windows_visual_styles"] }
 notify = "6.1.1"
 rand = "0.8.5"
-reqwest-eventsource = "0.5.0"
+reqwest-eventsource = "0.6.0"
 serde_json = "1.0.115"
 tar = "0.4.40"
 thiserror = "1.0"
