@@ -1,0 +1,10 @@
+# If using the x86_64-pc-windows-msvc or the i686-pc-windows-msvc toolchain,
+# then an appropriate C RunTime (CRT) must be available on the host system
+# or the CRT must be statically compiled with the Rust binary (executable).
+# See https://volks73.github.io/cargo-wix/cargo_wix/index.html#c-runtime
+
+[target.x86_64-pc-windows-msvc]
+rustflags = ["-C", "target-feature=+crt-static"]
+
+[target.i686-pc-windows-msvc]
+rustflags = ["-C", "target-feature=+crt-static"]
