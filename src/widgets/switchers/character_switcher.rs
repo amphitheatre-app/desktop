@@ -15,10 +15,8 @@ use crate::{
 };
 use amp_common::resource::CharacterSpec;
 use iced::{widget::Component, Length};
-use iced_aw::{
-    menu::{Item, Menu, MenuBar},
-    BootstrapIcon as Icon, BOOTSTRAP_FONT as ICON_FONT,
-};
+use iced_aw::menu::{Item, Menu, MenuBar};
+use iced_aw::{core::icons::bootstrap::Bootstrap as Icon, BOOTSTRAP_FONT as ICON_FONT};
 use tracing::debug;
 
 #[derive(Default)]

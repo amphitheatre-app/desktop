@@ -13,7 +13,7 @@ use amp_common::resource::CharacterSpec;
 use iced::widget::Component;
 use iced::Alignment;
 use iced::Length;
-use iced_aw::{BootstrapIcon as Icon, BOOTSTRAP_FONT as ICON_FONT};
+use iced_aw::{core::icons::bootstrap::Bootstrap as Icon, BOOTSTRAP_FONT as ICON_FONT};
 
 use crate::styles;
 use crate::styles::constants::ICON_FONT_SIZE_SIDEBAR;

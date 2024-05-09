@@ -13,15 +13,10 @@
 // limitations under the License.
 
 use amp_common::resource::PlaybookSpec;
-use iced_aw::{BootstrapIcon as Icon, BOOTSTRAP_FONT as ICON_FONT};
 
 use std::sync::Arc;
 use std::time::Duration;
 use tracing::{debug, error};
-
-use iced::alignment::Horizontal;
-use iced::widget::Container;
-use iced::{Command, Length, Subscription};
 
 use crate::cmd::config::switch_context;
 use crate::cmd::playbook::{compose, refresh_playbooks};
@@ -31,6 +26,11 @@ use crate::styles::{self, constants::*};
 use crate::utils::connection_status::ConnectionStatus;
 use crate::widgets::lists::PlaybookItem;
 use crate::widgets::*;
+
+use iced::alignment::Horizontal;
+use iced::widget::Container;
+use iced::{Command, Length, Subscription};
+use iced_aw::{core::icons::bootstrap::Bootstrap as Icon, BOOTSTRAP_FONT as ICON_FONT};
 
 use crate::widgets::switchers::ContextSwitcher;
 

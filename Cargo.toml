@@ -21,7 +21,7 @@ amp-client = { git = "https://github.com/amphitheatre-app/amp-client-rust", tag 
 amp-common = { git = "https://github.com/amphitheatre-app/common", tag = "v0.8.3" }
 futures = "0.3"
 iced = { version = "0.12.1", features = ["tokio", "debug", "lazy"] }
-iced_aw = { version = "0.8.0", features = ["icons"] }
+iced_aw = { version = "0.9.3", features = ["icons"] }
 iced_futures = "0.12.0"
 ignore = "0.4.22"
 native-dialog = { version = "0.7.0", features = ["windows_dpi_awareness", "windows_visual_styles"] }
