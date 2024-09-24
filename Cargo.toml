@@ -22,7 +22,7 @@ amp-common = { git = "https://github.com/amphitheatre-app/common", tag = "v0.9.1
 futures = "0.3"
 iced = { version = "0.12.1", features = ["tokio", "debug", "lazy"] }
 iced_aw = { version = "0.9.3", features = ["icons"] }
-iced_futures = "0.12.0"
+iced_futures = "0.13.2"
 ignore = "0.4.23"
 native-dialog = { version = "0.7.0", features = ["windows_dpi_awareness", "windows_visual_styles"] }
 notify = "6.1.1"
