@@ -25,7 +25,7 @@ iced_aw = { version = "0.9.3", features = ["icons"] }
 iced_futures = "0.12.0"
 ignore = "0.4.23"
 native-dialog = { version = "0.7.0", features = ["windows_dpi_awareness", "windows_visual_styles"] }
-notify = "6.1.1"
+notify = "7.0.0"
 rand = "0.8.5"
 reqwest-eventsource = "0.6.0"
 serde_json = "1.0.127"
