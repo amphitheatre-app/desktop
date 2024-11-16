@@ -17,8 +17,8 @@ name = "amphitheatre-desktop"
 path = "src/main.rs"
 
 [dependencies]
-amp-client = { git = "https://github.com/amphitheatre-app/amp-client-rust", tag = "v0.9.2" }
-amp-common = { git = "https://github.com/amphitheatre-app/common", tag = "v0.9.3" }
+amp-client = { git = "https://github.com/amphitheatre-app/amp-client-rust", tag = "v0.9.3" }
+amp-common = { git = "https://github.com/amphitheatre-app/common", tag = "v0.9.4" }
 futures = "0.3"
 iced = { version = "0.13.1", features = ["tokio", "debug", "lazy"] }
 iced_aw = { version = "0.11.0" }
@@ -26,12 +26,12 @@ iced_futures = "0.13.2"
 iced_fonts = { version = "0.1.0", features = ["bootstrap"] }
 ignore = "0.4.23"
 native-dialog = { version = "0.7.0", features = ["windows_dpi_awareness", "windows_visual_styles"] }
-notify = "6.1.1"
+notify = "7.0"
 rand = "0.8.5"
 reqwest-eventsource = "0.6.0"
 serde_json = "1.0.127"
 tar = "0.4.42"
-thiserror = "1.0"
+thiserror = "2.0"
 time = { version = "0.3.36", features = ["local-offset"] }
 tokio = { version = "1.41.0", features = ["full"] }
 toml = "0.8"
