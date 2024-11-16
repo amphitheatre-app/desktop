@@ -14,17 +14,16 @@
 
 use std::sync::Arc;
 
+use iced::widget::horizontal_space;
+use iced::{Alignment, Length, Subscription, Task};
+use iced_fonts::{Bootstrap as Icon, BOOTSTRAP_FONT as ICON_FONT};
+
 use amp_common::resource::{CharacterSpec, PlaybookSpec};
-use iced::widget::{horizontal_space, Rule};
-use iced::{Alignment, Command, Length, Subscription};
-use iced_aw::{core::icons::bootstrap::Bootstrap as Icon, BOOTSTRAP_FONT as ICON_FONT};
 
 use crate::context::Context;
-use crate::styles;
-use crate::styles::constants::{FONT_SIZE_SMALLER, ICON_FONT_SIZE_TOOLBAR, SPACING_NORMAL, SPACING_SMALL};
+use crate::styles::{self, constants::*};
 use crate::widgets::empty::empty;
-use crate::widgets::lists::CharacterItem;
-use crate::widgets::{Button, Column, Container, Element, Row, Scrollable, Text};
+use crate::widgets::{Button, Column, Container, Element, Row, Rule, Scrollable, Text};
 
 // #[derive(Default)]
 pub struct Cast {
@@ -48,7 +47,7 @@ impl Cast {
         }
     }
 
-    pub fn update(&mut self, message: Message) -> Command<Message> {
+    pub fn update(&mut self, message: Message) -> Task<Message> {
         match message {
             Message::Initializing => {}
             Message::CloseButtonPressed(_) => {}
@@ -56,7 +55,7 @@ impl Cast {
                 self.selected_character = Some(*character);
             }
         }
-        Command::none()
+        Task::none()
     }
 
     pub fn subscription(&self) -> Subscription<Message> {
@@ -64,41 +63,36 @@ impl Cast {
     }
 
     pub fn view(&self) -> Element<Message> {
+        let selected_character_name = self.selected_character.as_ref().map(|c| &c.meta.name);
+
         let content: Element<Message>;
         if let Some(character) = &self.playbook.characters {
-            content = character
-                .iter()
-                .fold(
+            content = Scrollable::new(
+                character.iter().fold(
                     Column::new()
                         .width(Length::Fill)
                         .height(Length::Fill)
                         .spacing(SPACING_NORMAL),
-                    |column, character| {
-                        column.push(
-                            CharacterItem::new(character.clone())
-                                .active(
-                                    self.selected_character
-                                        .as_ref()
-                                        .is_some_and(|c| c.meta.name == character.meta.name),
-                                )
-                                .on_press(|p| Message::CharacterSelected(Box::new(p))),
-                        )
+                    |column, character: &CharacterSpec| {
+                        let active = Some(&character.meta.name) == selected_character_name;
+                        column.push(character_item(character, active))
                     },
-                )
-                .into();
+                ),
+            )
+            .width(Length::Fill)
+            .height(Length::Shrink)
+            .into();
         } else {
-            content = empty("No characters").into();
-        }
+            content = empty("No characters", None::<String>);
+        };
 
         Container::new(
             Column::new()
                 .push(self.toolbar())
                 .push(Rule::horizontal(1))
-                .push(Scrollable::new(
-                    Container::new(content).width(Length::Fill).height(Length::Shrink),
-                )),
+                .push(content),
         )
-        .width(Length::Fill)
+        .width(Length::Shrink)
         .height(Length::Fill)
         .into()
     }
@@ -113,9 +107,9 @@ impl Cast {
                 .push(horizontal_space())
                 .push(self.actions())
                 .width(Length::Fill)
-                .align_items(Alignment::Center),
+                .align_y(Alignment::Center),
         )
-        .style(styles::Container::Toolbar)
+        .style(styles::container::toolbar)
         .padding(16)
         .into()
     }
@@ -126,10 +120,10 @@ impl Cast {
                 Column::new().push(Text::new(&self.playbook.title)).push(
                     Text::new("Running")
                         .size(FONT_SIZE_SMALLER)
-                        .style(styles::Text::Success),
+                        .style(styles::text::success),
                 ),
             )
-            .align_items(Alignment::Center)
+            .align_y(Alignment::Center)
             .spacing(8)
             .into()
     }
@@ -137,7 +131,7 @@ impl Cast {
     fn actions(&self) -> Element<Message> {
         let button = |icon: Icon, on_press| {
             Button::new(Text::new(icon.to_string()).font(ICON_FONT).size(ICON_FONT_SIZE_TOOLBAR))
-                .style(styles::Button::Icon)
+                .style(styles::button::text)
                 .on_press(on_press)
         };
 
@@ -149,8 +143,30 @@ impl Cast {
                 Icon::X,
                 Message::CloseButtonPressed(Box::new(self.playbook.clone())),
             ))
-            .align_items(Alignment::Center)
+            .align_y(Alignment::Center)
             .spacing(SPACING_SMALL)
             .into()
     }
+}
+
+fn character_item(character: &CharacterSpec, active: bool) -> Element<Message> {
+    let icon = Text::new(Icon::Box.to_string())
+        .font(ICON_FONT)
+        .size(ICON_FONT_SIZE_SIDEBAR);
+
+    let content = Row::new()
+        .push(icon)
+        .push(Text::new(&character.meta.name))
+        .align_y(Alignment::Center)
+        .spacing(8);
+
+    Button::new(content)
+        .style(if active {
+            styles::button::primary
+        } else {
+            styles::button::text
+        })
+        .width(Length::Fill)
+        .on_press(Message::CharacterSelected(Box::new(character.clone())))
+        .into()
 }

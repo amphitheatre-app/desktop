@@ -21,7 +21,7 @@ use desktop::app::App;
 use desktop::context::Context;
 use desktop::errors::{Errors::IcedError, Result};
 use desktop::styles::constants::*;
-use iced::{window, Application, Settings, Size};
+use iced::{window, Size};
 use tracing_subscriber::EnvFilter;
 
 #[tokio::main]
@@ -34,14 +34,17 @@ async fn main() -> Result<()> {
         .with_env_filter(filter)
         .init();
 
-    App::run(Settings {
-        flags: Arc::new(Context::init()?),
-        window: window::Settings {
+    let ctx = Arc::new(Context::init()?);
+    iced::application(App::title, App::update, App::view)
+        .window(window::Settings {
             size: Size::new(WINDOW_INITIAL_WIDTH, WINDOW_INITIAL_HEIGHT),
             min_size: Some(Size::new(WINDOW_INITIAL_WIDTH, WINDOW_INITIAL_HEIGHT)),
             ..window::Settings::default()
-        },
-        ..Settings::default()
-    })
-    .map_err(|e| IcedError(e.to_string()))
+        })
+        .subscription(App::subscription)
+        .font(iced_fonts::BOOTSTRAP_FONT_BYTES)
+        .theme(App::theme)
+        .centered()
+        .run_with(|| App::new(ctx))
+        .map_err(|e| IcedError(e.to_string()))
 }

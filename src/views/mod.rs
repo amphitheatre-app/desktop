@@ -14,6 +14,6 @@
 
 pub mod body;
 pub mod cast;
-pub mod compose;
+pub mod composer;
 pub mod detail;
 pub mod sidebar;

@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use iced::widget::Rule;
 use iced::Length;
 use iced_aw::TabLabel;
 
-use super::{Column, Container, Element};
+use crate::widgets::{Column, Container, Element, Rule};
 
 pub trait Tab {
     type Message;
 
     fn title(&self) -> String;
-
     fn label(&self) -> TabLabel;
 
     fn content(&self) -> Element<Self::Message> {

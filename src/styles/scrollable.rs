@@ -15,41 +15,98 @@
 use iced::{
     widget::{
         container,
-        scrollable::{Appearance, Scrollbar, Scroller, StyleSheet},
+        scrollable::{Catalog, Rail, Scroller, Status, Style, StyleFn},
     },
     Border,
 };
 
 use super::Theme;
 
-impl StyleSheet for Theme {
-    type Style = ();
+impl Catalog for Theme {
+    type Class<'a> = StyleFn<'a, Self>;
 
-    fn active(&self, _style: &Self::Style) -> Appearance {
-        Appearance {
-            container: container::Appearance::default(),
-            scrollbar: Scrollbar {
-                background: None,
-                border: Border {
-                    color: self.primary,
-                    width: 0.1,
-                    radius: 0.0.into(),
-                },
-
-                scroller: Scroller {
-                    color: self.primary,
-                    border: Border {
-                        color: self.primary,
-                        width: 0.1,
-                        radius: 0.0.into(),
-                    },
-                },
-            },
-            gap: None,
-        }
+    fn default<'a>() -> Self::Class<'a> {
+        Box::new(default)
     }
 
-    fn hovered(&self, style: &Self::Style, _is_mouse_over_scrollbar: bool) -> Appearance {
-        self.active(style)
+    fn style(&self, class: &Self::Class<'_>, status: Status) -> Style {
+        class(self, status)
+    }
+}
+
+/// The default style of a [`Scrollable`].
+pub fn default(theme: &Theme, status: Status) -> Style {
+    let palette = theme.extended_palette();
+
+    let scrollbar = Rail {
+        background: Some(palette.background.weak.color.into()),
+        border: Border::default(),
+        scroller: Scroller {
+            color: palette.background.strong.color,
+            border: Border::default(),
+        },
+    };
+
+    match status {
+        Status::Active => Style {
+            container: container::Style::default(),
+            vertical_rail: scrollbar,
+            horizontal_rail: scrollbar,
+            gap: None,
+        },
+        Status::Hovered {
+            is_horizontal_scrollbar_hovered,
+            is_vertical_scrollbar_hovered,
+        } => {
+            let hovered_scrollbar = Rail {
+                scroller: Scroller {
+                    color: palette.primary.strong.color,
+                    ..scrollbar.scroller
+                },
+                ..scrollbar
+            };
+
+            Style {
+                container: container::Style::default(),
+                vertical_rail: if is_vertical_scrollbar_hovered {
+                    hovered_scrollbar
+                } else {
+                    scrollbar
+                },
+                horizontal_rail: if is_horizontal_scrollbar_hovered {
+                    hovered_scrollbar
+                } else {
+                    scrollbar
+                },
+                gap: None,
+            }
+        }
+        Status::Dragged {
+            is_horizontal_scrollbar_dragged,
+            is_vertical_scrollbar_dragged,
+        } => {
+            let dragged_scrollbar = Rail {
+                scroller: Scroller {
+                    color: palette.primary.base.color,
+                    ..scrollbar.scroller
+                },
+                ..scrollbar
+            };
+
+            Style {
+                container: container::Style::default(),
+                vertical_rail: if is_vertical_scrollbar_dragged {
+                    dragged_scrollbar
+                } else {
+                    scrollbar
+                },
+                horizontal_rail: if is_horizontal_scrollbar_dragged {
+                    dragged_scrollbar
+                } else {
+                    scrollbar
+                },
+                gap: None,
+            }
+        }
     }
 }

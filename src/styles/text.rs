@@ -12,33 +12,58 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use iced::widget::text::{Appearance, StyleSheet};
-use iced::Color;
+use iced::widget::text::{Catalog, Style, StyleFn};
 
 use super::Theme;
 
-#[derive(Debug, Clone, Copy, Default)]
-pub enum Text {
-    #[default]
-    Default,
-    Primary,
-    Secondary,
-    Success,
-    Danger,
+impl Catalog for Theme {
+    type Class<'a> = StyleFn<'a, Self>;
+
+    fn default<'a>() -> Self::Class<'a> {
+        Box::new(default)
+    }
+
+    fn style(&self, class: &Self::Class<'_>) -> Style {
+        class(self)
+    }
 }
 
-impl StyleSheet for Theme {
-    type Style = Text;
+/// The default text styling; color is inherited.
+pub fn default(_theme: &Theme) -> Style {
+    Style { color: None }
+}
 
-    fn appearance(&self, style: Self::Style) -> Appearance {
-        let color = match style {
-            Text::Default => self.text,
-            Text::Primary => self.primary,
-            Text::Secondary => Color { a: 0.25, ..self.text },
-            Text::Success => self.success,
-            Text::Danger => self.danger,
-        };
+/// Text with the default base color.
+pub fn base(theme: &Theme) -> Style {
+    Style {
+        color: Some(theme.palette().text),
+    }
+}
 
-        Appearance { color: Some(color) }
+/// Text conveying some important information, like an action.
+pub fn primary(theme: &Theme) -> Style {
+    Style {
+        color: Some(theme.palette().primary),
+    }
+}
+
+/// Text conveying some secondary information, like a footnote.
+pub fn secondary(theme: &Theme) -> Style {
+    Style {
+        color: Some(theme.extended_palette().secondary.strong.color),
+    }
+}
+
+/// Text conveying some positive information, like a successful event.
+pub fn success(theme: &Theme) -> Style {
+    Style {
+        color: Some(theme.palette().success),
+    }
+}
+
+/// Text conveying some negative information, like an error.
+pub fn danger(theme: &Theme) -> Style {
+    Style {
+        color: Some(theme.palette().danger),
     }
 }

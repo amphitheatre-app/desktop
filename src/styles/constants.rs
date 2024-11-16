@@ -31,7 +31,7 @@ pub const ICON_FONT_SIZE_BIG: u16 = 96;
 pub const ICON_FONT_SIZE_SIDEBAR: u16 = 14;
 pub const ICON_FONT_SIZE_TOOLBAR: u16 = 24;
 
-pub const SIDEBAR_WIDTH: u16 = 200;
+pub const SIDEBAR_WIDTH: u16 = 220;
 
 pub const WINDOW_INITIAL_WIDTH: f32 = 1028.0;
 pub const WINDOW_INITIAL_HEIGHT: f32 = 640.0;

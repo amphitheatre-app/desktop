@@ -14,25 +14,26 @@
 
 use std::sync::Arc;
 
+use iced::widget::horizontal_space;
+use iced::{Alignment, Length, Subscription, Task};
+use iced_fonts::{Bootstrap as Icon, BOOTSTRAP_FONT as ICON_FONT};
+
 use amp_common::resource::{CharacterSpec, PlaybookSpec};
-use iced::widget::{horizontal_space, Rule};
-use iced::{Alignment, Command, Length, Subscription};
-use iced_aw::{core::icons::bootstrap::Bootstrap as Icon, BOOTSTRAP_FONT as ICON_FONT};
 
 use crate::context::Context;
-use crate::styles;
-use crate::styles::constants::{FONT_SIZE_SMALLER, ICON_FONT_SIZE_TOOLBAR, SPACING_SMALL};
+use crate::styles::{self, constants::*};
 use crate::views::detail::inspect::{self, Information};
 use crate::views::detail::logs::{self, Logs};
 use crate::views::detail::stats::{self, Stats};
-use crate::widgets::switchers::CharacterSwitcher;
+use crate::widgets::character_switcher::{self, *};
 use crate::widgets::tabs::Tab;
-use crate::widgets::{Button, Column, Container, Element, Row, Tabs, Text};
+use crate::widgets::{Button, Column, Container, Element, Row, Rule, Tabs, Text};
 
 // #[derive(Default)]
 pub struct Body {
-    playbook: PlaybookSpec,
-    character: CharacterSpec,
+    playbook: Arc<PlaybookSpec>,
+    character: Arc<CharacterSpec>,
+    switcher: CharacterSwitcher,
     active_tab: TabId,
     logs: Logs,
     info: Information,
@@ -43,13 +44,14 @@ pub struct Body {
 pub enum Message {
     Initializing,
 
-    CloseButtonPressed(Box<PlaybookSpec>),
+    CloseButtonPressed(Arc<PlaybookSpec>),
     TabSelected(TabId),
-    CharacterSelected(Box<CharacterSpec>),
 
     Logs(logs::Message),
     Info(inspect::Message),
     Stats(stats::Message),
+
+    Switcher(character_switcher::Message),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -61,10 +63,11 @@ pub enum TabId {
 }
 
 impl Body {
-    pub fn new(ctx: Arc<Context>, playbook: PlaybookSpec, character: CharacterSpec) -> Self {
+    pub fn new(ctx: Arc<Context>, playbook: Arc<PlaybookSpec>, character: Arc<CharacterSpec>) -> Self {
         Self {
             playbook: playbook.clone(),
             character: character.clone(),
+            switcher: CharacterSwitcher::new(playbook.clone(), character.clone()),
             active_tab: TabId::default(),
             logs: Logs::new(ctx.clone(), playbook.clone(), character.clone()),
             info: Information::new(ctx.clone(), playbook.clone(), character.clone()),
@@ -72,24 +75,29 @@ impl Body {
         }
     }
 
-    pub fn update(&mut self, message: Message) -> Command<Message> {
+    pub fn update(&mut self, message: Message) -> Task<Message> {
         match message {
             Message::Initializing => {
-                return Command::batch(vec![
-                    Command::perform(async {}, |_| Message::Info(inspect::Message::Initializing)),
-                    Command::perform(async {}, |_| Message::Stats(stats::Message::Initializing)),
+                return Task::batch(vec![
+                    Task::perform(async {}, |_| Message::Info(inspect::Message::Initializing)),
+                    Task::perform(async {}, |_| Message::Stats(stats::Message::Initializing)),
                 ]);
             }
             Message::CloseButtonPressed(_) => {}
             Message::TabSelected(tab) => self.active_tab = tab,
-            Message::CharacterSelected(character) => {
-                self.character = *character;
-            }
             Message::Logs(message) => return self.logs.update(message).map(Message::Logs),
             Message::Info(message) => return self.info.update(message).map(Message::Info),
             Message::Stats(message) => return self.stats.update(message).map(Message::Stats),
+            Message::Switcher(message) => {
+                let action = self.switcher.update(message);
+
+                match action {
+                    Action::None => {}
+                    Action::Switch(character) => self.character = character,
+                };
+            }
         }
-        Command::none()
+        Task::none()
     }
 
     pub fn subscription(&self) -> Subscription<Message> {
@@ -107,7 +115,7 @@ impl Body {
                 .push(Rule::horizontal(1))
                 .push(self.tabs()),
         )
-        .width(Length::Fill)
+        .width(Length::Shrink)
         .height(Length::Fill)
         .into()
     }
@@ -122,9 +130,9 @@ impl Body {
                 .push(horizontal_space())
                 // .push(self.actions())
                 .width(Length::Fill)
-                .align_items(Alignment::Center),
+                .align_y(Alignment::Center),
         )
-        .style(styles::Container::Toolbar)
+        .style(styles::container::toolbar)
         .padding(16)
         .into()
     }
@@ -133,11 +141,7 @@ impl Body {
         let mut items = vec![];
         if let Some(characters) = &self.playbook.characters {
             if characters.len() > 1 {
-                items.push(
-                    CharacterSwitcher::new(self.character.clone(), characters.clone())
-                        .on_change(|p| Message::CharacterSelected(Box::new(p)))
-                        .into(),
-                );
+                items.push(self.switcher.view().map(Message::Switcher));
             }
         }
 
@@ -147,22 +151,19 @@ impl Body {
                 .push(
                     Text::new("Running")
                         .size(FONT_SIZE_SMALLER)
-                        .style(styles::Text::Success),
+                        .style(styles::text::success),
                 )
                 .into(),
         );
 
-        Row::with_children(items)
-            .align_items(Alignment::Center)
-            .spacing(8)
-            .into()
+        Row::with_children(items).align_y(Alignment::Center).spacing(8).into()
     }
 
     #[allow(dead_code)]
     fn actions(&self) -> Element<Message> {
         let button = |icon: Icon, on_press| {
             Button::new(Text::new(icon.to_string()).font(ICON_FONT).size(ICON_FONT_SIZE_TOOLBAR))
-                .style(styles::Button::Icon)
+                .style(styles::button::text)
                 .on_press(on_press)
         };
 
@@ -170,11 +171,8 @@ impl Body {
             // .push(button(Icon::Play, Message::ButtonPressed))
             // .push(button(Icon::Stop, Message::ButtonPressed))
             // .push(button(Icon::ArrowRepeat, Message::ButtonPressed))
-            .push(button(
-                Icon::X,
-                Message::CloseButtonPressed(Box::new(self.playbook.clone())),
-            ))
-            .align_items(Alignment::Center)
+            .push(button(Icon::X, Message::CloseButtonPressed(self.playbook.clone())))
+            .align_y(Alignment::Center)
             .spacing(SPACING_SMALL)
             .into()
     }

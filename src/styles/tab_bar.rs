@@ -12,27 +12,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use iced_aw::tab_bar::{Appearance, StyleSheet};
+use iced::Background;
+use iced_aw::style::{
+    status::{Status, StyleFn},
+    tab_bar::{Catalog, Style},
+};
 
 use super::Theme;
 
-impl StyleSheet for Theme {
-    type Style = ();
+impl Catalog for Theme {
+    type Class<'a> = StyleFn<'a, Self, Style>;
 
-    fn active(&self, _style: &Self::Style, is_active: bool) -> Appearance {
-        Appearance {
-            tab_label_background: iced::Color::TRANSPARENT.into(),
-            tab_label_border_color: iced::Color::TRANSPARENT,
-            text_color: if is_active {
-                self.text
-            } else {
-                iced::Color { a: 0.1, ..self.text }
-            },
-            ..Default::default()
+    fn default<'a>() -> Self::Class<'a> {
+        Box::new(primary)
+    }
+
+    fn style(&self, class: &Self::Class<'_>, status: Status) -> Style {
+        class(self, status)
+    }
+}
+
+pub fn primary(theme: &Theme, status: Status) -> Style {
+    let mut base = Style::default();
+    let palette = theme.extended_palette();
+
+    base.text_color = palette.background.base.text;
+
+    match status {
+        Status::Disabled => {
+            base.tab_label_background = Background::Color(palette.background.strong.color);
+        }
+        Status::Hovered => {
+            base.tab_label_background = Background::Color(palette.primary.strong.color);
+        }
+        _ => {
+            base.tab_label_background = Background::Color(palette.primary.base.color);
         }
     }
 
-    fn hovered(&self, style: &Self::Style, is_active: bool) -> Appearance {
-        self.active(style, is_active)
-    }
+    base
 }

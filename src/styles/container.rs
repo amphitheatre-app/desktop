@@ -12,43 +12,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use iced::widget::container::{Appearance, StyleSheet};
+use iced::widget::container::{transparent, Catalog, Style, StyleFn};
 
 use super::Theme;
 
-#[derive(Debug, Clone, Copy, Default)]
-pub enum Container {
-    #[default]
-    Default,
-    Toolbar,
-    Sidebar,
+impl Catalog for Theme {
+    type Class<'a> = StyleFn<'a, Self>;
+
+    fn default<'a>() -> Self::Class<'a> {
+        Box::new(transparent)
+    }
+
+    fn style(&self, class: &Self::Class<'_>) -> Style {
+        class(self)
+    }
 }
 
-impl StyleSheet for Theme {
-    type Style = Container;
+pub fn sidebar(theme: &Theme) -> Style {
+    let palette = theme.palette();
+    let mut color = palette.background;
+    color.r += 0.05;
+    color.g += 0.05;
+    color.b += 0.05;
 
-    fn appearance(&self, style: &Self::Style) -> Appearance {
-        let background_color = match style {
-            Container::Default => iced::Color::TRANSPARENT,
-            Container::Toolbar => {
-                let mut c = self.background;
-                c.r += 0.03;
-                c.g += 0.03;
-                c.b += 0.03;
-                c
-            }
-            Container::Sidebar => {
-                let mut c = self.background;
-                c.r += 0.05;
-                c.g += 0.05;
-                c.b += 0.05;
-                c
-            }
-        };
+    Style {
+        background: Some(color.into()),
+        ..Style::default()
+    }
+}
 
-        Appearance {
-            background: Some(background_color.into()),
-            ..Appearance::default()
-        }
+pub fn toolbar(theme: &Theme) -> Style {
+    let palette = theme.palette();
+    let mut color = palette.background;
+    color.r += 0.03;
+    color.g += 0.03;
+    color.b += 0.03;
+
+    Style {
+        background: Some(color.into()),
+        ..Style::default()
     }
 }

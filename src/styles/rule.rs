@@ -14,17 +14,28 @@
 
 use super::Theme;
 
-use iced::widget::rule::{self, Appearance, StyleSheet};
+use iced::widget::rule::{Catalog, FillMode, Style, StyleFn};
 
-impl StyleSheet for Theme {
-    type Style = ();
+impl Catalog for Theme {
+    type Class<'a> = StyleFn<'a, Self>;
 
-    fn appearance(&self, _style: &Self::Style) -> Appearance {
-        Appearance {
-            color: iced::Color::BLACK,
-            width: 1,
-            radius: 0.0.into(),
-            fill_mode: rule::FillMode::Full,
-        }
+    fn default<'a>() -> Self::Class<'a> {
+        Box::new(default)
+    }
+
+    fn style(&self, class: &Self::Class<'_>) -> Style {
+        class(self)
+    }
+}
+
+/// The default styling of a [`Rule`].
+pub fn default(theme: &Theme) -> Style {
+    let palette = theme.extended_palette();
+
+    Style {
+        color: palette.background.weak.color,
+        width: 1,
+        radius: 0.0.into(),
+        fill_mode: FillMode::Full,
     }
 }

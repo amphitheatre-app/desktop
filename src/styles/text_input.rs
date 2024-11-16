@@ -12,62 +12,62 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use iced::widget::text_input::{Appearance, StyleSheet};
-use iced::{color, Border, Color};
+use iced::{
+    widget::text_input::{Catalog, Status, Style, StyleFn},
+    Background, Border,
+};
 
 use super::Theme;
 
-impl StyleSheet for Theme {
-    type Style = ();
+impl Catalog for Theme {
+    type Class<'a> = StyleFn<'a, Self>;
 
-    fn active(&self, _style: &Self::Style) -> Appearance {
-        Appearance {
-            background: iced::Color::TRANSPARENT.into(),
+    fn default<'a>() -> Self::Class<'a> {
+        Box::new(default)
+    }
+
+    fn style(&self, class: &Self::Class<'_>, status: Status) -> Style {
+        class(self, status)
+    }
+}
+
+/// The default style of a [`TextInput`].
+pub fn default(theme: &Theme, status: Status) -> Style {
+    let palette = theme.extended_palette();
+
+    let active = Style {
+        background: Background::Color(palette.background.base.color),
+        border: Border {
+            radius: 2.0.into(),
+            width: 1.0,
+            color: palette.background.strong.color,
+        },
+        icon: palette.background.weak.text,
+        placeholder: palette.background.strong.color,
+        value: palette.background.base.text,
+        selection: palette.primary.weak.color,
+    };
+
+    match status {
+        Status::Active => active,
+        Status::Hovered => Style {
             border: Border {
-                color: iced::Color { a: 0.1, ..self.text },
-                width: 1.0,
-                radius: 6.0.into(),
+                color: palette.background.base.text,
+                ..active.border
             },
-            icon_color: iced::Color { a: 0.1, ..self.text },
-        }
-    }
-
-    fn focused(&self, style: &Self::Style) -> Appearance {
-        Appearance {
+            ..active
+        },
+        Status::Focused => Style {
             border: Border {
-                color: self.primary,
-                width: 1.0,
-                radius: 6.0.into(),
+                color: palette.primary.strong.color,
+                ..active.border
             },
-            ..self.active(style)
-        }
-    }
-
-    fn placeholder_color(&self, _style: &Self::Style) -> iced::Color {
-        iced::Color { a: 0.1, ..self.text }
-    }
-
-    fn value_color(&self, _style: &Self::Style) -> iced::Color {
-        self.text
-    }
-
-    fn selection_color(&self, _style: &Self::Style) -> iced::Color {
-        self.primary
-    }
-
-    fn disabled_color(&self, _style: &Self::Style) -> Color {
-        iced::Color { a: 0.1, ..self.text }
-    }
-
-    fn disabled(&self, _style: &Self::Style) -> Appearance {
-        Appearance {
-            background: color!(0x292C33).into(),
-            border: Border {
-                color: color!(0x474B56),
-                width: 1.0,
-                radius: 6.0.into(),
-            },
-            icon_color: color!(0xC9CCD3),
-        }
+            ..active
+        },
+        Status::Disabled => Style {
+            background: Background::Color(palette.background.weak.color),
+            value: active.placeholder,
+            ..active
+        },
     }
 }

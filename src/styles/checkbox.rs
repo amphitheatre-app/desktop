@@ -12,47 +12,61 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use super::Theme;
-
 use iced::{
-    widget::checkbox::{Appearance, StyleSheet},
-    Border,
+    theme::palette,
+    widget::checkbox::{Catalog, Status, Style, StyleFn},
+    Background, Border, Color,
 };
 
-impl StyleSheet for Theme {
-    type Style = ();
+use super::Theme;
 
-    fn active(&self, _style: &Self::Style, is_checked: bool) -> Appearance {
-        Appearance {
-            background: iced::Color::TRANSPARENT.into(),
-            icon_color: self.text,
-            border: Border {
-                radius: 0.0.into(),
-                width: 1.0,
-                color: if is_checked {
-                    self.primary
-                } else {
-                    iced::Color { a: 0.1, ..self.text }
-                },
-            },
-            text_color: Some(self.text),
-        }
+impl Catalog for Theme {
+    type Class<'a> = StyleFn<'a, Self>;
+
+    fn default<'a>() -> Self::Class<'a> {
+        Box::new(primary)
     }
 
-    fn hovered(&self, style: &Self::Style, is_checked: bool) -> Appearance {
-        self.active(style, is_checked)
+    fn style(&self, class: &Self::Class<'_>, status: Status) -> Style {
+        class(self, status)
     }
+}
 
-    fn disabled(&self, _style: &Self::Style, _is_checked: bool) -> Appearance {
-        Appearance {
-            background: iced::Color::TRANSPARENT.into(),
-            icon_color: iced::Color { a: 0.1, ..self.text },
-            border: Border {
-                radius: 0.0.into(),
-                width: 1.0,
-                color: iced::Color { a: 0.1, ..self.text },
-            },
-            text_color: Some(self.text),
-        }
+/// A primary checkbox; denoting a main toggle.
+pub fn primary(theme: &Theme, status: Status) -> Style {
+    let palette = theme.extended_palette();
+
+    match status {
+        Status::Active { is_checked } => styled(
+            palette.primary.strong.text,
+            palette.background.base,
+            palette.primary.strong,
+            is_checked,
+        ),
+        Status::Hovered { is_checked } => styled(
+            palette.primary.strong.text,
+            palette.background.weak,
+            palette.primary.base,
+            is_checked,
+        ),
+        Status::Disabled { is_checked } => styled(
+            palette.primary.strong.text,
+            palette.background.weak,
+            palette.background.strong,
+            is_checked,
+        ),
+    }
+}
+
+fn styled(icon_color: Color, base: palette::Pair, accent: palette::Pair, is_checked: bool) -> Style {
+    Style {
+        background: Background::Color(if is_checked { accent.color } else { base.color }),
+        icon_color,
+        border: Border {
+            radius: 0.0.into(),
+            width: 1.0,
+            color: accent.color,
+        },
+        text_color: None,
     }
 }

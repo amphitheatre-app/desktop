@@ -12,17 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use iced::application::{Appearance, StyleSheet};
+use iced::application::{Appearance, DefaultStyle};
 
 use super::Theme;
 
-impl StyleSheet for Theme {
-    type Style = ();
+impl DefaultStyle for Theme {
+    fn default_style(&self) -> Appearance {
+        default(self)
+    }
+}
 
-    fn appearance(&self, _style: &Self::Style) -> Appearance {
-        Appearance {
-            background_color: self.background,
-            text_color: self.text,
-        }
+pub fn default(theme: &Theme) -> Appearance {
+    let palette = theme.extended_palette();
+
+    Appearance {
+        background_color: palette.background.base.color,
+        text_color: palette.background.base.text,
     }
 }

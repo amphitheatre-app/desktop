@@ -12,80 +12,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use iced::advanced::text;
 use iced::alignment::{Alignment, Horizontal};
-use iced::widget::{component, Component};
 use iced::Length;
 
-use crate::styles::constants::{FONT_SIZE_LARGE, FONT_SIZE_STANDARD, SPACING_NORMAL};
-use crate::styles::Theme;
+use crate::widgets::{Column, Container, Element, Text};
 
-use super::{Column, Container, Element, Text};
+use crate::styles::constants::*;
 
-pub struct EmptyState {
-    tagline: String,
-    message: Option<String>,
-}
+pub fn empty<'a, Message: 'a>(
+    tagline: impl text::IntoFragment<'a>,
+    message: Option<impl text::IntoFragment<'a>>,
+) -> Element<'a, Message> {
+    let tagline = Text::new(tagline)
+        .size(FONT_SIZE_LARGE)
+        .width(Length::Fill)
+        .align_x(Horizontal::Center);
 
-pub fn empty(tagline: impl Into<String>) -> EmptyState {
-    EmptyState::new(tagline, None::<String>)
-}
-
-impl EmptyState {
-    pub fn new(tagline: impl Into<String>, message: impl Into<Option<String>>) -> Self {
-        Self {
-            tagline: tagline.into(),
-            message: message.into(),
-        }
-    }
-}
-
-impl<Message> Component<Message, Theme> for EmptyState {
-    type State = ();
-    type Event = ();
-
-    fn update(&mut self, _state: &mut Self::State, _event: Self::Event) -> Option<Message> {
-        None
-    }
-
-    fn view(&self, _state: &Self::State) -> Element<Self::Event> {
-        let tagline = Text::new(&self.tagline)
-            .size(FONT_SIZE_LARGE)
+    let message = if let Some(message) = message {
+        Text::new(message)
+            .size(FONT_SIZE_STANDARD)
             .width(Length::Fill)
-            .horizontal_alignment(Horizontal::Center);
+            .align_x(Horizontal::Center)
+    } else {
+        Text::new("").size(16).width(Length::Fill).align_x(Horizontal::Center)
+    };
 
-        let message = if let Some(message) = &self.message {
-            Text::new(message)
-                .size(FONT_SIZE_STANDARD)
-                .width(Length::Fill)
-                .horizontal_alignment(Horizontal::Center)
-        } else {
-            Text::new("")
-                .size(16)
-                .width(Length::Fill)
-                .horizontal_alignment(Horizontal::Center)
-        };
+    let content = Column::new()
+        .width(Length::Fill)
+        .align_x(Alignment::Center)
+        .spacing(SPACING_NORMAL)
+        .push(tagline)
+        .push(message);
 
-        let content = Column::new()
-            .width(Length::Fill)
-            .align_items(Alignment::Center)
-            .spacing(SPACING_NORMAL)
-            .push(tagline)
-            .push(message);
-
-        Container::new(content)
-            .width(Length::Fill)
-            .height(Length::Fill)
-            .center_x()
-            .center_y()
-            .into()
-    }
-}
-
-impl<'a, Message> From<EmptyState> for Element<'a, Message>
-where
-    Message: 'a,
-{
-    fn from(empty: EmptyState) -> Self {
-        component(empty)
-    }
+    Container::new(content)
+        .width(Length::Fill)
+        .height(Length::Fill)
+        .center(Length::Fill)
+        .into()
 }

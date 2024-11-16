@@ -12,55 +12,57 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use iced::{
+    color,
+    theme::{
+        palette::{self, Extended},
+        Palette,
+    },
+};
+
 pub mod application;
-
-mod button;
-pub use button::Button;
-
+pub mod button;
 pub mod card;
-pub mod constants;
-
-mod container;
-pub use container::Container;
-
 pub mod checkbox;
+pub mod constants;
+pub mod container;
 pub mod menu;
-pub mod modal;
 pub mod rule;
 pub mod scrollable;
-pub mod split;
 pub mod tab_bar;
+pub mod text;
 pub mod text_input;
 
-mod text;
-pub use text::Text;
-
 /// The custom theme for the application.
-/// [iced example](https://github.com/iced-rs/iced/blob/master/examples/styling/src/main.rs)
-/// [apple color guidelines](https://developer.apple.com/design/human-interface-guidelines/color)
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 pub struct Theme {
-    background: iced::Color,
-    text: iced::Color,
-    primary: iced::Color,
-    success: iced::Color,
-    danger: iced::Color,
+    palette: Palette,
+    extended: palette::Extended,
 }
 
 impl Theme {
-    pub fn new() -> Self {
-        Self {
-            background: iced::Color::from_rgba8(30, 30, 30, 1.0),
-            text: iced::Color::from_rgba8(221, 221, 221, 1.0),
-            primary: iced::Color::from_rgba8(10, 132, 255, 1.0),
-            success: iced::Color::from_rgba8(48, 209, 81, 1.0),
-            danger: iced::Color::from_rgba8(255, 69, 58, 1.0),
-        }
+    /// Returns the [`Palette`] of the [`Theme`].
+    pub fn palette(&self) -> &Palette {
+        &self.palette
+    }
+
+    /// Returns the [`palette::Extended`] of the [`Theme`].
+    pub fn extended_palette(&self) -> &palette::Extended {
+        &self.extended
     }
 }
 
 impl Default for Theme {
     fn default() -> Self {
-        Self::new()
+        let palette = Palette {
+            background: color!(0x1B1F22),
+            text: color!(0xDFE2E6),
+            primary: color!(0x79B8FF),
+            success: color!(0x34CC57),
+            danger: color!(0x79B8FF),
+        };
+        let extended = Extended::generate(palette);
+
+        Self { palette, extended }
     }
 }

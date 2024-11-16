@@ -14,23 +14,21 @@
 
 use std::path::Path;
 
-use crate::styles::constants::*;
-use crate::styles::{self, Theme};
-use crate::widgets::{Button, Card, Checkbox, Column, Container, Scrollable, Text, TextInput};
-use crate::widgets::{Element, Row};
-use iced::widget::{horizontal_space, Component};
-use iced::{alignment::Horizontal, Alignment, Length};
+use iced::widget::horizontal_space;
+use iced::{Alignment, Length};
+use iced_aw::Card;
 use native_dialog::FileDialog;
 
-pub struct Compose<Message> {
+use crate::styles::{self, constants::*};
+use crate::widgets::{Button, Checkbox, Column, Container, Element, Row, Scrollable, Text, TextInput};
+
+#[derive(Default)]
+pub struct Composer {
     form: Form,
-    on_change: Box<dyn Fn(Form) -> Message>,
-    on_cancel: Message,
-    on_submit: Message,
 }
 
-#[derive(Clone)]
-pub enum Event {
+#[derive(Debug, Clone)]
+pub enum Message {
     TitleChanged(String),
     DescriptionChanged(String),
 
@@ -42,6 +40,12 @@ pub enum Event {
     SubmitButtonPressed,
 }
 
+pub enum Action {
+    None,
+    Submit(Form),
+    Cancel,
+}
+
 #[derive(Clone, Debug, Default)]
 pub struct Form {
     pub title: String,
@@ -50,86 +54,66 @@ pub struct Form {
     pub live: bool,
 }
 
-impl<Message: Clone> Compose<Message> {
-    pub fn new(
-        form: Form,
-        on_change: impl Fn(Form) -> Message + 'static,
-        on_cancel: Message,
-        on_submit: Message,
-    ) -> Self {
-        Self {
-            form,
-            on_change: Box::new(on_change),
-            on_cancel,
-            on_submit,
-        }
+impl Composer {
+    pub fn reset(&mut self) {
+        self.form = Form::default();
     }
-}
 
-impl<Message: Clone> Component<Message, Theme> for Compose<Message> {
-    type State = ();
-    type Event = Event;
-
-    fn update(&mut self, _state: &mut Self::State, event: Self::Event) -> Option<Message> {
-        match event {
-            Event::TitleChanged(title) => {
+    pub fn update(&mut self, message: Message) -> Action {
+        match message {
+            Message::TitleChanged(title) => {
                 self.form.title = title;
-                Some((self.on_change)(self.form.clone()))
+                Action::None
             }
-            Event::DescriptionChanged(description) => {
+            Message::DescriptionChanged(description) => {
                 self.form.description = description;
-                Some((self.on_change)(self.form.clone()))
+                Action::None
             }
-            Event::RepositoryChanged(repository) => {
+            Message::RepositoryChanged(repository) => {
                 self.form.preface = repository;
-                Some((self.on_change)(self.form.clone()))
+                Action::None
             }
-            Event::SelectFileButtonPressed => {
+            Message::SelectFileButtonPressed => {
                 if let Ok(Some(path)) = FileDialog::new().show_open_single_dir() {
                     self.form.preface = path.to_str().unwrap_or_default().to_string();
-                    Some((self.on_change)(self.form.clone()))
-                } else {
-                    None
                 }
+                Action::None
             }
-            Event::LiveUpdateChecked(live) => {
+            Message::LiveUpdateChecked(live) => {
                 self.form.live = live;
-                Some((self.on_change)(self.form.clone()))
+                Action::None
             }
-            Event::CancelButtonPressed => Some(self.on_cancel.clone()),
-            Event::SubmitButtonPressed => Some(self.on_submit.clone()),
+            Message::CancelButtonPressed => Action::Cancel,
+            Message::SubmitButtonPressed => Action::Submit(self.form.clone()),
         }
     }
 
-    fn view(&self, _state: &Self::State) -> Element<Self::Event> {
+    pub fn view(&self) -> Element<Message> {
         let title = Text::new("Compose a new playbook").size(FONT_SIZE_LARGE);
         let element = Card::new(title, self.form())
             .close_size(ICON_FONT_SIZE_TOOLBAR as f32)
-            .on_close(Event::CancelButtonPressed)
+            .on_close(Message::CancelButtonPressed)
             .foot(self.actions())
             .padding(SPACING_LARGE.into());
 
         let content = Scrollable::new(element);
         Container::new(Column::new().push(content).max_width(480))
-            .center_x()
-            .center_y()
+            .center(Length::Fill)
             .into()
     }
-}
 
-impl<Message> Compose<Message> {
-    fn form(&self) -> Element<Event> {
+    fn form(&self) -> Element<Message> {
         let help = Text::new(
             "Please give your playbook a clear title and description to convey its purpose \
             and content effectively. Additionally, provide a GIT URL or local file path as the repository.",
         )
-        .style(styles::Text::Secondary)
+        .style(styles::text::secondary)
         .into();
 
         let title = Column::with_children(vec![
             Text::new("Name your playbook").into(),
             TextInput::new("Untitled", &self.form.title)
-                .on_input(Event::TitleChanged)
+                .on_input(Message::TitleChanged)
                 .into(),
         ])
         .into();
@@ -137,7 +121,7 @@ impl<Message> Compose<Message> {
         let description = Column::with_children(vec![
             Text::new("Add a description").into(),
             TextInput::new("Add your description here...", &self.form.description)
-                .on_input(Event::DescriptionChanged)
+                .on_input(Message::DescriptionChanged)
                 .into(),
         ])
         .into();
@@ -146,8 +130,8 @@ impl<Message> Compose<Message> {
         let repository = Column::with_children(vec![
             Text::new("Repository").into(),
             Row::new()
-                .push(TextInput::new(repo_placeholder, &self.form.preface).on_input(Event::RepositoryChanged))
-                .push(Button::new(Text::new("Browse")).on_press(Event::SelectFileButtonPressed))
+                .push(TextInput::new(repo_placeholder, &self.form.preface).on_input(Message::RepositoryChanged))
+                .push(Button::new(Text::new("Browse")).on_press(Message::SelectFileButtonPressed))
                 .spacing(SPACING_SMALL)
                 .into(),
         ])
@@ -157,7 +141,7 @@ impl<Message> Compose<Message> {
         if Path::new(&self.form.preface).exists() {
             fields.push(
                 Checkbox::new("Running in development mode", self.form.live)
-                    .on_toggle(Event::LiveUpdateChecked)
+                    .on_toggle(Message::LiveUpdateChecked)
                     .into(),
             );
         }
@@ -165,14 +149,14 @@ impl<Message> Compose<Message> {
         Column::with_children(fields).spacing(SPACING_LARGE).into()
     }
 
-    fn actions(&self) -> Element<Event> {
-        let cancel_button = Button::new(Text::new("Cancel").style(styles::Text::Secondary))
-            .style(styles::Button::Element)
-            .on_press(Event::CancelButtonPressed);
-        let submit_button = Button::new(Text::new("Start compose").horizontal_alignment(Horizontal::Center))
-            .style(styles::Button::Primary)
+    fn actions(&self) -> Element<Message> {
+        let cancel_button = Button::new(Text::new("Cancel").style(styles::text::secondary))
+            .style(styles::button::text)
+            .on_press(Message::CancelButtonPressed);
+        let submit_button = Button::new(Text::new("Start compose"))
+            .style(styles::button::primary)
             .width(Length::FillPortion(3))
-            .on_press(Event::SubmitButtonPressed);
+            .on_press(Message::SubmitButtonPressed);
 
         Container::new(
             Row::new()
@@ -180,17 +164,8 @@ impl<Message> Compose<Message> {
                 .push(horizontal_space())
                 .push(submit_button)
                 .width(Length::Fill)
-                .align_items(Alignment::Center),
+                .align_y(Alignment::Center),
         )
         .into()
-    }
-}
-
-impl<'a, Message> From<Compose<Message>> for Element<'a, Message>
-where
-    Message: 'a + Clone,
-{
-    fn from(component: Compose<Message>) -> Self {
-        iced::widget::component(component)
     }
 }

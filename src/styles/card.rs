@@ -12,28 +12,58 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use iced::theme::palette;
+use iced_aw::style::{
+    card::{Catalog, Style},
+    status::{Status, StyleFn},
+};
+
 use super::Theme;
-use iced_aw::style::card::Appearance;
-use iced_aw::style::card::StyleSheet;
 
-impl StyleSheet for Theme {
-    type Style = ();
+impl Catalog for Theme {
+    type Class<'a> = StyleFn<'a, Self, Style>;
 
-    fn active(&self, _style: &Self::Style) -> Appearance {
-        let color = iced::Color {
-            r: self.background.r + 0.1,
-            g: self.background.r + 0.1,
-            b: self.background.r + 0.1,
-            a: self.background.a + 0.1,
-        };
+    fn default<'a>() -> Self::Class<'a> {
+        Box::new(primary)
+    }
 
-        Appearance {
-            background: color.into(),
-            head_background: color.into(),
-            foot_background: color.into(),
-            border_width: 0.0,
-            close_color: self.text,
-            ..Appearance::default()
-        }
+    fn style(&self, class: &Self::Class<'_>, status: Status) -> Style {
+        class(self, status)
+    }
+}
+
+pub fn primary(theme: &Theme, _status: Status) -> Style {
+    let palette = theme.extended_palette();
+    styled(theme, palette.primary.strong)
+}
+
+pub fn secondary(theme: &Theme, _status: Status) -> Style {
+    let palette = theme.extended_palette();
+    styled(theme, palette.secondary.strong)
+}
+
+pub fn success(theme: &Theme, _status: Status) -> Style {
+    let palette = theme.extended_palette();
+    styled(theme, palette.success.strong)
+}
+
+pub fn danger(theme: &Theme, _status: Status) -> Style {
+    let palette = theme.extended_palette();
+    styled(theme, palette.danger.strong)
+}
+
+fn styled(theme: &Theme, pair: palette::Pair) -> Style {
+    let palette = theme.extended_palette();
+    let foreground = theme.palette();
+
+    Style {
+        border_color: pair.color,
+        head_background: pair.color.into(),
+        head_text_color: pair.text,
+        close_color: pair.text,
+        background: palette.background.base.color.into(),
+        body_text_color: foreground.text,
+        foot_text_color: foreground.text,
+        ..Style::default()
     }
 }

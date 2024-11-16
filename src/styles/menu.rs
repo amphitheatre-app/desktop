@@ -13,25 +13,36 @@
 // limitations under the License.
 
 use iced::Color;
-use iced_aw::style::menu_bar::{Appearance, StyleSheet};
+use iced_aw::style::{
+    menu_bar::{Catalog, Style},
+    status::{Status, StyleFn},
+};
 
 use super::Theme;
 
-impl StyleSheet for Theme {
-    type Style = ();
+impl Catalog for Theme {
+    type Class<'a> = StyleFn<'a, Self, Style>;
 
-    fn appearance(&self, _style: &Self::Style) -> Appearance {
-        let color = iced::Color {
-            r: self.background.r + 0.1,
-            g: self.background.r + 0.1,
-            b: self.background.r + 0.1,
-            a: self.background.a + 0.1,
-        };
+    fn default<'a>() -> Self::Class<'a> {
+        Box::new(primary)
+    }
 
-        Appearance {
-            bar_background: Color::TRANSPARENT.into(),
-            menu_background: color.into(),
-            ..Default::default()
-        }
+    fn style(&self, class: &Self::Class<'_>, status: Status) -> Style {
+        class(self, status)
+    }
+}
+
+pub fn primary(theme: &Theme, _status: Status) -> Style {
+    let palette = theme.extended_palette();
+    let mut color = palette.background.base.color;
+    color.r += 0.05;
+    color.g += 0.05;
+    color.b += 0.05;
+
+    Style {
+        bar_background: Color::TRANSPARENT.into(),
+        menu_background: color.into(),
+        path: palette.primary.weak.color.into(),
+        ..Default::default()
     }
 }

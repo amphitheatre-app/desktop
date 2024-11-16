@@ -16,15 +16,16 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::Duration;
 
+use iced::{Alignment, Length, Subscription, Task};
+use iced_aw::TabLabel;
+
+use amp_common::resource::{CharacterSpec, PlaybookSpec};
+
 use crate::cmd::actor::refresh_actor_stats;
 use crate::context::Context;
 use crate::errors::Result;
 use crate::widgets::tabs::Tab;
-use crate::widgets::{Column, Container, Element, Text};
-use amp_common::resource::{CharacterSpec, PlaybookSpec};
-use iced::widget::{Row, Rule};
-use iced::{Alignment, Command, Length, Subscription};
-use iced_aw::TabLabel;
+use crate::widgets::{Column, Container, Element, Row, Rule, Text};
 
 #[derive(Clone, Debug)]
 pub enum Message {
@@ -35,12 +36,12 @@ pub enum Message {
 pub struct Stats {
     ctx: Arc<Context>,
     data: HashMap<String, String>,
-    playbook: PlaybookSpec,
-    character: CharacterSpec,
+    playbook: Arc<PlaybookSpec>,
+    character: Arc<CharacterSpec>,
 }
 
 impl Stats {
-    pub fn new(ctx: Arc<Context>, playbook: PlaybookSpec, character: CharacterSpec) -> Self {
+    pub fn new(ctx: Arc<Context>, playbook: Arc<PlaybookSpec>, character: Arc<CharacterSpec>) -> Self {
         Self {
             ctx,
             data: Default::default(),
@@ -49,17 +50,17 @@ impl Stats {
         }
     }
 
-    pub fn update(&mut self, message: Message) -> Command<Message> {
+    pub fn update(&mut self, message: Message) -> Task<Message> {
         match message {
             Message::Initializing => {
                 let pid = self.playbook.id.clone();
                 let name = self.character.meta.name.clone();
-                return Command::perform(refresh_actor_stats(self.ctx.clone(), pid, name), Message::StatsLoaded);
+                return Task::perform(refresh_actor_stats(self.ctx.clone(), pid, name), Message::StatsLoaded);
             }
             Message::StatsLoaded(data) => self.data = data.unwrap_or_default(),
         }
 
-        Command::none()
+        Task::none()
     }
 
     pub fn subscription(&self) -> Subscription<Message> {
@@ -98,13 +99,12 @@ impl Stats {
             Column::new()
                 .push(Text::new(value.to_string()).size(26))
                 .push(Text::new(label.to_string()).size(16))
-                .align_items(Alignment::Center)
+                .align_x(Alignment::Center)
                 .spacing(32),
         )
         .width(Length::Fill)
         .height(Length::Fill)
-        .center_x()
-        .center_y()
+        .center(Length::Fill)
         .into()
     }
 

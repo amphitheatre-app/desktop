@@ -15,13 +15,15 @@
 use std::hash::Hash;
 use std::sync::Arc;
 
-use amp_common::resource::{CharacterSpec, PlaybookSpec};
 use futures::StreamExt;
 use iced::widget::scrollable;
-use iced::{Command, Font, Length, Subscription};
+use iced::{Font, Length, Subscription, Task};
 use iced_aw::TabLabel;
+use iced_futures::subscription::{from_recipe, Hasher};
 use iced_futures::{subscription, BoxStream};
 use reqwest_eventsource::Event;
+
+use amp_common::resource::{CharacterSpec, PlaybookSpec};
 
 use crate::context::Context;
 use crate::styles::constants::{FONT_SIZE_SMALL, SPACING_SMALL};
@@ -36,14 +38,14 @@ pub enum Message {
 
 pub struct Logs {
     ctx: Arc<Context>,
-    playbook: PlaybookSpec,
-    character: CharacterSpec,
+    playbook: Arc<PlaybookSpec>,
+    character: Arc<CharacterSpec>,
     messages: Vec<String>,
     scrollable_id: scrollable::Id,
 }
 
 impl Logs {
-    pub fn new(ctx: Arc<Context>, playbook: PlaybookSpec, character: CharacterSpec) -> Self {
+    pub fn new(ctx: Arc<Context>, playbook: Arc<PlaybookSpec>, character: Arc<CharacterSpec>) -> Self {
         Self {
             ctx,
             playbook,
@@ -53,7 +55,7 @@ impl Logs {
         }
     }
 
-    pub fn update(&mut self, message: Message) -> Command<Message> {
+    pub fn update(&mut self, message: Message) -> Task<Message> {
         match message {
             Message::Received(message) => {
                 self.messages.push(message);
@@ -68,7 +70,7 @@ impl Logs {
 
     // Tail the log stream from the server
     pub fn subscription(&self) -> Subscription<Message> {
-        Subscription::from_recipe(Receiver::new(
+        from_recipe(Receiver::new(
             self.ctx.clone(),
             &self.playbook.id,
             &self.character.meta.name,
@@ -129,7 +131,7 @@ const OPEN_STREAM_MESSAGE: &str = "Receiving the log stream from the server...";
 impl subscription::Recipe for Receiver {
     type Output = Message;
 
-    fn hash(&self, state: &mut iced_futures::core::Hasher) {
+    fn hash(&self, state: &mut Hasher) {
         std::any::TypeId::of::<Self>().hash(state);
         self.pid.hash(state);
         self.name.hash(state);
