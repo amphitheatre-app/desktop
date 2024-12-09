@@ -36,7 +36,7 @@ time = { version = "0.3.36", features = ["local-offset"] }
 tokio = { version = "1.41.0", features = ["full"] }
 toml = "0.8"
 tracing = "0.1.41"
-tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 
 [package.metadata.deb]
 section="Development"
