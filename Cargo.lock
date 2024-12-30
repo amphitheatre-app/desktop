@@ -83,7 +83,7 @@ name = "amp-client"
 version = "0.9.3"
 source = "git+https://github.com/amphitheatre-app/amp-client-rust?tag=v0.9.3#a8495f6ead9823d6fb176341dc4fc13e36c5b7ab"
 dependencies = [
- "amp-common",
+ "amp-common 0.9.4",
  "futures",
  "reqwest-eventsource",
  "serde",
@@ -103,8 +103,8 @@ dependencies = [
  "data-encoding",
  "dirs 5.0.1",
  "json_comments",
- "k8s-openapi",
- "kube",
+ "k8s-openapi 0.23.0",
+ "kube 0.96.0",
  "notify",
  "oci-distribution",
  "schemars",
@@ -116,7 +116,35 @@ dependencies = [
  "ureq",
  "url",
  "utoipa",
- "validator",
+ "validator 0.18.1",
+]
+
+[[package]]
+name = "amp-common"
+version = "0.9.5"
+source = "git+https://github.com/amphitheatre-app/common?tag=v0.9.5#197f7d80218e802241ee72d7befddb70e6154814"
+dependencies = [
+ "anyhow",
+ "chrono",
+ "confy",
+ "convert_case",
+ "data-encoding",
+ "dirs 5.0.1",
+ "json_comments",
+ "k8s-openapi 0.24.0",
+ "kube 0.98.0",
+ "notify",
+ "oci-distribution",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.9",
+ "toml",
+ "tracing",
+ "ureq",
+ "url",
+ "utoipa",
+ "validator 0.19.0",
 ]
 
 [[package]]
@@ -1030,7 +1058,7 @@ name = "desktop"
 version = "0.8.2"
 dependencies = [
  "amp-client",
- "amp-common",
+ "amp-common 0.9.5",
  "futures",
  "iced",
  "iced_aw",
@@ -1431,6 +1459,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 
 [[package]]
+name = "foldhash"
+version = "0.1.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a0d2fde1f7b3d48b8395d5f2de76c18a528bd6a9cdde438df747bfcba3e05d6f"
+
+[[package]]
 name = "font-types"
 version = "0.7.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1802,6 +1836,11 @@ name = "hashbrown"
 version = "0.15.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3a9bfc1af68b1726ea47d3d5109de126281def866b33970e10fbab11b5dafab3"
+dependencies = [
+ "allocator-api2",
+ "equivalent",
+ "foldhash",
+]
 
 [[package]]
 name = "hassle-rs"
@@ -1888,6 +1927,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e3d1354bf6b7235cb4a0576c2619fd4ed18183f689b12b006a0ee7329eeff9a5"
 dependencies = [
  "windows-sys 0.52.0",
+]
+
+[[package]]
+name = "hostname"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f9c7c7c8ac16c798734b8a24560c1362120597c40d5e1459f09498f8f6c8f2ba"
+dependencies = [
+ "cfg-if",
+ "libc",
+ "windows",
 ]
 
 [[package]]
@@ -2561,7 +2611,19 @@ version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5b1fb8864823fad91877e6caea0baca82e49e8db50f8e5c9f9a453e27d3330fc"
 dependencies = [
- "jsonptr",
+ "jsonptr 0.4.7",
+ "serde",
+ "serde_json",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "json-patch"
+version = "3.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "863726d7afb6bc2590eeff7135d923545e5e964f004c2ccf8716c25e70a86f08"
+dependencies = [
+ "jsonptr 0.6.3",
  "serde",
  "serde_json",
  "thiserror 1.0.69",
@@ -2589,12 +2651,35 @@ dependencies = [
 ]
 
 [[package]]
+name = "jsonpath-rust"
+version = "0.7.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0c00ae348f9f8fd2d09f82a98ca381c60df9e0820d8d79fce43e649b4dc3128b"
+dependencies = [
+ "pest",
+ "pest_derive",
+ "regex",
+ "serde_json",
+ "thiserror 2.0.9",
+]
+
+[[package]]
 name = "jsonptr"
 version = "0.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1c6e529149475ca0b2820835d3dce8fcc41c6b943ca608d32f35b449255e4627"
 dependencies = [
  "fluent-uri",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "jsonptr"
+version = "0.6.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5dea2b27dd239b2556ed7a25ba842fe47fd602e7fc7433c2a8d6106d4d9edd70"
+dependencies = [
  "serde",
  "serde_json",
 ]
@@ -2619,6 +2704,20 @@ name = "k8s-openapi"
 version = "0.23.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9c8847402328d8301354c94d605481f25a6bdc1ed65471fd96af8eca71141b13"
+dependencies = [
+ "base64 0.22.1",
+ "chrono",
+ "schemars",
+ "serde",
+ "serde-value",
+ "serde_json",
+]
+
+[[package]]
+name = "k8s-openapi"
+version = "0.24.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2c75b990324f09bef15e791606b7b7a296d02fc88a344f6eba9390970a870ad5"
 dependencies = [
  "base64 0.22.1",
  "chrono",
@@ -2671,11 +2770,24 @@ version = "0.96.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "efffeb3df0bd4ef3e5d65044573499c0e4889b988070b08c50b25b1329289a1f"
 dependencies = [
- "k8s-openapi",
- "kube-client",
- "kube-core",
- "kube-derive",
- "kube-runtime",
+ "k8s-openapi 0.23.0",
+ "kube-client 0.96.0",
+ "kube-core 0.96.0",
+ "kube-derive 0.96.0",
+ "kube-runtime 0.96.0",
+]
+
+[[package]]
+name = "kube"
+version = "0.98.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "32053dc495efad4d188c7b33cc7c02ef4a6e43038115348348876efd39a53cba"
+dependencies = [
+ "k8s-openapi 0.24.0",
+ "kube-client 0.98.0",
+ "kube-core 0.98.0",
+ "kube-derive 0.98.0",
+ "kube-runtime 0.98.0",
 ]
 
 [[package]]
@@ -2698,9 +2810,9 @@ dependencies = [
  "hyper-rustls",
  "hyper-timeout",
  "hyper-util",
- "jsonpath-rust",
- "k8s-openapi",
- "kube-core",
+ "jsonpath-rust 0.5.1",
+ "k8s-openapi 0.23.0",
+ "kube-core 0.96.0",
  "pem",
  "rustls",
  "rustls-pemfile",
@@ -2717,6 +2829,44 @@ dependencies = [
 ]
 
 [[package]]
+name = "kube-client"
+version = "0.98.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9d34ad38cdfbd1fa87195d42569f57bb1dda6ba5f260ee32fef9570b7937a0c9"
+dependencies = [
+ "base64 0.22.1",
+ "bytes",
+ "chrono",
+ "either",
+ "futures",
+ "home",
+ "http",
+ "http-body",
+ "http-body-util",
+ "hyper",
+ "hyper-http-proxy",
+ "hyper-rustls",
+ "hyper-timeout",
+ "hyper-util",
+ "jsonpath-rust 0.7.5",
+ "k8s-openapi 0.24.0",
+ "kube-core 0.98.0",
+ "pem",
+ "rustls",
+ "rustls-pemfile",
+ "secrecy",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "thiserror 2.0.9",
+ "tokio",
+ "tokio-util",
+ "tower",
+ "tower-http",
+ "tracing",
+]
+
+[[package]]
 name = "kube-core"
 version = "0.96.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2725,8 +2875,8 @@ dependencies = [
  "chrono",
  "form_urlencoded",
  "http",
- "json-patch",
- "k8s-openapi",
+ "json-patch 2.0.0",
+ "k8s-openapi 0.23.0",
  "schemars",
  "serde",
  "serde-value",
@@ -2735,10 +2885,41 @@ dependencies = [
 ]
 
 [[package]]
+name = "kube-core"
+version = "0.98.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "97aa830b288a178a90e784d1b0f1539f2d200d2188c7b4a3146d9dc983d596f3"
+dependencies = [
+ "chrono",
+ "form_urlencoded",
+ "http",
+ "json-patch 3.0.1",
+ "k8s-openapi 0.24.0",
+ "schemars",
+ "serde",
+ "serde-value",
+ "serde_json",
+ "thiserror 2.0.9",
+]
+
+[[package]]
 name = "kube-derive"
 version = "0.96.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f9364e04cc5e0482136c6ee8b7fb7551812da25802249f35b3def7aaa31e82ad"
+dependencies = [
+ "darling",
+ "proc-macro2",
+ "quote",
+ "serde_json",
+ "syn 2.0.87",
+]
+
+[[package]]
+name = "kube-derive"
+version = "0.98.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "37745d8a4076b77e0b1952e94e358726866c8e14ec94baaca677d47dcdb98658"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -2761,15 +2942,44 @@ dependencies = [
  "educe",
  "futures",
  "hashbrown 0.14.5",
- "json-patch",
- "jsonptr",
- "k8s-openapi",
- "kube-client",
+ "json-patch 2.0.0",
+ "jsonptr 0.4.7",
+ "k8s-openapi 0.23.0",
+ "kube-client 0.96.0",
  "parking_lot 0.12.3",
  "pin-project",
  "serde",
  "serde_json",
  "thiserror 1.0.69",
+ "tokio",
+ "tokio-util",
+ "tracing",
+]
+
+[[package]]
+name = "kube-runtime"
+version = "0.98.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a41af186a0fe80c71a13a13994abdc3ebff80859ca6a4b8a6079948328c135b"
+dependencies = [
+ "ahash 0.8.11",
+ "async-broadcast",
+ "async-stream",
+ "async-trait",
+ "backoff",
+ "educe",
+ "futures",
+ "hashbrown 0.15.1",
+ "hostname",
+ "json-patch 3.0.1",
+ "jsonptr 0.6.3",
+ "k8s-openapi 0.24.0",
+ "kube-client 0.98.0",
+ "parking_lot 0.12.3",
+ "pin-project",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.9",
  "tokio",
  "tokio-util",
  "tracing",
@@ -3926,6 +4136,28 @@ dependencies = [
  "proc-macro2",
  "quote",
  "version_check",
+]
+
+[[package]]
+name = "proc-macro-error-attr2"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "96de42df36bb9bba5542fe9f1a054b8cc87e172759a1868aa05c1f3acc89dfc5"
+dependencies = [
+ "proc-macro2",
+ "quote",
+]
+
+[[package]]
+name = "proc-macro-error2"
+version = "2.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "11ec05c52be0a07b08061f7dd003e7d7092e0472bc731b4af7bb1ef876109802"
+dependencies = [
+ "proc-macro-error-attr2",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.87",
 ]
 
 [[package]]
@@ -5501,7 +5733,23 @@ dependencies = [
  "serde_derive",
  "serde_json",
  "url",
- "validator_derive",
+ "validator_derive 0.18.2",
+]
+
+[[package]]
+name = "validator"
+version = "0.19.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d0b4a29d8709210980a09379f27ee31549b73292c87ab9899beee1c0d3be6303"
+dependencies = [
+ "idna 1.0.3",
+ "once_cell",
+ "regex",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "url",
+ "validator_derive 0.19.0",
 ]
 
 [[package]]
@@ -5513,6 +5761,20 @@ dependencies = [
  "darling",
  "once_cell",
  "proc-macro-error",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.87",
+]
+
+[[package]]
+name = "validator_derive"
+version = "0.19.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bac855a2ce6f843beb229757e6e570a42e837bcb15e5f449dd48d5747d41bf77"
+dependencies = [
+ "darling",
+ "once_cell",
+ "proc-macro-error2",
  "proc-macro2",
  "quote",
  "syn 2.0.87",
@@ -5820,7 +6082,7 @@ dependencies = [
  "js-sys",
  "log",
  "naga",
- "parking_lot 0.12.3",
+ "parking_lot 0.11.2",
  "profiling",
  "raw-window-handle 0.6.2",
  "smallvec",
@@ -5848,7 +6110,7 @@ dependencies = [
  "log",
  "naga",
  "once_cell",
- "parking_lot 0.12.3",
+ "parking_lot 0.11.2",
  "profiling",
  "raw-window-handle 0.6.2",
  "rustc-hash 1.1.0",
@@ -5890,7 +6152,7 @@ dependencies = [
  "ndk-sys 0.5.0+25.2.9519653",
  "objc",
  "once_cell",
- "parking_lot 0.12.3",
+ "parking_lot 0.11.2",
  "profiling",
  "range-alloc",
  "raw-window-handle 0.6.2",
