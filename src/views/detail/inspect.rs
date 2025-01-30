@@ -36,14 +36,14 @@ pub enum Message {
 }
 
 pub struct Information {
-    ctx: Arc<Context>,
+    ctx: Context,
     data: HashMap<String, HashMap<String, String>>,
     playbook: Arc<PlaybookSpec>,
     character: Arc<CharacterSpec>,
 }
 
 impl Information {
-    pub fn new(ctx: Arc<Context>, playbook: Arc<PlaybookSpec>, character: Arc<CharacterSpec>) -> Self {
+    pub fn new(ctx: Context, playbook: Arc<PlaybookSpec>, character: Arc<CharacterSpec>) -> Self {
         Self {
             ctx,
             data: Default::default(),

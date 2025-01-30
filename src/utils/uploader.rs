@@ -12,18 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::path::{Path, PathBuf};
-
-use amp_client::actors::Actors;
-use amp_common::sync::{EventKinds, Synchronization};
 use ignore::WalkBuilder;
+use std::path::{Path, PathBuf};
 use tar::Builder;
 use tracing::debug;
 
-use crate::errors::{Errors, Result};
+use amp_common::sync::{EventKinds, Synchronization};
+
+use crate::{
+    context::Context,
+    errors::{Errors, Result},
+};
 
 /// Upload the given directory to the server.
-pub fn upload(client: &Actors, pid: &str, actor: &str, workspace: &Path) -> Result<()> {
+pub async fn upload(ctx: &Context, pid: &str, actor: &str, workspace: &Path) -> Result<()> {
     let mut paths: Vec<(PathBuf, PathBuf)> = vec![];
 
     let base = workspace;
@@ -45,8 +47,10 @@ pub fn upload(client: &Actors, pid: &str, actor: &str, workspace: &Path) -> Resu
         attributes: None,
         payload: Some(payload),
     };
-    client
+    ctx.client()
+        .actors()
         .sync(pid, actor, req)
+        .await
         .map_err(|e| Errors::ClientError(e.to_string()))?;
 
     Ok(())

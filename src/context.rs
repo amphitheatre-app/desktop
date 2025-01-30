@@ -17,24 +17,7 @@ use amp_client::client::Client;
 use amp_common::config::{Cluster, Configuration};
 use std::sync::{Arc, RwLock};
 
-/// Context holds the current context state
-pub struct Context {
-    pub configuration: RwLock<Configuration>,
-    pub client: Arc<RwLock<Client>>,
-}
-
-impl Default for Context {
-    fn default() -> Self {
-        let configuration = Configuration::default();
-        let (_, cluster) = context(&configuration).unwrap_or_default();
-        let client = Client::new(&format!("{}/v1", &cluster.server), cluster.token.clone());
-
-        Context {
-            configuration: RwLock::new(configuration),
-            client: Arc::new(RwLock::new(client)),
-        }
-    }
-}
+pub struct Context(Arc<RwLock<ContextInner>>);
 
 impl Context {
     /// Initialize a new context
@@ -42,18 +25,63 @@ impl Context {
         let path = Configuration::path().map_err(|e| Errors::InvalidConfigPath(e.to_string()))?;
         let configuration = Configuration::load(path).map_err(|e| Errors::FailedLoadConfiguration(e.to_string()))?;
 
-        let (_, cluster) = context(&configuration)?;
+        let (_, cluster) = current(&configuration)?;
         let client = Client::new(&format!("{}/v1", &cluster.server), cluster.token.clone());
 
-        Ok(Context {
-            configuration: RwLock::new(configuration),
-            client: Arc::new(RwLock::new(client)),
-        })
+        Ok(Context(Arc::new(RwLock::new(ContextInner {
+            configuration: Arc::new(configuration),
+            client: Arc::new(client),
+        }))))
+    }
+
+    /// Get the readonly client
+    pub fn client(&self) -> Arc<Client> {
+        self.0.read().unwrap().client.clone()
+    }
+
+    /// Get the readonly configuration
+    pub fn configuration(&self) -> Arc<Configuration> {
+        self.0.read().unwrap().configuration.clone()
+    }
+
+    pub async fn switch(&mut self, name: String) -> Result<()> {
+        // read the configuration
+        let mut configuration = self.configuration();
+        let configuration = Arc::make_mut(&mut configuration);
+        let context = configuration.context.as_mut().unwrap();
+
+        // switch the context
+        context
+            .select(&name)
+            .map_err(|e| Errors::FailedSelectContext(e.to_string()))?;
+
+        // save the configuration
+        let path = Configuration::path().map_err(|e| Errors::InvalidConfigPath(e.to_string()))?;
+        configuration
+            .save(path)
+            .map_err(|e| Errors::FailedSaveConfiguration(e.to_string()))?;
+
+        // reload the context
+        *self = Context::init()?;
+
+        Ok(())
     }
 }
 
+impl Clone for Context {
+    fn clone(&self) -> Self {
+        Context(self.0.clone())
+    }
+}
+
+/// Context holds the current context state
+pub struct ContextInner {
+    configuration: Arc<Configuration>,
+    client: Arc<Client>,
+}
+
 /// Get the current context from the configuration
-fn context(configuration: &Configuration) -> Result<(String, Cluster)> {
+fn current(configuration: &Configuration) -> Result<(String, Cluster)> {
     if let Some(context) = &configuration.context {
         return context.current().ok_or(Errors::NotFoundCurrentContext);
     }

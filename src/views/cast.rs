@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::sync::Arc;
-
 use iced::widget::horizontal_space;
 use iced::{Alignment, Length, Subscription, Task};
 use iced_fonts::{Bootstrap as Icon, BOOTSTRAP_FONT as ICON_FONT};
@@ -40,7 +38,7 @@ pub enum Message {
 }
 
 impl Cast {
-    pub fn new(_ctx: Arc<Context>, playbook: PlaybookSpec) -> Self {
+    pub fn new(_ctx: Context, playbook: PlaybookSpec) -> Self {
         Self {
             playbook: playbook.clone(),
             selected_character: None,

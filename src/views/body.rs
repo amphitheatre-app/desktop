@@ -63,7 +63,7 @@ pub enum TabId {
 }
 
 impl Body {
-    pub fn new(ctx: Arc<Context>, playbook: Arc<PlaybookSpec>, character: Arc<CharacterSpec>) -> Self {
+    pub fn new(ctx: Context, playbook: Arc<PlaybookSpec>, character: Arc<CharacterSpec>) -> Self {
         Self {
             playbook: playbook.clone(),
             character: character.clone(),

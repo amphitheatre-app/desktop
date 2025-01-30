@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::sync::Arc;
 use std::time::Duration;
 use tracing::{debug, error};
 
@@ -32,7 +31,7 @@ use amp_common::resource::PlaybookSpec;
 use super::composer::{self, Composer};
 
 pub struct Sidebar {
-    ctx: Arc<Context>,
+    ctx: Context,
     query: String,
     playbooks: Vec<PlaybookSpec>,
     status: ConnectionStatus,
@@ -57,9 +56,8 @@ pub enum Message {
 }
 
 impl Sidebar {
-    pub fn new(ctx: Arc<Context>) -> Self {
-        let ctx_clone = ctx.clone();
-        let config = ctx_clone.configuration.read().unwrap();
+    pub fn new(ctx: Context) -> Self {
+        let config = ctx.configuration();
         let context = config.context.as_ref().unwrap();
         let (name, cluster) = context.current().unwrap_or_default();
         let status = ConnectionStatus::default();

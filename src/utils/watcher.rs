@@ -27,7 +27,7 @@ use crate::errors::{Errors, Result};
 use crate::utils::uploader;
 
 ///  Watch file changes and sync the changed files.
-pub fn watch(workspace: &Path, client: &Client, pid: &str, name: &str) -> Result<()> {
+pub async fn watch(workspace: &Path, client: &Client, pid: &str, name: &str) -> Result<()> {
     let (tx, rx) = std::sync::mpsc::channel();
 
     // We listen to the file changes giving Notify
@@ -52,13 +52,13 @@ pub fn watch(workspace: &Path, client: &Client, pid: &str, name: &str) -> Result
             continue;
         }
 
-        handle(client, pid, name, workspace, event)?;
+        handle(client, pid, name, workspace, event).await?;
     }
 
     Ok(())
 }
 
-fn handle(client: &Client, pid: &str, name: &str, base: &Path, event: Event) -> Result<()> {
+async fn handle(client: &Client, pid: &str, name: &str, base: &Path, event: Event) -> Result<()> {
     trace!("Changed: {:?}", event);
 
     let kind = EventKinds::from(event.kind);
@@ -96,6 +96,7 @@ fn handle(client: &Client, pid: &str, name: &str, base: &Path, event: Event) -> 
     client
         .actors()
         .sync(pid, name, req)
+        .await
         .map_err(|e| Errors::ClientError(e.to_string()))?;
 
     Ok(())

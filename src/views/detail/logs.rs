@@ -37,7 +37,7 @@ pub enum Message {
 }
 
 pub struct Logs {
-    ctx: Arc<Context>,
+    ctx: Context,
     playbook: Arc<PlaybookSpec>,
     character: Arc<CharacterSpec>,
     messages: Vec<String>,
@@ -45,7 +45,7 @@ pub struct Logs {
 }
 
 impl Logs {
-    pub fn new(ctx: Arc<Context>, playbook: Arc<PlaybookSpec>, character: Arc<CharacterSpec>) -> Self {
+    pub fn new(ctx: Context, playbook: Arc<PlaybookSpec>, character: Arc<CharacterSpec>) -> Self {
         Self {
             ctx,
             playbook,
@@ -117,9 +117,9 @@ struct Receiver {
 }
 
 impl Receiver {
-    pub fn new(ctx: Arc<Context>, pid: &str, name: &str) -> Self {
+    pub fn new(ctx: Context, pid: &str, name: &str) -> Self {
         Self {
-            es: ctx.client.read().unwrap().actors().logs(pid, name),
+            es: ctx.client().actors().logs(pid, name),
             pid: String::from(pid),
             name: String::from(name),
         }

@@ -15,8 +15,6 @@
 // Prevent console window from showing up on Windows
 #![windows_subsystem = "windows"]
 
-use std::sync::Arc;
-
 use desktop::app::App;
 use desktop::context::Context;
 use desktop::errors::{Errors::IcedError, Result};
@@ -34,7 +32,7 @@ async fn main() -> Result<()> {
         .with_env_filter(filter)
         .init();
 
-    let ctx = Arc::new(Context::init()?);
+    let ctx = Context::init()?;
     iced::application(App::title, App::update, App::view)
         .window(window::Settings {
             size: Size::new(WINDOW_INITIAL_WIDTH, WINDOW_INITIAL_HEIGHT),

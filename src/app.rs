@@ -38,7 +38,7 @@ pub enum Message {
 
 pub struct App {
     theme: Theme,
-    ctx: Arc<Context>,
+    ctx: Context,
 
     sidebar: Sidebar,
     body: Option<Body>,
@@ -49,7 +49,7 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(ctx: Arc<Context>) -> (Self, Task<Message>) {
+    pub fn new(ctx: Context) -> (Self, Task<Message>) {
         let app = Self {
             theme: Theme::default(),
             ctx: ctx.clone(),
