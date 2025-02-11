@@ -2115,17 +2115,19 @@ dependencies = [
 
 [[package]]
 name = "iced_aw"
-version = "0.11.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "42e05df3019f20c6decea93d035b32a2afc7b329d89cc5a68cca097d0e0a1889"
+checksum = "ca4a6c74757eb721f125ab40d0acfd43180807f907848b17e2ff60f3efff5d81"
 dependencies = [
  "cfg-if",
  "chrono",
+ "getrandom 0.3.1",
  "iced",
  "iced_fonts",
- "itertools 0.13.0",
+ "itertools 0.14.0",
  "num-format",
  "num-traits",
+ "web-time",
 ]
 
 [[package]]
@@ -2523,9 +2525,9 @@ dependencies = [
 
 [[package]]
 name = "itertools"
-version = "0.13.0"
+version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
+checksum = "2b192c782037fadd9cfa75548310488aabdbf3d2da73885b31bd0abd03351285"
 dependencies = [
  "either",
 ]
