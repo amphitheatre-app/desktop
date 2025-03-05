@@ -23,7 +23,7 @@ futures = "0.3"
 iced = { version = "0.13.1", features = ["tokio", "debug", "lazy"] }
 iced_aw = { version = "0.12.2" }
 iced_futures = "0.13.2"
-iced_fonts = { version = "0.1.0", features = ["bootstrap"] }
+iced_fonts = { version = "0.2.1", features = ["bootstrap"] }
 ignore = "0.4.23"
 native-dialog = { version = "0.7.0", features = ["windows_dpi_awareness", "windows_visual_styles"] }
 notify = "8.0"
