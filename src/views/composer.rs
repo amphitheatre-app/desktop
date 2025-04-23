@@ -17,7 +17,7 @@ use std::path::Path;
 use iced::widget::horizontal_space;
 use iced::{Alignment, Length};
 use iced_aw::Card;
-use native_dialog::FileDialog;
+use native_dialog::DialogBuilder;
 
 use crate::styles::{self, constants::*};
 use crate::widgets::{Button, Checkbox, Column, Container, Element, Row, Scrollable, Text, TextInput};
@@ -74,7 +74,7 @@ impl Composer {
                 Action::None
             }
             Message::SelectFileButtonPressed => {
-                if let Ok(Some(path)) = FileDialog::new().show_open_single_dir() {
+                if let Ok(Some(path)) = DialogBuilder::file().open_single_dir().show() {
                     self.form.preface = path.to_str().unwrap_or_default().to_string();
                 }
                 Action::None
