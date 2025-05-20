@@ -41,6 +41,7 @@ pub struct Sidebar {
     composer: Composer,
 }
 
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum Message {
     Initializing,

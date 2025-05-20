@@ -28,6 +28,7 @@ use crate::views::sidebar::{self, Sidebar};
 use crate::widgets::empty::empty;
 use crate::widgets::{Container, Element, Row, Rule};
 
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum Message {
     // Messages from the sub views.
