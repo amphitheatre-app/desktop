@@ -144,7 +144,7 @@ impl subscription::Recipe for Receiver {
                 Some(Ok(Event::Open)) => Some((Message::Received(String::from(OPEN_STREAM_MESSAGE)), es)),
                 Some(Ok(Event::Message(message))) => Some((Message::Received(message.data), es)),
                 Some(Err(e)) => Some((Message::Errored(e.to_string()), es)),
-                _ => Some((Message::Errored(format!("{:#?}", event)), es)),
+                _ => Some((Message::Errored(format!("{event:#?}")), es)),
             }
         })
         .boxed()
