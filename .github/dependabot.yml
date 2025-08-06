@@ -11,7 +11,10 @@ updates:
       interval: "weekly"
     labels:
       - "dependencies"
-  
+    groups:
+      amp-deps:
+        patterns: ["amp-client", "amp-common"]
+
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
