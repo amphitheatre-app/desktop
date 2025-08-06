@@ -80,45 +80,15 @@ checksum = "683d7910e743518b0e34f1186f92494becacb047c7b6bf616c96772180fef923"
 
 [[package]]
 name = "amp-client"
-version = "0.10.2"
-source = "git+https://github.com/amphitheatre-app/amp-client-rust?tag=v0.10.2#337021b06f798b38851de77286c90ebd6152e60b"
+version = "0.10.3"
+source = "git+https://github.com/amphitheatre-app/amp-client-rust?tag=v0.10.3#c5f0e8bce4cf1a24678c40dbf849cf4d6229c8eb"
 dependencies = [
- "amp-common 0.10.4",
+ "amp-common",
  "futures",
  "reqwest-eventsource",
  "serde",
  "serde_json",
  "tokio",
-]
-
-[[package]]
-name = "amp-common"
-version = "0.10.4"
-source = "git+https://github.com/amphitheatre-app/common?tag=v0.10.4#50f7b8f53db65fb381fdfc6093218ac5f82b5d55"
-dependencies = [
- "anyhow",
- "async-trait",
- "bytes",
- "confy",
- "convert_case",
- "data-encoding",
- "dirs 6.0.0",
- "json_comments",
- "k8s-openapi",
- "kube",
- "notify",
- "oci-distribution",
- "reqwest",
- "schemars",
- "serde",
- "serde_json",
- "thiserror 2.0.12",
- "tokio",
- "toml 0.8.23",
- "tracing",
- "url",
- "utoipa",
- "validator",
 ]
 
 [[package]]
@@ -144,7 +114,7 @@ dependencies = [
  "serde_json",
  "thiserror 2.0.12",
  "tokio",
- "toml 0.9.2",
+ "toml 0.9.5",
  "tracing",
  "url",
  "utoipa",
@@ -1047,7 +1017,7 @@ name = "desktop"
 version = "0.9.3"
 dependencies = [
  "amp-client",
- "amp-common 0.10.5",
+ "amp-common",
  "futures",
  "iced",
  "iced_aw",
