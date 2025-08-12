@@ -67,7 +67,7 @@ impl Stats {
         iced::time::every(Duration::from_secs(5)).map(|_| Message::Initializing)
     }
 
-    pub fn view(&self) -> Element<Message> {
+    pub fn view(&self) -> Element<'_, Message> {
         let content = Column::new()
             .push(
                 Row::new()
@@ -94,7 +94,7 @@ impl Stats {
 }
 
 impl Stats {
-    fn cell(&self, label: impl ToString, value: impl ToString) -> Element<Message> {
+    fn cell(&self, label: impl ToString, value: impl ToString) -> Element<'_, Message> {
         Container::new(
             Column::new()
                 .push(Text::new(value.to_string()).size(26))
@@ -129,7 +129,7 @@ impl Tab for Stats {
     }
 
     #[inline]
-    fn view(&self) -> Element<Self::Message> {
+    fn view(&self) -> Element<'_, Self::Message> {
         self.view()
     }
 }

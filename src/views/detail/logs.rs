@@ -77,7 +77,7 @@ impl Logs {
         ))
     }
 
-    pub fn view(&self) -> Element<Message> {
+    pub fn view(&self) -> Element<'_, Message> {
         let content = Column::with_children(
             self.messages
                 .iter()
@@ -105,7 +105,7 @@ impl Tab for Logs {
     }
 
     #[inline]
-    fn view(&self) -> Element<Self::Message> {
+    fn view(&self) -> Element<'_, Self::Message> {
         self.view()
     }
 }

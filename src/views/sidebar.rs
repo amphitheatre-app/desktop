@@ -163,7 +163,7 @@ impl Sidebar {
         iced::time::every(Duration::from_secs(5)).map(|_| Message::RefreshPlaybooks(Ok(())))
     }
 
-    pub fn view(&self) -> Element<Message> {
+    pub fn view(&self) -> Element<'_, Message> {
         let selected_playbook_id = self.selected_playbook.as_ref().map(|p| &p.id);
         let playbooks = Scrollable::new(self.playbooks.iter().fold(
             Column::new().width(Length::Fill).spacing(SPACING_NORMAL),
@@ -192,7 +192,7 @@ impl Sidebar {
 }
 
 impl Sidebar {
-    fn omnibox(&self) -> Element<Message> {
+    fn omnibox(&self) -> Element<'_, Message> {
         Row::new()
             .push(TextInput::new("Search", &self.query).on_input(Message::TextInputChanged))
             .push(self.button())
@@ -200,7 +200,7 @@ impl Sidebar {
             .into()
     }
 
-    fn button(&self) -> Element<Message> {
+    fn button(&self) -> Element<'_, Message> {
         let underlay = Button::new(
             Text::new(Icon::Plus.to_string())
                 .font(ICON_FONT)
@@ -224,7 +224,7 @@ impl Sidebar {
     }
 }
 
-fn playbook_item(playbook: &PlaybookSpec, active: bool) -> Element<Message> {
+fn playbook_item(playbook: &PlaybookSpec, active: bool) -> Element<'_, Message> {
     let icon = Text::new(Icon::Box.to_string())
         .font(ICON_FONT)
         .size(ICON_FONT_SIZE_SIDEBAR);

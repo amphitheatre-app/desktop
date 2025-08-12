@@ -69,7 +69,7 @@ impl Information {
         iced::time::every(Duration::from_secs(5)).map(|_| Message::Initializing)
     }
 
-    pub fn view(&self) -> Element<Message> {
+    pub fn view(&self) -> Element<'_, Message> {
         if self.data.is_empty() {
             return empty("No information available", None::<String>);
         }
@@ -115,7 +115,7 @@ impl Tab for Information {
     }
 
     #[inline]
-    fn view(&self) -> Element<Self::Message> {
+    fn view(&self) -> Element<'_, Self::Message> {
         self.view()
     }
 }

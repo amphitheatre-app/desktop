@@ -166,7 +166,7 @@ impl App {
         ])
     }
 
-    pub fn view(&self) -> Element<Message> {
+    pub fn view(&self) -> Element<'_, Message> {
         Container::new(
             Row::new()
                 .push(self.sidebar.view().map(Message::SidebarMessage))

@@ -108,7 +108,7 @@ impl Body {
         ])
     }
 
-    pub fn view(&self) -> Element<Message> {
+    pub fn view(&self) -> Element<'_, Message> {
         Container::new(
             Column::new()
                 .push(self.toolbar())
@@ -123,7 +123,7 @@ impl Body {
 
 impl Body {
     /// toolbar
-    fn toolbar(&self) -> Element<Message> {
+    fn toolbar(&self) -> Element<'_, Message> {
         Container::new(
             Row::new()
                 .push(self.header())
@@ -137,7 +137,7 @@ impl Body {
         .into()
     }
 
-    fn header(&self) -> Element<Message> {
+    fn header(&self) -> Element<'_, Message> {
         let mut items = vec![];
         if let Some(characters) = &self.playbook.characters {
             if characters.len() > 1 {
@@ -160,7 +160,7 @@ impl Body {
     }
 
     #[allow(dead_code)]
-    fn actions(&self) -> Element<Message> {
+    fn actions(&self) -> Element<'_, Message> {
         let button = |icon: Icon, on_press| {
             Button::new(Text::new(icon.to_string()).font(ICON_FONT).size(ICON_FONT_SIZE_TOOLBAR))
                 .style(styles::button::text)
@@ -177,7 +177,7 @@ impl Body {
             .into()
     }
 
-    fn tabs(&self) -> Element<Message> {
+    fn tabs(&self) -> Element<'_, Message> {
         Tabs::new(Message::TabSelected)
             .push(TabId::Logs, self.logs.label(), self.logs.content().map(Message::Logs))
             .push(TabId::Info, self.info.label(), self.info.content().map(Message::Info))

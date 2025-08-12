@@ -57,7 +57,7 @@ impl CharacterSwitcher {
         }
     }
 
-    pub fn view(&self) -> Element<Message> {
+    pub fn view(&self) -> Element<'_, Message> {
         let icon = Text::new(Icon::List.to_string())
             .font(ICON_FONT)
             .size(ICON_FONT_SIZE_TOOLBAR);

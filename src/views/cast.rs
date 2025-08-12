@@ -60,7 +60,7 @@ impl Cast {
         Subscription::none()
     }
 
-    pub fn view(&self) -> Element<Message> {
+    pub fn view(&self) -> Element<'_, Message> {
         let selected_character_name = self.selected_character.as_ref().map(|c| &c.meta.name);
 
         let content: Element<Message>;
@@ -98,7 +98,7 @@ impl Cast {
 
 impl Cast {
     /// toolbar
-    fn toolbar(&self) -> Element<Message> {
+    fn toolbar(&self) -> Element<'_, Message> {
         Container::new(
             Row::new()
                 .push(self.header())
@@ -112,7 +112,7 @@ impl Cast {
         .into()
     }
 
-    fn header(&self) -> Element<Message> {
+    fn header(&self) -> Element<'_, Message> {
         Row::new()
             .push(
                 Column::new().push(Text::new(&self.playbook.title)).push(
@@ -126,7 +126,7 @@ impl Cast {
             .into()
     }
 
-    fn actions(&self) -> Element<Message> {
+    fn actions(&self) -> Element<'_, Message> {
         let button = |icon: Icon, on_press| {
             Button::new(Text::new(icon.to_string()).font(ICON_FONT).size(ICON_FONT_SIZE_TOOLBAR))
                 .style(styles::button::text)
@@ -147,7 +147,7 @@ impl Cast {
     }
 }
 
-fn character_item(character: &CharacterSpec, active: bool) -> Element<Message> {
+fn character_item(character: &CharacterSpec, active: bool) -> Element<'_, Message> {
     let icon = Text::new(Icon::Box.to_string())
         .font(ICON_FONT)
         .size(ICON_FONT_SIZE_SIDEBAR);

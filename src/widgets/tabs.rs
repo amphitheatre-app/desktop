@@ -23,7 +23,7 @@ pub trait Tab {
     fn title(&self) -> String;
     fn label(&self) -> TabLabel;
 
-    fn content(&self) -> Element<Self::Message> {
+    fn content(&self) -> Element<'_, Self::Message> {
         Container::new(
             Column::new().push(Rule::horizontal(1)).push(
                 Container::new(self.view())
@@ -37,5 +37,5 @@ pub trait Tab {
         .into()
     }
 
-    fn view(&self) -> Element<Self::Message>;
+    fn view(&self) -> Element<'_, Self::Message>;
 }

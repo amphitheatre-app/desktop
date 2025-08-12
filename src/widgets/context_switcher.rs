@@ -63,7 +63,7 @@ impl ContextSwitcher {
         }
     }
 
-    pub fn view(&self) -> Element<Message> {
+    pub fn view(&self) -> Element<'_, Message> {
         let style = match self.status {
             ConnectionStatus::Connecting => styles::text::primary,
             ConnectionStatus::Connected => styles::text::success,

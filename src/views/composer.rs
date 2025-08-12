@@ -88,7 +88,7 @@ impl Composer {
         }
     }
 
-    pub fn view(&self) -> Element<Message> {
+    pub fn view(&self) -> Element<'_, Message> {
         let title = Text::new("Compose a new playbook").size(FONT_SIZE_LARGE);
         let element = Card::new(title, self.form())
             .close_size(ICON_FONT_SIZE_TOOLBAR as f32)
@@ -102,7 +102,7 @@ impl Composer {
             .into()
     }
 
-    fn form(&self) -> Element<Message> {
+    fn form(&self) -> Element<'_, Message> {
         let help = Text::new(
             "Please give your playbook a clear title and description to convey its purpose \
             and content effectively. Additionally, provide a GIT URL or local file path as the repository.",
@@ -149,7 +149,7 @@ impl Composer {
         Column::with_children(fields).spacing(SPACING_LARGE).into()
     }
 
-    fn actions(&self) -> Element<Message> {
+    fn actions(&self) -> Element<'_, Message> {
         let cancel_button = Button::new(Text::new("Cancel").style(styles::text::secondary))
             .style(styles::button::text)
             .on_press(Message::CancelButtonPressed);
