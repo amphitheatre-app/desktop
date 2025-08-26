@@ -80,8 +80,8 @@ checksum = "683d7910e743518b0e34f1186f92494becacb047c7b6bf616c96772180fef923"
 
 [[package]]
 name = "amp-client"
-version = "0.10.3"
-source = "git+https://github.com/amphitheatre-app/amp-client-rust?tag=v0.10.3#c5f0e8bce4cf1a24678c40dbf849cf4d6229c8eb"
+version = "0.10.4"
+source = "git+https://github.com/amphitheatre-app/amp-client-rust?tag=v0.10.4#908ef577d84a3358dab7d693075f5fd0c3261dd0"
 dependencies = [
  "amp-common",
  "futures",
@@ -2804,7 +2804,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "07033963ba89ebaf1584d767badaa2e8fcec21aedea6b8c0346d487d49c28667"
 dependencies = [
  "cfg-if",
- "windows-targets 0.53.3",
+ "windows-targets 0.48.5",
 ]
 
 [[package]]
@@ -6020,7 +6020,7 @@ dependencies = [
  "js-sys",
  "log",
  "naga",
- "parking_lot 0.12.4",
+ "parking_lot 0.11.2",
  "profiling",
  "raw-window-handle",
  "smallvec",
@@ -6048,7 +6048,7 @@ dependencies = [
  "log",
  "naga",
  "once_cell",
- "parking_lot 0.12.4",
+ "parking_lot 0.11.2",
  "profiling",
  "raw-window-handle",
  "rustc-hash 1.1.0",
@@ -6090,7 +6090,7 @@ dependencies = [
  "ndk-sys 0.5.0+25.2.9519653",
  "objc",
  "once_cell",
- "parking_lot 0.12.4",
+ "parking_lot 0.11.2",
  "profiling",
  "range-alloc",
  "raw-window-handle",
