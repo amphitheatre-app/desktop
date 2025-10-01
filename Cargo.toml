@@ -1,7 +1,7 @@
 [package]
 name = "desktop"
 description = "Open source GUI application that enables you to interact with Amphitheatre"
-version = "0.9.7"
+version = "0.9.8"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
