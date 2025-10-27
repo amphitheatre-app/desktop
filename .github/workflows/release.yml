@@ -65,7 +65,7 @@ jobs:
         run: cargo build --release --target ${{ matrix.target }}
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ env.BIN }}-${{ matrix.platform }}
           path: |
@@ -116,7 +116,7 @@ jobs:
           mv target/${{ matrix.target }}/debian/*.deb artifacts/${{ env.BIN }}-${{ matrix.platform }}.deb
 
       - name: Upload package artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ env.BIN }}-${{ matrix.platform }}.dmg
           path: artifacts/
@@ -165,7 +165,7 @@ jobs:
           mv target/${{ matrix.target }}/generate-rpm/*.rpm artifacts/${{ env.BIN }}-${{ matrix.platform }}.rpm
 
       - name: Upload package artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ env.BIN }}-${{ matrix.platform }}.rpm
           path: artifacts/
@@ -238,7 +238,7 @@ jobs:
             "target/release/bundle/osx/"
 
       - name: Upload package artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ env.BIN }}-${{ matrix.platform }}.dmg
           path: artifacts/
@@ -291,7 +291,7 @@ jobs:
           Move-Item -Path target\wix\*.msi -Destination .\artifacts\${{ env.BIN }}-${{ matrix.platform }}.msi
 
       - name: Upload package artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ env.BIN }}-${{ matrix.platform }}.msi
           path: artifacts/
