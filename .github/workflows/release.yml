@@ -45,7 +45,7 @@ jobs:
             os: windows
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -90,7 +90,7 @@ jobs:
             target: aarch64-unknown-linux-gnu
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Install dependencies
         run: apt-get update -y && apt-get install -y curl build-essential
@@ -139,7 +139,7 @@ jobs:
             target: aarch64-unknown-linux-gnu
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Install dependencies
         run: dnf update -y && dnf install -y @development-tools
@@ -184,7 +184,7 @@ jobs:
             target: aarch64-apple-darwin
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -257,7 +257,7 @@ jobs:
             target: x86_64-pc-windows-msvc
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Install dependencies
         shell: powershell
