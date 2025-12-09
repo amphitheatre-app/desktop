@@ -36,8 +36,7 @@ fn view(app: &App) -> Element<'_, Message, Theme> {
     app.view()
 }
 
-#[tokio::main]
-async fn main() -> Result<()> {
+fn main() -> Result<()> {
     // Initialize tracing
     std::env::set_var("RUST_LOG", "desktop=trace");
     let filter = EnvFilter::builder().from_env_lossy();
