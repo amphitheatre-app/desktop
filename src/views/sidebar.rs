@@ -16,7 +16,7 @@ use std::time::Duration;
 use tracing::{debug, error};
 
 use iced::{Alignment, Length, Subscription, Task};
-use iced_fonts::{Bootstrap as Icon, BOOTSTRAP_FONT as ICON_FONT};
+use iced_fonts::bootstrap;
 
 use crate::cmd::config::switch_context;
 use crate::cmd::playbook::{compose, refresh_playbooks};
@@ -201,13 +201,8 @@ impl Sidebar {
     }
 
     fn button(&self) -> Element<'_, Message> {
-        let underlay = Button::new(
-            Text::new(Icon::Plus.to_string())
-                .font(ICON_FONT)
-                .size(ICON_FONT_SIZE_TINY)
-                .width(Length::Fixed(20.0)),
-        )
-        .on_press(Message::CreateButtonPressed);
+        let underlay = Button::new(bootstrap::plus().size(ICON_FONT_SIZE_TINY).width(Length::Fixed(20.0)))
+            .on_press(Message::CreateButtonPressed);
 
         let _overlay = if self.show_modal {
             Some(self.composer.view().map(Message::Composer))
@@ -225,9 +220,7 @@ impl Sidebar {
 }
 
 fn playbook_item(playbook: &PlaybookSpec, active: bool) -> Element<'_, Message> {
-    let icon = Text::new(Icon::Box.to_string())
-        .font(ICON_FONT)
-        .size(ICON_FONT_SIZE_SIDEBAR);
+    let icon = bootstrap::r#box().size(ICON_FONT_SIZE_SIDEBAR);
 
     let content = Row::new()
         .push(icon)

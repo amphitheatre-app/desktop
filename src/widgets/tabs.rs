@@ -15,7 +15,7 @@
 use iced::Length;
 use iced_aw::TabLabel;
 
-use crate::widgets::{Column, Container, Element, Rule};
+use crate::widgets::{rule, Column, Container, Element};
 
 pub trait Tab {
     type Message;
@@ -25,7 +25,7 @@ pub trait Tab {
 
     fn content(&self) -> Element<'_, Self::Message> {
         Container::new(
-            Column::new().push(Rule::horizontal(1)).push(
+            Column::new().push(rule::horizontal(1)).push(
                 Container::new(self.view())
                     .width(Length::Fill)
                     .height(Length::Fill)

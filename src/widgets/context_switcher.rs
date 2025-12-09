@@ -13,7 +13,7 @@ use std::collections::HashMap;
 
 use amp_common::config::Cluster;
 use iced::{Alignment, Length};
-use iced_fonts::{Bootstrap as Icon, BOOTSTRAP_FONT as ICON_FONT};
+use iced_fonts::bootstrap;
 use tracing::debug;
 
 use crate::styles;
@@ -81,9 +81,8 @@ impl ContextSwitcher {
             .width(Length::Fill)
             .into();
 
-        let icon = Text::new(Icon::ChevronExpand.to_string())
+        let icon = bootstrap::chevron_expand()
             .style(styles::text::secondary)
-            .font(ICON_FONT)
             .size(16.0)
             .into();
 

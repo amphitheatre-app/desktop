@@ -14,7 +14,7 @@
 
 use std::path::Path;
 
-use iced::widget::horizontal_space;
+use iced::widget::space;
 use iced::{Alignment, Length};
 use iced_aw::Card;
 use native_dialog::DialogBuilder;
@@ -91,7 +91,7 @@ impl Composer {
     pub fn view(&self) -> Element<'_, Message> {
         let title = Text::new("Compose a new playbook").size(FONT_SIZE_LARGE);
         let element = Card::new(title, self.form())
-            .close_size(ICON_FONT_SIZE_TOOLBAR as f32)
+            .close_size(ICON_FONT_SIZE_TOOLBAR)
             .on_close(Message::CancelButtonPressed)
             .foot(self.actions())
             .padding(SPACING_LARGE.into());
@@ -140,7 +140,8 @@ impl Composer {
         let mut fields = vec![help, title, description, repository];
         if Path::new(&self.form.preface).exists() {
             fields.push(
-                Checkbox::new("Running in development mode", self.form.live)
+                Checkbox::new(self.form.live)
+                    .label("Running in development mode")
                     .on_toggle(Message::LiveUpdateChecked)
                     .into(),
             );
@@ -161,7 +162,7 @@ impl Composer {
         Container::new(
             Row::new()
                 .push(cancel_button)
-                .push(horizontal_space())
+                .push(space::horizontal())
                 .push(submit_button)
                 .width(Length::Fill)
                 .align_y(Alignment::Center),

@@ -25,7 +25,7 @@ use crate::cmd::actor::refresh_actor_stats;
 use crate::context::Context;
 use crate::errors::Result;
 use crate::widgets::tabs::Tab;
-use crate::widgets::{Column, Container, Element, Row, Rule, Text};
+use crate::widgets::{rule, Column, Container, Element, Row, Text};
 
 #[derive(Clone, Debug)]
 pub enum Message {
@@ -72,16 +72,16 @@ impl Stats {
             .push(
                 Row::new()
                     .push(self.cell("CPU USAGE", self.cpu_usage_value()))
-                    .push(Rule::vertical(1))
+                    .push(rule::vertical(1))
                     .push(self.cell("MEMORY USAGE", self.memory_usage_value()))
                     .width(Length::Fill)
                     .height(Length::FillPortion(5)),
             )
-            .push(Rule::horizontal(1))
+            .push(rule::horizontal(1))
             .push(
                 Row::new()
                     .push(self.cell("DISK READ/WRITE", "62.1 MB / 216 kB"))
-                    .push(Rule::vertical(1))
+                    .push(rule::vertical(1))
                     .push(self.cell("NETWORK IO", "0 Bytes / 0 Bytes"))
                     .width(Length::Fill)
                     .height(Length::FillPortion(5)),

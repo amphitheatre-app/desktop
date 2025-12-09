@@ -27,7 +27,7 @@ use crate::errors::Result;
 use crate::styles::constants::SPACING_NORMAL;
 use crate::widgets::empty::empty;
 use crate::widgets::tabs::Tab;
-use crate::widgets::{Column, Element, Row, Rule, Scrollable, Text};
+use crate::widgets::{rule, Column, Element, Row, Scrollable, Text};
 
 #[derive(Clone, Debug)]
 pub enum Message {
@@ -87,7 +87,7 @@ impl Information {
                                 .push(Text::new(value).size(14).width(Length::FillPortion(6)))
                                 .width(Length::Fill),
                         )
-                        .push(Rule::horizontal(1))
+                        .push(rule::horizontal(1))
                         .width(Length::Fill)
                         .spacing(SPACING_NORMAL)
                         .into(),

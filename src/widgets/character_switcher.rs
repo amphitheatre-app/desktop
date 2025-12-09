@@ -13,7 +13,7 @@ use std::sync::Arc;
 
 use iced::Length;
 use iced_aw::menu::{Item, Menu, MenuBar};
-use iced_fonts::{Bootstrap as Icon, BOOTSTRAP_FONT as ICON_FONT};
+use iced_fonts::bootstrap;
 use tracing::debug;
 
 use amp_common::resource::{CharacterSpec, PlaybookSpec};
@@ -58,9 +58,7 @@ impl CharacterSwitcher {
     }
 
     pub fn view(&self) -> Element<'_, Message> {
-        let icon = Text::new(Icon::List.to_string())
-            .font(ICON_FONT)
-            .size(ICON_FONT_SIZE_TOOLBAR);
+        let icon = bootstrap::list().size(ICON_FONT_SIZE_TOOLBAR);
 
         let items = if let Some(characters) = &self.playbook.characters {
             characters

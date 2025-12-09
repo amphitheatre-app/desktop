@@ -59,6 +59,7 @@ impl Default for Theme {
             text: color!(0xDFE2E6),
             primary: color!(0x79B8FF),
             success: color!(0x34CC57),
+            warning: color!(0xF0AD4E),
             danger: color!(0x79B8FF),
         };
         let extended = Extended::generate(palette);

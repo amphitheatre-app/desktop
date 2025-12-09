@@ -26,7 +26,7 @@ use crate::views::body::{self, Body};
 use crate::views::cast::{self, Cast};
 use crate::views::sidebar::{self, Sidebar};
 use crate::widgets::empty::empty;
-use crate::widgets::{Container, Element, Row, Rule};
+use crate::widgets::{rule, Container, Element, Row};
 
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
@@ -170,7 +170,7 @@ impl App {
         Container::new(
             Row::new()
                 .push(self.sidebar.view().map(Message::SidebarMessage))
-                .push(Rule::vertical(1))
+                .push(rule::vertical(1))
                 .push(
                     Container::new(if let Some(body) = &self.body {
                         body.view().map(Message::BodyMessage)

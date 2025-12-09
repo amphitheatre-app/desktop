@@ -34,8 +34,8 @@ pub fn default(theme: &Theme) -> Style {
 
     Style {
         color: palette.background.weak.color,
-        width: 1,
         radius: 0.0.into(),
         fill_mode: FillMode::Full,
+        snap: true,
     }
 }

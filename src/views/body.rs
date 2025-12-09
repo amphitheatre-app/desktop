@@ -14,9 +14,9 @@
 
 use std::sync::Arc;
 
-use iced::widget::horizontal_space;
+use iced::widget::space;
 use iced::{Alignment, Length, Subscription, Task};
-use iced_fonts::{Bootstrap as Icon, BOOTSTRAP_FONT as ICON_FONT};
+use iced_fonts::bootstrap;
 
 use amp_common::resource::{CharacterSpec, PlaybookSpec};
 
@@ -27,7 +27,7 @@ use crate::views::detail::logs::{self, Logs};
 use crate::views::detail::stats::{self, Stats};
 use crate::widgets::character_switcher::{self, *};
 use crate::widgets::tabs::Tab;
-use crate::widgets::{Button, Column, Container, Element, Row, Rule, Tabs, Text};
+use crate::widgets::{rule, Button, Column, Container, Element, Row, Tabs, Text};
 
 // #[derive(Default)]
 pub struct Body {
@@ -112,7 +112,7 @@ impl Body {
         Container::new(
             Column::new()
                 .push(self.toolbar())
-                .push(Rule::horizontal(1))
+                .push(rule::horizontal(1))
                 .push(self.tabs()),
         )
         .width(Length::Shrink)
@@ -127,7 +127,7 @@ impl Body {
         Container::new(
             Row::new()
                 .push(self.header())
-                .push(horizontal_space())
+                .push(space::horizontal())
                 // .push(self.actions())
                 .width(Length::Fill)
                 .align_y(Alignment::Center),
@@ -161,17 +161,15 @@ impl Body {
 
     #[allow(dead_code)]
     fn actions(&self) -> Element<'_, Message> {
-        let button = |icon: Icon, on_press| {
-            Button::new(Text::new(icon.to_string()).font(ICON_FONT).size(ICON_FONT_SIZE_TOOLBAR))
-                .style(styles::button::text)
-                .on_press(on_press)
-        };
-
         Row::new()
-            // .push(button(Icon::Play, Message::ButtonPressed))
-            // .push(button(Icon::Stop, Message::ButtonPressed))
-            // .push(button(Icon::ArrowRepeat, Message::ButtonPressed))
-            .push(button(Icon::X, Message::CloseButtonPressed(self.playbook.clone())))
+            // .push(Button::new(bootstrap::play().size(ICON_FONT_SIZE_TOOLBAR)).style(styles::button::text).on_press(Message::ButtonPressed))
+            // .push(Button::new(bootstrap::stop().size(ICON_FONT_SIZE_TOOLBAR)).style(styles::button::text).on_press(Message::ButtonPressed))
+            // .push(Button::new(bootstrap::arrow_repeat().size(ICON_FONT_SIZE_TOOLBAR)).style(styles::button::text).on_press(Message::ButtonPressed))
+            .push(
+                Button::new(bootstrap::x().size(ICON_FONT_SIZE_TOOLBAR))
+                    .style(styles::button::text)
+                    .on_press(Message::CloseButtonPressed(self.playbook.clone())),
+            )
             .align_y(Alignment::Center)
             .spacing(SPACING_SMALL)
             .into()

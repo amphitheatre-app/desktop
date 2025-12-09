@@ -37,6 +37,7 @@ pub mod menu {
 
 pub type Row<'a, Message> = iced::widget::Row<'a, Message, Theme>;
 pub type Rule<'a> = iced::widget::Rule<'a, Theme>;
+pub use iced::widget::rule;
 pub type Scrollable<'a, Message> = iced::widget::Scrollable<'a, Message, Theme>;
 pub type Tabs<'a, Message, TabId> = iced_aw::Tabs<'a, Message, TabId, Theme>;
 pub type Text<'a> = iced::widget::Text<'a, Theme>;

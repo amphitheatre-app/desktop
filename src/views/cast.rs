@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use iced::widget::horizontal_space;
+use iced::widget::space;
 use iced::{Alignment, Length, Subscription, Task};
-use iced_fonts::{Bootstrap as Icon, BOOTSTRAP_FONT as ICON_FONT};
+use iced_fonts::bootstrap;
 
 use amp_common::resource::{CharacterSpec, PlaybookSpec};
 
 use crate::context::Context;
 use crate::styles::{self, constants::*};
 use crate::widgets::empty::empty;
-use crate::widgets::{Button, Column, Container, Element, Row, Rule, Scrollable, Text};
+use crate::widgets::{rule, Button, Column, Container, Element, Row, Scrollable, Text};
 
 // #[derive(Default)]
 pub struct Cast {
@@ -87,7 +87,7 @@ impl Cast {
         Container::new(
             Column::new()
                 .push(self.toolbar())
-                .push(Rule::horizontal(1))
+                .push(rule::horizontal(1))
                 .push(content),
         )
         .width(Length::Shrink)
@@ -102,7 +102,7 @@ impl Cast {
         Container::new(
             Row::new()
                 .push(self.header())
-                .push(horizontal_space())
+                .push(space::horizontal())
                 .push(self.actions())
                 .width(Length::Fill)
                 .align_y(Alignment::Center),
@@ -127,20 +127,15 @@ impl Cast {
     }
 
     fn actions(&self) -> Element<'_, Message> {
-        let button = |icon: Icon, on_press| {
-            Button::new(Text::new(icon.to_string()).font(ICON_FONT).size(ICON_FONT_SIZE_TOOLBAR))
-                .style(styles::button::text)
-                .on_press(on_press)
-        };
-
         Row::new()
-            // .push(button(Icon::Play, Message::ButtonPressed))
-            // .push(button(Icon::Stop, Message::ButtonPressed))
-            // .push(button(Icon::ArrowRepeat, Message::ButtonPressed))
-            .push(button(
-                Icon::X,
-                Message::CloseButtonPressed(Box::new(self.playbook.clone())),
-            ))
+            // .push(Button::new(bootstrap::play().size(ICON_FONT_SIZE_TOOLBAR)).style(styles::button::text).on_press(Message::ButtonPressed))
+            // .push(Button::new(bootstrap::stop().size(ICON_FONT_SIZE_TOOLBAR)).style(styles::button::text).on_press(Message::ButtonPressed))
+            // .push(Button::new(bootstrap::arrow_repeat().size(ICON_FONT_SIZE_TOOLBAR)).style(styles::button::text).on_press(Message::ButtonPressed))
+            .push(
+                Button::new(bootstrap::x().size(ICON_FONT_SIZE_TOOLBAR))
+                    .style(styles::button::text)
+                    .on_press(Message::CloseButtonPressed(Box::new(self.playbook.clone()))),
+            )
             .align_y(Alignment::Center)
             .spacing(SPACING_SMALL)
             .into()
@@ -148,9 +143,7 @@ impl Cast {
 }
 
 fn character_item(character: &CharacterSpec, active: bool) -> Element<'_, Message> {
-    let icon = Text::new(Icon::Box.to_string())
-        .font(ICON_FONT)
-        .size(ICON_FONT_SIZE_SIDEBAR);
+    let icon = bootstrap::r#box().size(ICON_FONT_SIZE_SIDEBAR);
 
     let content = Row::new()
         .push(icon)

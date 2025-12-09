@@ -12,26 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub const SPACING_SMALL: u16 = 5;
-pub const SPACING_NORMAL: u16 = 10;
-pub const SPACING_LARGE: u16 = 20;
-pub const SPACING_EXTRA_LARGE: u16 = 40;
+pub const SPACING_SMALL: f32 = 5.0;
+pub const SPACING_NORMAL: f32 = 10.0;
+pub const SPACING_LARGE: f32 = 20.0;
+pub const SPACING_EXTRA_LARGE: f32 = 40.0;
 
 pub const FONT_SIZE_SMALLER: f32 = 12.0;
 pub const FONT_SIZE_SMALL: f32 = 13.0;
 pub const FONT_SIZE_STANDARD: f32 = 14.0;
 pub const FONT_SIZE_LARGE: f32 = 20.0;
 
-pub const ICON_FONT_SIZE_TINY: u16 = 16;
-pub const ICON_FONT_SIZE_SMALLER: u16 = 20;
-pub const ICON_FONT_SIZE_SMALL: u16 = 24;
-pub const ICON_FONT_SIZE_MEDIUM: u16 = 34;
-pub const ICON_FONT_SIZE_BIG: u16 = 96;
+pub const ICON_FONT_SIZE_TINY: f32 = 16.0;
+pub const ICON_FONT_SIZE_SMALLER: f32 = 20.0;
+pub const ICON_FONT_SIZE_SMALL: f32 = 24.0;
+pub const ICON_FONT_SIZE_MEDIUM: f32 = 34.0;
+pub const ICON_FONT_SIZE_BIG: f32 = 96.0;
 
-pub const ICON_FONT_SIZE_SIDEBAR: u16 = 14;
-pub const ICON_FONT_SIZE_TOOLBAR: u16 = 24;
+pub const ICON_FONT_SIZE_SIDEBAR: f32 = 14.0;
+pub const ICON_FONT_SIZE_TOOLBAR: f32 = 24.0;
 
-pub const SIDEBAR_WIDTH: u16 = 220;
+pub const SIDEBAR_WIDTH: f32 = 220.0;
 
 pub const WINDOW_INITIAL_WIDTH: f32 = 1028.0;
 pub const WINDOW_INITIAL_HEIGHT: f32 = 640.0;

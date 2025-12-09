@@ -15,9 +15,9 @@
 use iced::{
     widget::{
         container,
-        scrollable::{Catalog, Rail, Scroller, Status, Style, StyleFn},
+        scrollable::{AutoScroll, Catalog, Rail, Scroller, Status, Style, StyleFn},
     },
-    Border,
+    Border, Color, Shadow,
 };
 
 use super::Theme;
@@ -42,25 +42,34 @@ pub fn default(theme: &Theme, status: Status) -> Style {
         background: Some(palette.background.weak.color.into()),
         border: Border::default(),
         scroller: Scroller {
-            color: palette.background.strong.color,
+            background: palette.background.strong.color.into(),
             border: Border::default(),
         },
     };
 
+    let auto_scroll = AutoScroll {
+        background: palette.background.base.color.into(),
+        border: Border::default(),
+        shadow: Shadow::default(),
+        icon: Color::WHITE,
+    };
+
     match status {
-        Status::Active => Style {
+        Status::Active { .. } => Style {
             container: container::Style::default(),
             vertical_rail: scrollbar,
             horizontal_rail: scrollbar,
             gap: None,
+            auto_scroll,
         },
         Status::Hovered {
             is_horizontal_scrollbar_hovered,
             is_vertical_scrollbar_hovered,
+            ..
         } => {
             let hovered_scrollbar = Rail {
                 scroller: Scroller {
-                    color: palette.primary.strong.color,
+                    background: palette.primary.strong.color.into(),
                     ..scrollbar.scroller
                 },
                 ..scrollbar
@@ -79,15 +88,17 @@ pub fn default(theme: &Theme, status: Status) -> Style {
                     scrollbar
                 },
                 gap: None,
+                auto_scroll,
             }
         }
         Status::Dragged {
             is_horizontal_scrollbar_dragged,
             is_vertical_scrollbar_dragged,
+            ..
         } => {
             let dragged_scrollbar = Rail {
                 scroller: Scroller {
-                    color: palette.primary.base.color,
+                    background: palette.primary.base.color.into(),
                     ..scrollbar.scroller
                 },
                 ..scrollbar
@@ -106,6 +117,7 @@ pub fn default(theme: &Theme, status: Status) -> Style {
                     scrollbar
                 },
                 gap: None,
+                auto_scroll,
             }
         }
     }

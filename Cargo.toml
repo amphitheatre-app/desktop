@@ -20,10 +20,11 @@ path = "src/main.rs"
 amp-client = { git = "https://github.com/amphitheatre-app/amp-client-rust", tag = "v0.10.6" }
 amp-common = { git = "https://github.com/amphitheatre-app/common", tag = "v0.10.7" }
 futures = "0.3"
-iced = { version = "0.14", features = ["tokio", "debug", "lazy"] }
+iced = { version = "0.14", features = ["tokio", "debug", "lazy", "advanced"] }
 iced_aw = { version = "0.13" }
 iced_futures = "0.14"
 iced_fonts = { version = "0.3", features = ["bootstrap"] }
+iced_runtime = "0.14"
 ignore = "0.4"
 native-dialog = { version = "0.9", features = ["windows_dpi_awareness", "windows_visual_styles"] }
 notify = "8"

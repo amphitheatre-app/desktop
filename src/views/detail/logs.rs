@@ -16,11 +16,14 @@ use std::hash::Hash;
 use std::sync::Arc;
 
 use futures::StreamExt;
-use iced::widget::scrollable;
+use iced::advanced::widget::operation::scrollable as scrollable_op;
+use iced::widget::scrollable::RelativeOffset;
+use iced::widget::Id;
 use iced::{Font, Length, Subscription, Task};
 use iced_aw::TabLabel;
 use iced_futures::subscription::{from_recipe, Hasher};
 use iced_futures::{subscription, BoxStream};
+use iced_runtime::task::widget as task_widget;
 use reqwest_eventsource::Event;
 
 use amp_common::resource::{CharacterSpec, PlaybookSpec};
@@ -41,7 +44,7 @@ pub struct Logs {
     playbook: Arc<PlaybookSpec>,
     character: Arc<CharacterSpec>,
     messages: Vec<String>,
-    scrollable_id: scrollable::Id,
+    scrollable_id: Id,
 }
 
 impl Logs {
@@ -51,7 +54,7 @@ impl Logs {
             playbook,
             character,
             messages: vec![],
-            scrollable_id: scrollable::Id::unique(),
+            scrollable_id: Id::unique(),
         }
     }
 
@@ -59,11 +62,17 @@ impl Logs {
         match message {
             Message::Received(message) => {
                 self.messages.push(message);
-                scrollable::snap_to(self.scrollable_id.clone(), scrollable::RelativeOffset::END)
+                task_widget(scrollable_op::snap_to(
+                    self.scrollable_id.clone(),
+                    RelativeOffset::END.into(),
+                ))
             }
             Message::Errored(message) => {
                 self.messages.push(message);
-                scrollable::snap_to(self.scrollable_id.clone(), scrollable::RelativeOffset::END)
+                task_widget(scrollable_op::snap_to(
+                    self.scrollable_id.clone(),
+                    RelativeOffset::END.into(),
+                ))
             }
         }
     }

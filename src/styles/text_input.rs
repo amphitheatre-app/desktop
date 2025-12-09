@@ -57,7 +57,7 @@ pub fn default(theme: &Theme, status: Status) -> Style {
             },
             ..active
         },
-        Status::Focused => Style {
+        Status::Focused { .. } => Style {
             border: Border {
                 color: palette.primary.strong.color,
                 ..active.border

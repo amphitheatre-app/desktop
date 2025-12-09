@@ -15,12 +15,26 @@
 // Prevent console window from showing up on Windows
 #![windows_subsystem = "windows"]
 
-use desktop::app::App;
+use desktop::app::{App, Message};
 use desktop::context::Context;
 use desktop::errors::{Errors::IcedError, Result};
 use desktop::styles::constants::*;
-use iced::{window, Size};
+use desktop::styles::Theme;
+use iced::{window, Element, Size, Task};
 use tracing_subscriber::EnvFilter;
+
+fn boot() -> (App, Task<Message>) {
+    let ctx = Context::init().expect("Failed to initialize context");
+    App::new(ctx)
+}
+
+fn update(app: &mut App, message: Message) -> Task<Message> {
+    app.update(message)
+}
+
+fn view(app: &App) -> Element<'_, Message, Theme> {
+    app.view()
+}
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -32,8 +46,8 @@ async fn main() -> Result<()> {
         .with_env_filter(filter)
         .init();
 
-    let ctx = Context::init()?;
-    iced::application(App::title, App::update, App::view)
+    iced::application(boot, update, view)
+        .title(App::title)
         .window(window::Settings {
             size: Size::new(WINDOW_INITIAL_WIDTH, WINDOW_INITIAL_HEIGHT),
             min_size: Some(Size::new(WINDOW_INITIAL_WIDTH, WINDOW_INITIAL_HEIGHT)),
@@ -43,6 +57,6 @@ async fn main() -> Result<()> {
         .font(iced_fonts::BOOTSTRAP_FONT_BYTES)
         .theme(App::theme)
         .centered()
-        .run_with(|| App::new(ctx))
+        .run()
         .map_err(|e| IcedError(e.to_string()))
 }
