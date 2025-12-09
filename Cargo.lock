@@ -1099,7 +1099,7 @@ dependencies = [
  "futures",
  "iced 0.14.0",
  "iced_aw",
- "iced_fonts 0.2.1",
+ "iced_fonts 0.3.0",
  "iced_futures 0.13.2",
  "ignore",
  "native-dialog",
@@ -2329,12 +2329,25 @@ dependencies = [
 
 [[package]]
 name = "iced_fonts"
-version = "0.2.1"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7db9d45e87bc3ac22ff82e2d9dea9139f1c055137f1e0f39df3d68110fcee7a9"
+checksum = "214cff7c8499e328774216690e58e315a1a5f8f6fdd1035aed6298e62ffc4c1d"
 dependencies = [
- "iced_core 0.13.2",
- "iced_widget 0.13.4",
+ "iced_core 0.14.0",
+ "iced_fonts_macros",
+ "iced_widget 0.14.1",
+]
+
+[[package]]
+name = "iced_fonts_macros"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7ef5125e110cb19cd1910a28298661c98c5d9ab02eef43594968352940e8752e"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.109",
+ "ttf-parser 0.25.1",
 ]
 
 [[package]]
