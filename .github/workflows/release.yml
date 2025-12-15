@@ -103,7 +103,7 @@ jobs:
       - name: Install packaging tools
         run: cargo install cargo-deb
 
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           name: ${{ env.BIN }}-${{ matrix.platform }}
           path: target/
@@ -152,7 +152,7 @@ jobs:
       - name: Install packaging tools
         run: cargo install cargo-generate-rpm
 
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           name: ${{ env.BIN }}-${{ matrix.platform }}
           path: target/
@@ -194,7 +194,7 @@ jobs:
           cargo install toml-cli
           brew install create-dmg
 
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           name: ${{ env.BIN }}-${{ matrix.platform }}
           path: target/
@@ -278,7 +278,7 @@ jobs:
       - name: Install packaging tools
         run: cargo install cargo-wix
 
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           name: ${{ env.BIN }}-${{ matrix.platform }}
           path: target/
@@ -302,7 +302,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           pattern: ${{ env.BIN }}-*.*
           merge-multiple: true
