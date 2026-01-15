@@ -958,7 +958,7 @@ dependencies = [
 
 [[package]]
 name = "desktop"
-version = "0.10.1"
+version = "0.10.2"
 dependencies = [
  "amp-client",
  "amp-common",
