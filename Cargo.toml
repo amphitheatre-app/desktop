@@ -17,7 +17,7 @@ name = "amphitheatre-desktop"
 path = "src/main.rs"
 
 [dependencies]
-amp-client = { git = "https://github.com/amphitheatre-app/amp-client-rust", tag = "v0.10.6" }
+amp-client = { git = "https://github.com/amphitheatre-app/amp-client-rust", tag = "v0.11.0" }
 amp-common = { git = "https://github.com/amphitheatre-app/common", tag = "v0.11.0" }
 futures = "0.3"
 iced = { version = "0.14", features = ["tokio", "debug", "lazy", "advanced"] }
