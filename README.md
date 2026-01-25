@@ -2,8 +2,8 @@
 
 # Amphitheatre Desktop
 
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/amphitheatre-app/desktop/ci.yml?branch=master)
-[![License](https://img.shields.io/github/license/amphitheatre-app/desktop)](https://github.com/amphitheatre-app/desktop/blob/master/LICENSE)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/amphitheatre-app/desktop/ci.yml?branch=main)
+[![License](https://img.shields.io/github/license/amphitheatre-app/desktop)](https://github.com/amphitheatre-app/desktop/blob/main/LICENSE)
 [![GitHub contributors](https://img.shields.io/github/contributors/amphitheatre-app/desktop)](https://github.com/amphitheatre-app/desktop/graphs/contributors)
 [![GitHub issues](https://img.shields.io/github/issues/amphitheatre-app/desktop)](https://github.com/amphitheatre-app/desktop/issues)
 [![GitHub downloads](https://img.shields.io/github/downloads/amphitheatre-app/desktop/total)](https://github.com/amphitheatre-app/desktop/releases/latest)
