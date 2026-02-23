@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use rand::{rng, Rng};
+use rand::{rng, RngExt};
 
 pub fn generate_random_word(length: usize) -> String {
     let mut rng = rng();
