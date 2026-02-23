@@ -28,7 +28,7 @@ iced_runtime = "0.14"
 ignore = "0.4"
 native-dialog = { version = "0.9", features = ["windows_dpi_awareness", "windows_visual_styles"] }
 notify = "8"
-rand = "0.9"
+rand = "0.10"
 reqwest-eventsource = "0.6"
 serde_json = "1"
 tar = "0.4"
