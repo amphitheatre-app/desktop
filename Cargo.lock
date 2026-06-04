@@ -2971,13 +2971,12 @@ dependencies = [
 
 [[package]]
 name = "native-dialog"
-version = "0.9.6"
+version = "0.9.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b2373fb763ea6962e8c586571c7f9c5d8c995f9777cbdebbe0180263691bd4b"
+checksum = "971a75894502033d79718a00a86e03595caa1a3620e0cba1985a5fde8d2e0b66"
 dependencies = [
  "ascii",
  "block2 0.6.2",
- "dirs",
  "dispatch2",
  "formatx",
  "objc2 0.6.4",
