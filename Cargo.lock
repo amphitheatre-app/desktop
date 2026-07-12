@@ -57,43 +57,12 @@ name = "amp-client"
 version = "0.11.3"
 source = "git+https://github.com/amphitheatre-app/amp-client-rust?tag=v0.11.3#4e7adced5ceec5d7d8b1e74d90555105834756d7"
 dependencies = [
- "amp-common 0.12.0",
+ "amp-common",
  "futures",
  "reqwest-eventsource",
  "serde",
  "serde_json",
  "tokio",
-]
-
-[[package]]
-name = "amp-common"
-version = "0.11.1"
-source = "git+https://github.com/amphitheatre-app/common?tag=v0.11.1#0a74d1d34f24b4c4af531f805e3346e912c2b3e3"
-dependencies = [
- "anyhow",
- "async-trait",
- "bytes",
- "confy",
- "convert_case",
- "data-encoding",
- "dirs",
- "jiff",
- "json_comments",
- "k8s-openapi 0.27.1",
- "kube 3.0.1",
- "notify",
- "oci-distribution",
- "reqwest 0.13.2",
- "schemars",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "tokio",
- "toml 1.1.2+spec-1.1.0",
- "tracing",
- "url",
- "utoipa",
- "validator",
 ]
 
 [[package]]
@@ -110,8 +79,8 @@ dependencies = [
  "dirs",
  "jiff",
  "json_comments",
- "k8s-openapi 0.28.0",
- "kube 4.0.0",
+ "k8s-openapi",
+ "kube",
  "notify",
  "oci-distribution",
  "reqwest 0.13.2",
@@ -1022,7 +991,7 @@ name = "desktop"
 version = "0.11.8"
 dependencies = [
  "amp-client",
- "amp-common 0.11.1",
+ "amp-common",
  "futures",
  "iced",
  "iced_aw",
@@ -2589,19 +2558,6 @@ dependencies = [
 
 [[package]]
 name = "k8s-openapi"
-version = "0.27.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "51b326f5219dd55872a72c1b6ddd1b830b8334996c667449c29391d657d78d5e"
-dependencies = [
- "base64 0.22.1",
- "jiff",
- "schemars",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "k8s-openapi"
 version = "0.28.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d9c6922f6afe80418dd6019818af5d0d34584c371780ff09b9752370c25b4abb"
@@ -2652,63 +2608,15 @@ dependencies = [
 
 [[package]]
 name = "kube"
-version = "3.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f96b537b4c4f61fc183594edbecbbefa3037e403feac0701bb24e6eff78e0034"
-dependencies = [
- "k8s-openapi 0.27.1",
- "kube-client 3.0.1",
- "kube-core 3.0.1",
- "kube-derive 3.0.1",
- "kube-runtime 3.0.1",
-]
-
-[[package]]
-name = "kube"
 version = "4.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4bb9108095346a7096d11feeaff419c75dddcac1b2f59acb38d7bf3d13c3e146"
 dependencies = [
- "k8s-openapi 0.28.0",
- "kube-client 4.0.0",
- "kube-core 4.0.0",
- "kube-derive 4.0.0",
- "kube-runtime 4.0.0",
-]
-
-[[package]]
-name = "kube-client"
-version = "3.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "af97b8b696eb737e5694f087c498ca725b172c2a5bc3a6916328d160225537ee"
-dependencies = [
- "base64 0.22.1",
- "bytes",
- "either",
- "futures",
- "http",
- "http-body",
- "http-body-util",
- "hyper",
- "hyper-rustls",
- "hyper-timeout",
- "hyper-util",
- "jiff",
- "jsonpath-rust",
- "k8s-openapi 0.27.1",
- "kube-core 3.0.1",
- "pem",
- "rustls",
- "secrecy",
- "serde",
- "serde_json",
- "serde_yaml",
- "thiserror 2.0.18",
- "tokio",
- "tokio-util",
- "tower",
- "tower-http",
- "tracing",
+ "k8s-openapi",
+ "kube-client",
+ "kube-core",
+ "kube-derive",
+ "kube-runtime",
 ]
 
 [[package]]
@@ -2730,8 +2638,8 @@ dependencies = [
  "hyper-util",
  "jiff",
  "jsonpath-rust",
- "k8s-openapi 0.28.0",
- "kube-core 4.0.0",
+ "k8s-openapi",
+ "kube-core",
  "pem",
  "rustls",
  "secrecy",
@@ -2748,25 +2656,6 @@ dependencies = [
 
 [[package]]
 name = "kube-core"
-version = "3.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e7aeade7d2e9f165f96b3c1749ff01a8e2dc7ea954bd333bcfcecc37d5226bdd"
-dependencies = [
- "derive_more",
- "form_urlencoded",
- "http",
- "jiff",
- "json-patch",
- "k8s-openapi 0.27.1",
- "schemars",
- "serde",
- "serde-value",
- "serde_json",
- "thiserror 2.0.18",
-]
-
-[[package]]
-name = "kube-core"
 version = "4.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c1b02f5933ba06140d58c7d6727f6c319f0962ec6a344aa5e21e475e891deaa8"
@@ -2776,26 +2665,12 @@ dependencies = [
  "http",
  "jiff",
  "json-patch",
- "k8s-openapi 0.28.0",
+ "k8s-openapi",
  "schemars",
  "serde",
  "serde-value",
  "serde_json",
  "thiserror 2.0.18",
-]
-
-[[package]]
-name = "kube-derive"
-version = "3.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c98f59f4e68864624a0b993a1cc2424439ab7238eaede5c299e89943e2a093ff"
-dependencies = [
- "darling 0.23.0",
- "proc-macro2",
- "quote",
- "serde",
- "serde_json",
- "syn",
 ]
 
 [[package]]
@@ -2814,33 +2689,6 @@ dependencies = [
 
 [[package]]
 name = "kube-runtime"
-version = "3.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fc158473d6d86ec22692874bd5ddccf07474eab5c6bb41f226c522e945da5244"
-dependencies = [
- "ahash",
- "async-broadcast",
- "async-stream",
- "backon",
- "educe",
- "futures",
- "hashbrown 0.16.1",
- "hostname",
- "json-patch",
- "k8s-openapi 0.27.1",
- "kube-client 3.0.1",
- "parking_lot",
- "pin-project",
- "serde",
- "serde_json",
- "thiserror 2.0.18",
- "tokio",
- "tokio-util",
- "tracing",
-]
-
-[[package]]
-name = "kube-runtime"
 version = "4.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "99ddec66c540c7cf29a5b41fe4a657a53687f95c346e03bdf00585b70a1bab21"
@@ -2854,8 +2702,8 @@ dependencies = [
  "hashbrown 0.16.1",
  "hostname",
  "json-patch",
- "k8s-openapi 0.28.0",
- "kube-client 4.0.0",
+ "k8s-openapi",
+ "kube-client",
  "parking_lot",
  "pin-project",
  "serde",
@@ -4787,19 +4635,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "serde_yaml"
-version = "0.9.34+deprecated"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6a8b1a1a2ebf674015cc02edccce75287f1a0130d394307b36743c2f5d504b47"
-dependencies = [
- "indexmap",
- "itoa",
- "ryu",
- "serde",
- "unsafe-libyaml",
-]
-
-[[package]]
 name = "sha2"
 version = "0.10.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5553,12 +5388,6 @@ name = "unicode-xid"
 version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ebc1c04c71510c7f702b52b7c350734c9ff1295c464a03335b00bb84fc54f853"
-
-[[package]]
-name = "unsafe-libyaml"
-version = "0.2.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "673aac59facbab8a9007c7f6108d11f63b603f7cabff99fabf650fea5c32b861"
 
 [[package]]
 name = "untrusted"
