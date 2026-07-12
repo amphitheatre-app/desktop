@@ -26,7 +26,7 @@ impl Context {
         let configuration = Configuration::load(path).map_err(|e| Errors::FailedLoadConfiguration(e.to_string()))?;
 
         let (_, cluster) = current(&configuration)?;
-        let client = Client::new(&format!("{}/v1", &cluster.server), cluster.token.clone());
+        let client = Client::new(&format!("{}/v1", cluster.server), cluster.token.clone());
 
         Ok(Context(Arc::new(RwLock::new(ContextInner {
             configuration: Arc::new(configuration),
