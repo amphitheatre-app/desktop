@@ -57,7 +57,7 @@ name = "amp-client"
 version = "0.11.3"
 source = "git+https://github.com/amphitheatre-app/amp-client-rust?tag=v0.11.3#4e7adced5ceec5d7d8b1e74d90555105834756d7"
 dependencies = [
- "amp-common",
+ "amp-common 0.12.0",
  "futures",
  "reqwest-eventsource",
  "serde",
@@ -93,7 +93,38 @@ dependencies = [
  "tracing",
  "url",
  "utoipa",
- "validator",
+ "validator 0.20.0",
+]
+
+[[package]]
+name = "amp-common"
+version = "0.12.1"
+source = "git+https://github.com/amphitheatre-app/common?tag=v0.12.1#5d08840d74a317e3c2d2dc07936cd09fc158e660"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "bytes",
+ "confy",
+ "convert_case",
+ "data-encoding",
+ "dirs",
+ "jiff",
+ "json_comments",
+ "k8s-openapi",
+ "kube",
+ "notify",
+ "oci-distribution",
+ "reqwest 0.13.2",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.19",
+ "tokio",
+ "toml 1.1.4+spec-1.1.0",
+ "tracing",
+ "url",
+ "utoipa",
+ "validator 0.21.0",
 ]
 
 [[package]]
@@ -991,7 +1022,7 @@ name = "desktop"
 version = "0.11.12"
 dependencies = [
  "amp-client",
- "amp-common",
+ "amp-common 0.12.1",
  "futures",
  "iced",
  "iced_aw",
@@ -1954,7 +1985,7 @@ dependencies = [
  "js-sys",
  "log",
  "wasm-bindgen",
- "windows-core 0.62.2",
+ "windows-core 0.58.0",
 ]
 
 [[package]]
@@ -5468,6 +5499,21 @@ checksum = "43fb22e1a008ece370ce08a3e9e4447a910e92621bb49b85d6e48a45397e7cfa"
 dependencies = [
  "idna",
  "once_cell",
+ "regex",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "url",
+ "validator_derive",
+]
+
+[[package]]
+name = "validator"
+version = "0.21.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c3d68c6633c483df6780cc5277a417c7c2d1bceee2649d06c8ab6b0fd2dd3c81"
+dependencies = [
+ "idna",
  "regex",
  "serde",
  "serde_derive",
