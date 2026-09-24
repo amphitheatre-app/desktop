@@ -57,7 +57,7 @@ name = "amp-client"
 version = "0.11.4"
 source = "git+https://github.com/amphitheatre-app/amp-client-rust?tag=v0.11.4#a783fe4942ca733d59bcb3cf94fa5067cdea4b52"
 dependencies = [
- "amp-common",
+ "amp-common 0.12.1",
  "futures",
  "reqwest-eventsource",
  "serde",
@@ -74,9 +74,40 @@ dependencies = [
  "async-trait",
  "bytes",
  "confy",
- "convert_case",
+ "convert_case 0.11.0",
  "data-encoding",
- "dirs",
+ "dirs 6.0.0",
+ "jiff",
+ "json_comments",
+ "k8s-openapi",
+ "kube",
+ "notify",
+ "oci-distribution",
+ "reqwest 0.13.2",
+ "schemars",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.20",
+ "tokio",
+ "toml 1.1.6+spec-1.1.0",
+ "tracing",
+ "url",
+ "utoipa",
+ "validator",
+]
+
+[[package]]
+name = "amp-common"
+version = "0.12.2"
+source = "git+https://github.com/amphitheatre-app/common?tag=v0.12.2#de0286dd098febdad2a0241e25589efccbef7060"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "bytes",
+ "confy",
+ "convert_case 0.12.0",
+ "data-encoding",
+ "dirs 7.0.0",
  "jiff",
  "json_comments",
  "k8s-openapi",
@@ -713,6 +744,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "convert_case"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1af709f1f33454bf52eadfc8c78b3b9ef9cb26fb54d16dc9cd9a7299f899fd1b"
+dependencies = [
+ "unicode-segmentation",
+]
+
+[[package]]
 name = "core-foundation"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -991,7 +1031,7 @@ name = "desktop"
 version = "0.11.14"
 dependencies = [
  "amp-client",
- "amp-common",
+ "amp-common 0.12.2",
  "futures",
  "iced",
  "iced_aw",
@@ -1028,6 +1068,15 @@ name = "dirs"
 version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3e8aa94d75141228480295a7d0e7feb620b1a5ad9f12bc40be62411e38cce4e"
+dependencies = [
+ "dirs-sys",
+]
+
+[[package]]
+name = "dirs"
+version = "7.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8d57d423b3c82e89b9a24ca3091fee61f456a26edbd28d26c65906f4bc1dcd8f"
 dependencies = [
  "dirs-sys",
 ]
@@ -1954,7 +2003,7 @@ dependencies = [
  "js-sys",
  "log",
  "wasm-bindgen",
- "windows-core 0.62.2",
+ "windows-core 0.58.0",
 ]
 
 [[package]]
