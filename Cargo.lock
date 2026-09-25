@@ -54,8 +54,8 @@ checksum = "683d7910e743518b0e34f1186f92494becacb047c7b6bf616c96772180fef923"
 
 [[package]]
 name = "amp-client"
-version = "0.11.4"
-source = "git+https://github.com/amphitheatre-app/amp-client-rust?tag=v0.11.4#a783fe4942ca733d59bcb3cf94fa5067cdea4b52"
+version = "0.11.5"
+source = "git+https://github.com/amphitheatre-app/amp-client-rust?tag=v0.11.5#3fd08302dba6f7d956269217cc1cdb56e2b6f520"
 dependencies = [
  "amp-common",
  "futures",
@@ -67,8 +67,8 @@ dependencies = [
 
 [[package]]
 name = "amp-common"
-version = "0.12.1"
-source = "git+https://github.com/amphitheatre-app/common?tag=v0.12.1#5d08840d74a317e3c2d2dc07936cd09fc158e660"
+version = "0.12.2"
+source = "git+https://github.com/amphitheatre-app/common?tag=v0.12.2#de0286dd098febdad2a0241e25589efccbef7060"
 dependencies = [
  "anyhow",
  "async-trait",
@@ -705,9 +705,9 @@ dependencies = [
 
 [[package]]
 name = "convert_case"
-version = "0.11.0"
+version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "affbf0190ed2caf063e3def54ff444b449371d55c58e513a95ab98eca50adb49"
+checksum = "1af709f1f33454bf52eadfc8c78b3b9ef9cb26fb54d16dc9cd9a7299f899fd1b"
 dependencies = [
  "unicode-segmentation",
 ]
@@ -1025,9 +1025,9 @@ dependencies = [
 
 [[package]]
 name = "dirs"
-version = "6.0.0"
+version = "7.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c3e8aa94d75141228480295a7d0e7feb620b1a5ad9f12bc40be62411e38cce4e"
+checksum = "8d57d423b3c82e89b9a24ca3091fee61f456a26edbd28d26c65906f4bc1dcd8f"
 dependencies = [
  "dirs-sys",
 ]
